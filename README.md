@@ -17,7 +17,6 @@ A small collection of browser mini-games. All code is AI-generated.
 | 🚀 Void Breaker | Action |
 | 🧮 Calc Chall | Puzzle |
 | 🛡️ Clash Kingdoms | Strategy |
-| 🦇 Bat in the Shadows | Arcade |
 | 🗡️ Arc Survivor | Roguelike |
 | 🌐 CyberHack Sim | Simulation |
 | 🤠 Russian Roulette | Party |
