@@ -1,6 +1,6 @@
 # 🎮 Purr
 
-**Live:** [anas68755.github.io/purr](https://anas68755.github.io/purr/)
+**Live:** [anas68755.github.io/purr](https://anas68755.github.io/Truda)
 
 A small collection of browser mini-games. All code is AI-generated.
 
