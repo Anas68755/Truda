@@ -169,7 +169,7 @@
     </div>
 
     <div class="chat-panel" id="chatPanel">
-        <div class="chat-header">💬 دردشة الغرفة</div>
+        <div class="chat-header" id="chatHeader">💬 دردشة الغرفة</div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input-area">
             <input type="text" id="chatInput" class="chat-input" placeholder="اكتب رسالة...">
@@ -178,7 +178,8 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js"></script>
+<!-- Using jsDelivr CDN for better global availability -->
+<script src="https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js"></script>
 <script>
     (function() {
         "use strict";
@@ -241,6 +242,7 @@
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const chatSendBtn = document.getElementById('chatSendBtn');
+        const chatHeader = document.getElementById('chatHeader');
 
         // Multiplayer State (Fresh session)
         let client = null;
@@ -297,16 +299,45 @@
             document.body.className = lang === 'ar' ? 'lang-ar' : 'lang-en';
             langAr.classList.toggle('active', lang === 'ar');
             langEn.classList.toggle('active', lang === 'en');
+            
             if (lang === 'ar') {
-                titleMain.textContent = '⚡ الحقيقة · الجرأة'; subBadge.textContent = '🔥 300+ سؤال · جماعي';
-                truthBtn.innerHTML = '🔮 الحقيقة'; dareBtn.innerHTML = '⚡ الجرأة'; randomBtn.innerHTML = '🎲 عشوائي';
-                resetBtn.textContent = '⟳ إعادة تعيين'; typeBadge.textContent = '✦ جاهز';
+                titleMain.textContent = '⚡ الحقيقة · الجرأة'; 
+                subBadge.textContent = '🔥 300+ سؤال · جماعي';
+                truthBtn.innerHTML = '🔮 الحقيقة'; 
+                dareBtn.innerHTML = '⚡ الجرأة'; 
+                randomBtn.innerHTML = '🎲 عشوائي';
+                resetBtn.textContent = '⟳ إعادة تعيين'; 
+                typeBadge.textContent = '✦ جاهز';
                 promptText.innerHTML = 'اختر <strong style="color:#f5c542;">الحقيقة</strong> أو <strong style="color:#ff8a9e;">الجرأة</strong>';
+                mpSolo.innerHTML = '👤 فردي';
+                mpMulti.innerHTML = '👥 جماعي';
+                connectBtn.textContent = 'اتصال';
+                leaveBtn.textContent = 'مغادرة';
+                chatHeader.textContent = '💬 دردشة الغرفة';
+                chatInput.placeholder = 'اكتب رسالة...';
+                chatSendBtn.textContent = 'إرسال';
+                nickInput.placeholder = 'اسمك المستعار';
+                roomInput.placeholder = 'رمز الغرفة';
+                mpInfo.innerHTML = 'أدخل اسمك ورمز غرفة (أو اترك الرمز فارغًا لإنشاء غرفة جديدة).';
             } else {
-                titleMain.textContent = '⚡ TRUTH · DARE'; subBadge.textContent = '🔥 300+ prompts · Multiplayer';
-                truthBtn.innerHTML = '🔮 Truth'; dareBtn.innerHTML = '⚡ Dare'; randomBtn.innerHTML = '🎲 Random';
-                resetBtn.textContent = '⟳ reset'; typeBadge.textContent = '✦ ready';
+                titleMain.textContent = '⚡ TRUTH · DARE'; 
+                subBadge.textContent = '🔥 300+ prompts · Multiplayer';
+                truthBtn.innerHTML = '🔮 Truth'; 
+                dareBtn.innerHTML = '⚡ Dare'; 
+                randomBtn.innerHTML = '🎲 Random';
+                resetBtn.textContent = '⟳ reset'; 
+                typeBadge.textContent = '✦ ready';
                 promptText.innerHTML = 'Tap <strong style="color:#f5c542;">Truth</strong> or <strong style="color:#ff8a9e;">Dare</strong>';
+                mpSolo.innerHTML = '👤 Solo';
+                mpMulti.innerHTML = '👥 Multiplayer';
+                connectBtn.textContent = 'Connect';
+                leaveBtn.textContent = 'Leave';
+                chatHeader.textContent = '💬 Room Chat';
+                chatInput.placeholder = 'Type a message...';
+                chatSendBtn.textContent = 'Send';
+                nickInput.placeholder = 'Your Nickname';
+                roomInput.placeholder = 'Room Code';
+                mpInfo.innerHTML = 'Enter your name and room code (or leave blank to create a new room).';
             }
             truthPool = [...(lang === 'ar' ? TRUTHS_AR : TRUTHS_EN)].sort(() => Math.random() - 0.5);
             darePool = [...(lang === 'ar' ? DARES_AR : DARES_EN)].sort(() => Math.random() - 0.5);
@@ -320,15 +351,14 @@
             mpSolo.classList.toggle('active', !enable);
             mpMulti.classList.toggle('active', enable);
             
-            // If switching to solo while connected, disconnect automatically
             if (!enable && client) {
-                leaveRoom(false); // false = don't keep multiplayer panel open
+                leaveRoom(false); 
             }
         }
 
         function connectMQTT() {
             if (typeof mqtt === 'undefined') {
-                mpInfo.innerHTML = "مكتبة الاتصال غير محملة. تأكد من الإنترنت. / MQTT library failed to load.";
+                mpInfo.innerHTML = currentLang === 'ar' ? "مكتبة الاتصال غير محملة. تأكد من الإنترنت." : "Connection library failed to load. Check internet.";
                 mpInfo.classList.add('err');
                 return;
             }
@@ -338,7 +368,7 @@
             if (!roomCode) roomCode = 'ROOM' + Math.floor(Math.random() * 9000 + 1000);
             
             nickInput.value = nickname; roomInput.value = roomCode;
-            mpInfo.innerHTML = `جاري الاتصال بالغرفة <b>${roomCode}</b>...`;
+            mpInfo.innerHTML = currentLang === 'ar' ? `جاري الاتصال بالغرفة <b>${roomCode}</b>...` : `Connecting to room <b>${roomCode}</b>...`;
             mpInfo.classList.remove('err');
             
             try {
@@ -347,17 +377,16 @@
                 });
 
                 client.on('connect', () => {
-                    mpInfo.innerHTML = `متصل بالغرفة <b>${roomCode}</b>! شارك الرمز. (Share: ${roomCode})`;
+                    mpInfo.innerHTML = currentLang === 'ar' ? `متصل بالغرفة <b>${roomCode}</b>! شارك الرمز. (Share: ${roomCode})` : `Connected to room <b>${roomCode}</b>! Share the code.`;
                     mpInfo.classList.remove('err');
                     client.subscribe(`td_room_${roomCode}/chat`);
                     client.subscribe(`td_room_${roomCode}/prompt`);
-                    chatMessages.innerHTML = ''; // Clear chat view on new connect
+                    chatMessages.innerHTML = ''; 
                     
                     const joinText = currentLang === 'ar' ? `${nickname} انضم للغرفة!` : `${nickname} joined the room!`;
                     addChatMessage('System', joinText, true);
                     client.publish(`td_room_${roomCode}/chat`, JSON.stringify({ user: 'System', text: nickname, action: 'join' }));
                     
-                    // Toggle buttons
                     connectBtn.style.display = 'none';
                     leaveBtn.style.display = 'inline-block';
                     nickInput.disabled = true;
@@ -383,15 +412,14 @@
                 });
 
                 client.on('error', (err) => {
-                    mpInfo.innerHTML = `خطأ في الاتصال. تأكد من الإنترنت. / Connection error.`;
+                    mpInfo.innerHTML = currentLang === 'ar' ? `خطأ في الاتصال. تأكد من الإنترنت.` : `Connection error. Check internet.`;
                     mpInfo.classList.add('err');
                 });
 
                 client.on('close', () => {
                     if (isMultiplayer && client && !client.connected) {
-                        mpInfo.innerHTML = "انقطع الاتصال. تحقق من الشبكة. / Disconnected.";
+                        mpInfo.innerHTML = currentLang === 'ar' ? "انقطع الاتصال. تحقق من الشبكة." : "Disconnected. Check network.";
                         mpInfo.classList.add('err');
-                        // Revert UI if disconnected unexpectedly
                         connectBtn.style.display = 'inline-block';
                         leaveBtn.style.display = 'none';
                         nickInput.disabled = false;
@@ -399,7 +427,7 @@
                     }
                 });
             } catch (e) {
-                mpInfo.innerHTML = "فشل تهيئة الاتصال. / Failed to init.";
+                mpInfo.innerHTML = currentLang === 'ar' ? "فشل تهيئة الاتصال." : "Failed to init connection.";
                 mpInfo.classList.add('err');
                 console.error(e);
             }
@@ -410,7 +438,6 @@
                 try { client.end(true); } catch(e){}
                 client = null;
             }
-            // Clear session data
             try {
                 sessionStorage.removeItem('td_room');
                 sessionStorage.removeItem('td_chat_history');
@@ -425,7 +452,7 @@
                 leaveBtn.style.display = 'none';
                 nickInput.disabled = false;
                 roomInput.disabled = false;
-                mpInfo.innerHTML = "غادرت الغرفة. أدخل رمزاً جديداً للاتصال.";
+                mpInfo.innerHTML = currentLang === 'ar' ? "غادرت الغرفة. أدخل رمزاً جديداً للاتصال." : "Left the room. Enter a new code to connect.";
                 mpInfo.classList.remove('err');
             }
         }
