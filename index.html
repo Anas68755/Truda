@@ -1,514 +1,487 @@
 <!DOCTYPE html>
+<!-- 10 Originals — Hub — original collection, 100% offline -->
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🔥 الحقيقة أو الجرأة · متعدد اللاعبين</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Tajawal', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(145deg, #0b0a1a 0%, #1a1035 100%);
-            display: flex; align-items: center; justify-content: center;
-            padding: 16px; color: #f0eefe; transition: all 0.3s ease; overflow-x: hidden;
-        }
-        body.lang-en { direction: ltr; }
-        body.lang-ar { direction: rtl; }
-        .game-container {
-            max-width: 680px; width: 100%;
-            background: rgba(20, 18, 48, 0.75);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border-radius: 48px; padding: 28px 24px 36px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 215, 0, 0.08); position: relative;
-        }
-        .title {
-            font-size: 2.4rem; font-weight: 800; letter-spacing: 2px; text-align: center;
-            background: linear-gradient(135deg, #f5c542, #ff8a5c);
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            text-shadow: 0 0 30px rgba(255, 200, 50, 0.15); margin-bottom: 4px; line-height: 1.1;
-        }
-        .sub {
-            text-align: center; font-size: 0.9rem; color: #a89ec9; margin-bottom: 24px;
-            border-bottom: 1px dashed rgba(255, 215, 0, 0.15); padding-bottom: 14px;
-            display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;
-        }
-        .sub span { background: rgba(255, 215, 0, 0.08); padding: 2px 12px; border-radius: 40px; font-weight: 600; color: #f5c542; }
-        .controls-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-        .lang-toggle, .mp-toggle {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 40px; padding: 4px 6px; display: inline-flex; gap: 4px; align-items: center;
-        }
-        .lang-btn, .mp-btn {
-            background: transparent; border: none; padding: 6px 14px; border-radius: 30px;
-            font-size: 0.8rem; font-weight: 600; color: #7a6f9a; cursor: pointer; transition: all 0.2s; font-family: inherit;
-        }
-        .lang-btn.active, .mp-btn.active { background: rgba(255, 215, 0, 0.15); color: #f5c542; }
-        .mp-setup {
-            background: rgba(10, 8, 28, 0.6); border-radius: 20px; padding: 16px; margin-bottom: 20px;
-            border: 1px solid rgba(100, 255, 130, 0.15); display: none; flex-direction: column; gap: 10px;
-        }
-        .mp-setup.active { display: flex; }
-        .mp-input-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .mp-input {
-            flex: 1; min-width: 120px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; padding: 10px 14px; color: #fff; font-size: 0.9rem; font-family: inherit;
-        }
-        .mp-input:focus { outline: none; border-color: #f5c542; }
-        .mp-input:disabled { opacity: 0.5; cursor: not-allowed; }
-        .mp-connect-btn {
-            background: linear-gradient(145deg, #2f2a6b, #1d184a); color: #c8beff;
-            border: 1px solid rgba(120, 100, 255, 0.25); padding: 10px 20px; border-radius: 12px;
-            font-weight: bold; cursor: pointer; font-family: inherit;
-        }
-        .mp-leave-btn {
-            background: linear-gradient(145deg, #6b2a4a, #4a1835); color: #ffc8d4;
-            border: 1px solid rgba(255, 100, 120, 0.25); padding: 10px 20px; border-radius: 12px;
-            font-weight: bold; cursor: pointer; font-family: inherit;
-        }
-        .mp-info { font-size: 0.8rem; color: #80ffa0; text-align: center; }
-        .mp-info b { color: #fff; }
-        .mp-info.err { color: #ff8080; }
-        .prompt-card {
-            background: rgba(10, 8, 28, 0.6); border-radius: 32px; padding: 32px 20px 28px; margin: 8px 0 22px;
-            min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 1px solid rgba(255, 215, 0, 0.06); transition: background 0.25s ease;
-        }
-        .prompt-type-badge {
-            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
-            padding: 4px 16px; border-radius: 40px; background: rgba(255, 215, 0, 0.12); color: #f5c542; margin-bottom: 16px;
-        }
-        .prompt-text {
-            font-size: 1.6rem; font-weight: 600; line-height: 1.5; text-align: center; color: #f2edff;
-            word-break: break-word; padding: 0 4px; min-height: 80px; display: flex; align-items: center; justify-content: center;
-        }
-        .prompt-number { margin-top: 14px; font-size: 0.75rem; color: #5d5380; }
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0 16px; }
-        .btn {
-            border: none; border-radius: 80px; padding: 16px 10px; font-weight: 700; font-size: 1.1rem; cursor: pointer;
-            transition: all 0.15s ease; background: rgba(30, 26, 60, 0.7); color: #d6cef0; border: 1px solid rgba(255, 255, 255, 0.04);
-            display: flex; align-items: center; justify-content: center; gap: 6px; user-select: none; font-family: inherit;
-        }
-        .btn:active { transform: scale(0.95); }
-        .btn-truth { background: linear-gradient(145deg, #2f2a6b, #1d184a); color: #c8beff; }
-        .btn-dare { background: linear-gradient(145deg, #6b2a4a, #4a1835); color: #ffc8d4; }
-        .btn-random { background: rgba(255, 215, 0, 0.08); border: 1px solid rgba(255, 215, 0, 0.15); color: #f5d98a; grid-column: 1 / -1; padding: 14px; }
-        .footer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; }
-        .counter { font-size: 0.85rem; color: #6e6492; }
-        .counter strong { color: #c4b8ec; }
-        .btn-small { background: transparent; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 40px; padding: 6px 14px; font-size: 0.75rem; color: #7a6f9a; cursor: pointer; font-family: inherit; }
-        .chat-panel {
-            margin-top: 24px; background: rgba(10, 8, 28, 0.6); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.06);
-            overflow: hidden; display: none; flex-direction: column; height: 35vh; max-height: 320px;
-        }
-        .chat-panel.active { display: flex; }
-        .chat-header { padding: 12px 20px; background: rgba(0,0,0,0.2); font-weight: 700; color: #c8beff; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .chat-messages { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .chat-msg { max-width: 80%; padding: 8px 12px; border-radius: 16px; font-size: 0.9rem; line-height: 1.3; word-break: break-word; }
-        .chat-msg.system { align-self: center; background: rgba(255,255,255,0.05); color: #7a6f9a; font-size: 0.8rem; border-radius: 10px; text-align: center; }
-        .chat-msg.me { align-self: flex-end; background: linear-gradient(145deg, #2f2a6b, #1d184a); color: #fff; border-bottom-right-radius: 4px; }
-        .chat-msg.other { align-self: flex-start; background: rgba(255,255,255,0.08); color: #f0eefe; border-bottom-left-radius: 4px; }
-        .chat-msg .nick { font-size: 0.75rem; font-weight: 700; color: #f5c542; margin-bottom: 2px; display: block; }
-        .chat-input-area { display: flex; padding: 10px; gap: 8px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.05); }
-        .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: none; border-radius: 20px; padding: 10px 16px; color: #fff; font-size: 0.9rem; font-family: inherit; }
-        .chat-input:focus { outline: none; background: rgba(255,255,255,0.1); }
-        .chat-send-btn { background: linear-gradient(145deg, #f5c542, #ff8a5c); border: none; border-radius: 20px; padding: 0 18px; color: #000; font-weight: 700; cursor: pointer; }
-        @media (max-width: 480px) {
-            .game-container { padding: 20px 16px 28px; border-radius: 32px; }
-            .title { font-size: 1.9rem; }
-            .prompt-text { font-size: 1.3rem; min-height: 70px; }
-            .btn { padding: 14px 8px; font-size: 0.95rem; }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>الأصيلة العشرة — 10 Originals</title>
+<style>
+/* ============================ DESIGN TOKENS ============================ */
+:root{
+  --bg:#0a0d14; --bg-2:#0f1420; --ink:#ece7db; --muted:#98a0b3; --faint:#6b7284;
+  --glass:rgba(255,255,255,.045); --glass-2:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.10); --line-2:rgba(255,255,255,.18);
+  --gold:#e8b45a; --gold-soft:rgba(232,180,90,.14);
+  --ok:#7fc98f;
+  --radius:18px; --radius-sm:12px;
+  --ease:cubic-bezier(.22,.9,.28,1);
+  --shadow:0 18px 50px -18px rgba(0,0,0,.75);
+  --font:"Segoe UI",Tahoma,system-ui,-apple-system,"Noto Sans","Noto Sans Arabic",sans-serif;
+}
+html[dir="ltr"] :root{--font:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html,body{min-height:100%}
+body{
+  font-family:var(--font); color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(1100px 700px at 78% -12%,#1a2136 0%,transparent 60%),
+                   radial-gradient(900px 600px at -10% 108%,#141b2b 0%,transparent 55%);
+  background-attachment:fixed;
+  overflow-x:hidden; line-height:1.6; font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(232,180,90,.35)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+
+/* ============================ BACKGROUND CANVAS ============================ */
+#bg{position:fixed;inset:0;z-index:0;opacity:.6;pointer-events:none}
+#vignette{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 42%,transparent 55%,rgba(0,0,0,.5) 100%)}
+
+/* ============================ LAYOUT ============================ */
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:26px 22px 70px}
+
+/* ============================ HEADER ============================ */
+header{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:8px}
+.brand{display:flex;align-items:center;gap:16px;min-width:0}
+.brand-mark{width:58px;height:58px;flex:none;border-radius:16px;display:grid;place-items:center;
+  background:linear-gradient(145deg,rgba(232,180,90,.22),rgba(232,180,90,.05));
+  border:1px solid rgba(232,180,90,.35);box-shadow:inset 0 0 24px rgba(232,180,90,.10)}
+.brand-mark svg{width:32px;height:32px;stroke:var(--gold)}
+.brand h1{font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:.3px;line-height:1.15}
+.brand h1 .en{display:block;font-size:.52em;font-weight:600;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+.head-actions{display:flex;align-items:center;gap:10px}
+.chip-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;
+  background:var(--glass);border:1px solid var(--line);font-size:14px;font-weight:600;color:var(--muted);
+  transition:all .25s var(--ease)}
+.chip-btn:hover{background:var(--glass-2);color:var(--ink);border-color:var(--line-2);transform:translateY(-1px)}
+.chip-btn:active{transform:translateY(0) scale(.97)}
+.chip-btn .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.subtitle{color:var(--muted);max-width:640px;margin:6px 0 26px;font-size:15.5px}
+
+/* ============================ CONTROLS ROW ============================ */
+.controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:26px}
+.tabs{display:inline-flex;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:4px;gap:2px}
+.tab{padding:8px 18px;border-radius:999px;font-size:14px;font-weight:700;color:var(--muted);transition:all .22s var(--ease);white-space:nowrap}
+.tab .n{font-size:12px;opacity:.75;margin-inline-start:6px}
+.tab:hover{color:var(--ink)}
+.tab[aria-pressed="true"]{background:var(--gold);color:#221708;box-shadow:0 4px 18px -6px rgba(232,180,90,.55)}
+.search{position:relative;flex:1;min-width:230px;max-width:430px}
+.search input{width:100%;padding:12px 44px 12px 16px;border-radius:999px;border:1px solid var(--line);
+  background:var(--glass);color:var(--ink);font-size:15px;font-family:inherit;transition:border .25s,background .25s}
+html[dir="rtl"] .search input{padding:12px 16px 12px 44px}
+.search input::placeholder{color:var(--faint)}
+.search input:focus{outline:none;border-color:rgba(232,180,90,.55);background:var(--glass-2)}
+.search .mag{position:absolute;inset-inline-end:16px;top:50%;transform:translateY(-50%);color:var(--faint);pointer-events:none;font-size:15px}
+.search kbd{position:absolute;inset-inline-start:14px;top:50%;transform:translateY(-50%);font-family:inherit;font-size:11.5px;color:var(--faint);
+  border:1px solid var(--line);border-radius:6px;padding:2px 7px;background:rgba(0,0,0,.25)}
+html[dir="rtl"] .search kbd{inset-inline-start:auto;inset-inline-end:40px}
+
+/* ============================ GRID + CARDS ============================ */
+.section-label{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;font-weight:700;
+  letter-spacing:2.5px;text-transform:uppercase;margin:34px 2px 14px}
+.section-label::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,var(--line),transparent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(305px,1fr));gap:18px}
+.card{position:relative;display:flex;flex-direction:column;gap:12px;padding:22px 20px 18px;border-radius:var(--radius);
+  background:linear-gradient(160deg,var(--glass-2),var(--glass) 55%);
+  border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:var(--shadow);cursor:pointer;overflow:hidden;
+  transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease)}
+.card::before{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--ac),transparent 85%);opacity:.85}
+.card::after{content:"";position:absolute;inset:0;background:radial-gradient(340px 190px at 80% -10%,color-mix(in srgb,var(--ac) 16%,transparent),transparent 70%);
+  opacity:0;transition:opacity .35s var(--ease);pointer-events:none}
+.card:hover,.card:focus-visible{transform:translateY(-5px);border-color:color-mix(in srgb,var(--ac) 45%,var(--line));box-shadow:0 26px 60px -20px rgba(0,0,0,.85)}
+.card:hover::after,.card:focus-visible::after{opacity:1}
+.card:active{transform:translateY(-2px) scale(.99)}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.icon-box{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;flex:none;
+  background:color-mix(in srgb,var(--ac) 13%,transparent);border:1px solid color-mix(in srgb,var(--ac) 30%,transparent);
+  transition:transform .35s var(--ease)}
+.card:hover .icon-box{transform:rotate(-6deg) scale(1.07)}
+.icon-box svg{width:28px;height:28px;stroke:var(--ac);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.badge{font-size:11.5px;font-weight:800;letter-spacing:1.2px;padding:5px 12px;border-radius:999px;white-space:nowrap;
+  color:var(--ac);background:color-mix(in srgb,var(--ac) 12%,transparent);border:1px solid color-mix(in srgb,var(--ac) 28%,transparent)}
+.card h3{font-size:19.5px;font-weight:800;line-height:1.3}
+.card h3 .en-name{display:block;font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:1.6px;margin-top:3px;text-transform:uppercase}
+.card .tag{color:var(--muted);font-size:14px;min-height:44px}
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px dashed var(--line)}
+.launch{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:var(--ac);transition:gap .25s var(--ease)}
+.card:hover .launch{gap:13px}
+.launch .arr{transition:transform .25s var(--ease)}
+html[dir="rtl"] .launch .arr{display:inline-block;transform:scaleX(-1)}
+.meta{font-size:12px;color:var(--faint)}
+.empty{padding:60px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--radius);display:none}
+
+/* ============================ MODAL ============================ */
+.overlay{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:20px;
+  background:rgba(5,7,12,.72);backdrop-filter:blur(6px)}
+.overlay.open{display:grid}
+.modal{width:min(560px,100%);max-height:82vh;overflow:auto;border-radius:20px;padding:28px;
+  background:linear-gradient(165deg,#151b2a,#0e1320);border:1px solid var(--line-2);box-shadow:var(--shadow);
+  animation:pop .28s var(--ease)}
+@keyframes pop{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+.modal h2{font-size:21px;margin-bottom:12px;color:var(--gold)}
+.modal p{color:var(--muted);font-size:14.5px;margin-bottom:10px}
+.modal ul{margin:10px 22px;color:var(--muted);font-size:14px}
+.modal li{margin-bottom:6px}
+.modal .close-x{position:sticky;top:0;float:inline-end;width:34px;height:34px;border-radius:10px;background:var(--glass);
+  border:1px solid var(--line);font-size:16px;color:var(--muted)}
+.modal .close-x:hover{color:var(--ink);background:var(--glass-2)}
+
+/* ============================ FOOTER ============================ */
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;color:var(--faint);font-size:13px}
+footer .shield{display:inline-flex;align-items:center;gap:8px}
+footer .shield svg{width:15px;height:15px;stroke:var(--ok)}
+
+/* ============================ RESPONSIVE + MOTION ============================ */
+@media (max-width:640px){
+  .wrap{padding:18px 14px 50px}
+  .grid{grid-template-columns:1fr}
+  .card .tag{min-height:0}
+  header{gap:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+}
+body.reduced *{transition-duration:.01ms !important;animation-duration:.01ms !important}
+</style>
 </head>
 <body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div id="vignette" aria-hidden="true"></div>
 
-<div class="game-container" role="main">
-    <h1 class="title" id="titleMain">⚡ الحقيقة · الجرأة</h1>
-    <div class="sub">
-        <span id="subBadge">🔥 300+ سؤال · جماعي</span>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2.5 20.2 7v10L12 21.5 3.8 17V7L12 2.5z"/>
+          <path d="M8 12.2l2.7 2.7L16.2 9.5"/>
+        </svg>
+      </div>
+      <h1><span data-i18n="title">الأصيلة العشرة</span><span class="en">10 Originals</span></h1>
     </div>
+    <div class="head-actions">
+      <button class="chip-btn" id="aboutBtn" aria-label="About this collection"><span aria-hidden="true">ⓘ</span><span data-i18n="about">عن المجموعة</span></button>
+      <button class="chip-btn" id="langBtn" aria-label="Switch language"><span aria-hidden="true">🌐</span><span id="langLabel">English</span></button>
+    </div>
+  </header>
 
-    <div class="controls-row">
-        <div class="lang-toggle">
-            <button type="button" class="lang-btn active" id="langAr">🇸🇦 عربي</button>
-            <button type="button" class="lang-btn" id="langEn">🇬🇧 English</button>
-        </div>
-        <div class="mp-toggle">
-            <button type="button" class="mp-btn active" id="mpSolo">👤 فردي</button>
-            <button type="button" class="mp-btn" id="mpMulti">👥 جماعي</button>
-        </div>
-    </div>
+  <p class="subtitle" data-i18n="subtitle">خمس ألعاب وخمس أدوات — كل واحدة فكرة جديدة وُلدت من الصفر، وتعمل داخل ملف HTML واحد، دون اتصال ودون أي مكتبات.</p>
 
-    <div class="mp-setup" id="mpSetup">
-        <div class="mp-input-group">
-            <input type="text" id="nickInput" class="mp-input" placeholder="اسمك المستعار" maxlength="12">
-            <input type="text" id="roomInput" class="mp-input" placeholder="رمز الغرفة" maxlength="12">
-            <button type="button" class="mp-connect-btn" id="connectBtn">اتصال</button>
-            <button type="button" class="mp-leave-btn" id="leaveBtn" style="display:none;">مغادرة</button>
-        </div>
-        <div class="mp-info" id="mpInfo">أدخل اسمك ورمز غرفة (أو اترك الرمز فارغًا لإنشاء غرفة جديدة).</div>
+  <div class="controls">
+    <div class="tabs" role="tablist" aria-label="Category">
+      <button class="tab" id="tabAll" aria-pressed="true"><span data-i18n="tabAll">الكل</span><span class="n" id="nAll">10</span></button>
+      <button class="tab" id="tabGames" aria-pressed="false"><span data-i18n="tabGames">الألعاب</span><span class="n" id="nGames">5</span></button>
+      <button class="tab" id="tabApps" aria-pressed="false"><span data-i18n="tabApps">الأدوات</span><span class="n" id="nApps">5</span></button>
     </div>
+    <div class="search">
+      <input id="q" type="search" autocomplete="off" spellcheck="false"
+             placeholder="ابحث في المجموعة… اضغط /"
+             aria-label="Search the collection">
+      <kbd aria-hidden="true">/</kbd>
+      <span class="mag" aria-hidden="true">⌕</span>
+    </div>
+  </div>
 
-    <div class="prompt-card" id="promptCard">
-        <div class="prompt-type-badge" id="typeBadge">✦ جاهز</div>
-        <div class="prompt-text" id="promptText">اختر <strong style="color:#f5c542;">الحقيقة</strong> أو <strong style="color:#ff8a9e;">الجرأة</strong></div>
-        <div class="prompt-number" id="promptNumber"># —</div>
-    </div>
+  <div id="gamesWrap">
+    <div class="section-label" data-i18n="secGames">الألعاب — تجارب قابلة للعب</div>
+    <div class="grid" id="gridGames"></div>
+  </div>
+  <div id="appsWrap">
+    <div class="section-label" data-i18n="secApps">الأدوات — أدوات تُنتج شيئًا ملموسًا</div>
+    <div class="grid" id="gridApps"></div>
+  </div>
+  <div class="empty" id="empty" data-i18n="empty">لا نتائج مطابقة — جرّب كلمة أخرى.</div>
 
-    <div class="action-grid">
-        <button type="button" class="btn btn-truth" id="truthBtn">🔮 الحقيقة</button>
-        <button type="button" class="btn btn-dare" id="dareBtn">⚡ الجرأة</button>
-        <button type="button" class="btn btn-random" id="randomBtn">🎲 عشوائي</button>
-    </div>
-
-    <div class="footer-actions">
-        <span class="counter" id="counterDisplay"><strong>0</strong> مستخدم · 0ح 0ج</span>
-        <button type="button" class="btn-small" id="resetBtn">⟳ إعادة تعيين</button>
-    </div>
-
-    <div class="chat-panel" id="chatPanel">
-        <div class="chat-header" id="chatHeader">💬 دردشة الغرفة</div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input-area">
-            <input type="text" id="chatInput" class="chat-input" placeholder="اكتب رسالة...">
-            <button type="button" class="chat-send-btn" id="chatSendBtn">إرسال</button>
-        </div>
-    </div>
+  <footer>
+    <span class="shield">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 2.5 20 6v6c0 5-3.4 8.2-8 9.5C7.4 20.2 4 17 4 12V6l8-3.5z"/>
+      </svg>
+      <span data-i18n="footMain">مجموعة أصلية بالكامل: بلا شبكة، بلا APIs، بلا مكتبات — كل شيء يعمل دون اتصال.</span>
+    </span>
+    <span data-i18n="footHint">اختصارات: / للبحث · Enter لتشغيل أول نتيجة · Esc للإلغاء</span>
+  </footer>
 </div>
 
-<!-- Using jsDelivr CDN for better global availability -->
-<script src="https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js"></script>
+<!-- About modal -->
+<div class="overlay" id="aboutOverlay" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="modal">
+    <button class="close-x" id="aboutClose" aria-label="Close">✕</button>
+    <h2 id="aboutTitle" data-i18n="aboutTitle">عن «الأصيلة العشرة»</h2>
+    <p data-i18n="aboutP1">عشر تجارب متصفح أصيلة — خمس ألعاب وخمس أدوات — كل واحدة وُلدت من عصف ذهني مقصود بعيدًا عن الاستنساخ: لا ثعبان، لا تتريس، لا مذكرات، لا مؤقتات. كل تجربة ملف HTML واحد مستقل يعمل بمفرده، ويحفظ تقدمك محليًا على جهازك.</p>
+    <p data-i18n="aboutP2">كل شيء داخل الملفات: الرسومات مرسومة بالكانفس و SVG، والأصوات مُولَّدة بـ Web Audio، والواجهة بالعربية والإنجليزية. لا طلبات شبكة إطلاقًا — افتح Network في أدوات المطور وتحقق بنفسك.</p>
+    <ul>
+      <li data-i18n="aboutL1">اضغط / للانتقال إلى البحث فورًا، و Enter لتشغيل أول نتيجة.</li>
+      <li data-i18n="aboutL2">كل تجربة فيها: شرح أولي، إعدادات، لوحة «عن التجربة»، وحفظ تلقائي.</li>
+      <li data-i18n="aboutL3">إن حُجب التخزين المحلي، ستعمل التجارب بلا حفظ بلطف دون أعطال.</li>
+    </ul>
+  </div>
+</div>
+
 <script>
-    (function() {
-        "use strict";
-        console.log("Script Start");
+"use strict";
+/* ============================ I18N ============================ */
+const I18N = {
+  ar: {
+    title: "الأصيلة العشرة",
+    subtitle: "خمس ألعاب وخمس أدوات — كل واحدة فكرة جديدة وُلدت من الصفر، وتعمل داخل ملف HTML واحد، دون اتصال ودون أي مكتبات.",
+    about: "عن المجموعة", aboutTitle: "عن «الأصيلة العشرة»",
+    aboutP1: "عشر تجارب متصفح أصيلة — خمس ألعاب وخمس أدوات — كل واحدة وُلدت من عصف ذهني مقصود بعيدًا عن الاستنساخ: لا ثعبان، لا تتريس، لا مذكرات، لا مؤقتات. كل تجربة ملف HTML واحد مستقل يعمل بمفرده، ويحفظ تقدمك محليًا على جهازك.",
+    aboutP2: "كل شيء داخل الملفات: الرسومات مرسومة بالكانفس و SVG، والأصوات مُولَّدة بـ Web Audio، والواجهة بالعربية والإنجليزية. لا طلبات شبكة إطلاقًا — افتح Network في أدوات المطور وتحقق بنفسك.",
+    aboutL1: "اضغط / للانتقال إلى البحث فورًا، و Enter لتشغيل أول نتيجة.",
+    aboutL2: "كل تجربة فيها: شرح أولي، إعدادات، لوحة «عن التجربة»، وحفظ تلقائي.",
+    aboutL3: "إن حُجب التخزين المحلي، ستعمل التجارب بلا حفظ بلطف دون أعطال.",
+    tabAll: "الكل", tabGames: "الألعاب", tabApps: "الأدوات",
+    secGames: "الألعاب — تجارب قابلة للعب",
+    secApps: "الأدوات — أدوات تُنتج شيئًا ملموسًا",
+    empty: "لا نتائج مطابقة — جرّب كلمة أخرى.",
+    footMain: "مجموعة أصلية بالكامل: بلا شبكة، بلا APIs، بلا مكتبات — كل شيء يعمل دون اتصال.",
+    footHint: "اختصارات: / للبحث · Enter لتشغيل أول نتيجة · Esc للإلغاء",
+    launch: "انطلق", lines: "سطرًا", badgeGame: "لعبة", badgeApp: "أداة",
+    searchPh: "ابحث في المجموعة… اضغط /"
+  },
+  en: {
+    title: "The Ten Originals",
+    subtitle: "Five games and five tools — each a genuinely novel concept built from scratch inside a single HTML file, fully offline, no libraries.",
+    about: "About", aboutTitle: "About “10 Originals”",
+    aboutP1: "Ten original browser experiences — five games and five apps — each born from deliberate brainstorming, not cloning: no snake, no tetris, no notes app, no timers. Every experience is one standalone HTML file that runs on its own and saves your progress locally.",
+    aboutP2: "Everything lives inside the files: art is canvas/SVG, sound is Web Audio synthesis, interface is Arabic + English. Zero network requests — open DevTools Network and verify.",
+    aboutL1: "Press / to jump into search, Enter to launch the first result.",
+    aboutL2: "Every experience ships: onboarding, settings, an About panel, and autosave.",
+    aboutL3: "If localStorage is blocked, everything degrades gracefully to no-save mode.",
+    tabAll: "All", tabGames: "Games", tabApps: "Apps",
+    secGames: "Games — playable experiences",
+    secApps: "Apps — tools that produce something tangible",
+    empty: "No matches — try another word.",
+    footMain: "A fully original collection: no network, no APIs, no libraries — everything runs offline.",
+    footHint: "Shortcuts: / to search · Enter to launch first result · Esc to cancel",
+    launch: "Launch", lines: "lines", badgeGame: "Game", badgeApp: "Tool",
+    searchPh: "Search the collection… press /"
+  }
+};
 
-        // Clear any previous room/chat data on reload to prevent auto-joining
-        try {
-            sessionStorage.removeItem('td_room');
-            sessionStorage.removeItem('td_chat_history');
-        } catch (e) {}
+/* ============================ SAFE STORAGE ============================ */
+const store = {
+  mem: {}, ok: false,
+  init(){ try{ localStorage.setItem("_t1","1"); localStorage.removeItem("_t1"); this.ok = true; }catch(e){ this.ok = false; } },
+  get(k,d){ try{ if(this.ok){ const v = localStorage.getItem(k); if(v != null) return JSON.parse(v); } }catch(e){}
+    return (k in this.mem) ? this.mem[k] : d; },
+  set(k,v){ try{ if(this.ok){ localStorage.setItem(k, JSON.stringify(v)); return; } }catch(e){} this.mem[k] = v; }
+};
+store.init();
 
-        const TRUTHS_EN = [
-            "What's the most embarrassing thing you've ever done in public?","Have you ever lied to your best friend? What about?","What's the worst date you've ever been on?","What's a secret you've never told anyone?","Who in this room would you trust with your life?","What's the most illegal thing you've ever done?","Have you ever cheated on a test? How?","What's the biggest lie you've ever told?","What's the meanest thing you've ever said to someone?","Have you ever ghosted someone? Why?","What's your biggest fear in a relationship?","What's the most money you've ever found and kept?","Have you ever stolen anything? What?","What's a weird habit you have that nobody knows about?","What's the most awkward kiss you've ever had?","Have you ever fake-laughed at a joke?","What's the longest you've gone without showering?","What's the most childish thing you still do?","Have you ever creeped on someone's social media?","What's the worst advice you've ever given?","Have you ever pretended to like a gift?","What's something you're secretly proud of?","What's the most trouble you've ever been in at school/work?","Have you ever had a crush on a friend's partner?","What's the most boring thing about you?","Have you ever lied about your age?","What's the most embarrassing purchase you've made?","Have you ever eavesdropped on a conversation?","What's a fear you have that seems irrational?","What's the worst song you secretly love?","Have you ever regretted breaking up with someone?","What's the most useless talent you have?","Have you ever cried during a movie? Which one?","What's the most awkward thing you've said to a crush?","Have you ever made a fake social media account?","What's the biggest risk you've ever taken?","Have you ever hurt someone and not apologized?","What's a weird food combination you enjoy?","Have you ever stalked someone online?","What's the most expensive thing you've broken?","Have you ever cheated in a game?","What's the worst thing you've ever done for money?","Have you ever been jealous of a friend?","What's the most inappropriate thing you've laughed at?","Have you ever lied to get out of plans?","What's the worst haircut you've ever had?","Have you ever kissed someone and regretted it?","What's the most embarrassing nickname you've had?","Have you ever sent a text to the wrong person?","What's the most awkward family moment you've experienced?","Have you ever pretended to understand something you didn't?","What's the worst thing you've ever done while drunk?","Have you ever lied to a teacher or boss?","What's a guilty pleasure you have?","Have you ever been caught doing something you shouldn't?","What's the most embarrassing thing your parents have seen you do?","Have you ever had a dream that came true?","What's the worst thing you've ever eaten?","Have you ever lied about being sick?","What's the most impulsive thing you've ever done?","What's the worst thing you've ever done to a sibling?","Have you ever had a crush on a teacher?","What's the most embarrassing ringtone you've had?","Have you ever broken something and blamed someone else?","What's the worst thing you've ever said to a partner?","Have you ever shoplifted anything small?","What's the most childish thing you still get upset about?","Have you ever intentionally hurt someone's feelings?","What's the most embarrassing thing your pet has seen you do?","Have you ever been in a physical fight? What happened?","What's the weirdest thing you've ever collected?","Have you ever lied to get a job or promotion?","What's the worst thing you've ever done when angry?","Have you ever broken a promise? Which one?","What's the most embarrassing memory from high school?","Have you ever had a crush on a friend's ex?","What's the worst fashion choice you've ever made?","Have you ever cheated in a relationship?","What's the most scared you've ever been?","Have you ever pretended to know someone you didn't?","What's the worst thing you've ever done to a friend?","Have you ever lied to avoid a conflict?","What's the most embarrassing thing you've done for attention?","Have you ever gotten revenge on someone?","What's the worst thing you've ever smelled?","Have you ever had a nightmare that felt real?","What's the most boring movie you've ever watched fully?","Have you ever lied about your location?","What's the worst thing you've ever done at a party?","Have you ever been caught in a lie? What was it?","What's the most embarrassing thing you've ever worn?","Have you ever had a fake online identity?","What's the worst thing you've ever laughed at?","Have you ever ghosted someone you cared about?","What's the most embarrassing thing you've said to a waiter?","Have you ever lied to get out of a date?","What's the worst gift you've ever given?","Have you ever been jealous of a sibling?","What's the most embarrassing thing you've ever put online?","Have you ever pretended to be someone else?","What's the worst thing you've ever done to a parent?","Have you ever had a secret relationship?","What's the most embarrassing thing you've ever done on vacation?","Have you ever lied to impress someone?","What's the worst thing you've ever overheard?","Have you ever had a crush on a fictional character?","What's the most embarrassing thing you've ever bought?","Have you ever forgotten someone's name mid-conversation?","What's the worst thing you've ever done while driving?","Have you ever blamed a pet for something you did?","Have you ever faked a smile so well that even you believed it?","What is the most embarrassing thing you have done in front of a complete stranger?","Have you ever secretly hoped your friend would fail at something?","What is the worst lie you have ever told your parents?","Have you ever stalked someone online for more than three hours straight?","What is the most disgusting thing you have ever eaten and pretended to like?","Have you ever cheated in a board game and felt zero guilt?","What is the most selfish thing you have ever done in a relationship?","Have you ever ignored a message on purpose for days? Why?","What is the most cringey thing you have ever posted on social media?","Have you ever laughed at something tragic because you did not know how to react?","What is the worst financial decision you have ever made?","Have you ever lied about your age to get into somewhere or with someone?","What is the most awkward thing you have ever said to a waiter or cashier?","Have you ever broken something expensive and blamed it on someone else?","What is the most childish argument you have ever had as an adult?","Have you ever pretended to like a gift and then re-gifted it?","What is the worst thing you have ever done to get attention?","Have you ever eavesdropped on a conversation and got caught?","What is the most humiliating thing you have ever done while drunk?","Have you ever lied to your boss about being sick when you were perfectly fine?","What is the most bizarre food combination you secretly enjoy?","Have you ever had a crush on your best friend's ex?","What is the most illegal thing you have done and got away with?","Have you ever cried over a commercial or a stupid video?","What is the most awkward hug you have ever given or received?","Have you ever pretended to be busy to avoid talking to someone you know?","What is the worst advice you have ever followed?","Have you ever copied someone's homework or work and changed it slightly?","What is the most embarrassing ringtone you have ever had?","Have you ever accidentally sent a message to the wrong person? What did it say?","What is the most pathetic thing you have done for love or attention?","Have you ever lied about your location to avoid meeting someone?","What is the most overrated thing you pretended to love?","Have you ever been caught picking your nose in public?","What is the most regretful thing you have ever said to a partner?","Have you ever taken credit for someone else's idea at work or school?","What is the grossest habit you have that no one knows about?","Have you ever wished you were friends with a different group?","What is the most dangerous thing you have ever done for fun?","Have you ever lied about your salary or income to impress someone?","What is the most embarrassing thing your parents have seen you do?","Have you ever broken a promise and felt completely fine about it?","What is the worst outfit you have ever worn in public?","Have you ever stalked your ex online after a breakup?","What is the most cowardly thing you have ever done?","Have you ever lied to get out of a date or a plan?","What is the most annoying habit you have that you refuse to change?","Have you ever faked an orgasm? Be honest.","What is the most immature thing you still do at your age?","Have you ever blamed your pet for something you did?","What is the most painful thing you have ever laughed at?","Have you ever pretended to know someone you did not recognize?","What is the most useless talent you have that you are secretly proud of?","Have you ever cheated on a test and felt no remorse?","What is the most awkward family dinner moment you have experienced?","Have you ever hated someone for no logical reason?","What is the worst thing you have ever smelled and almost threw up from?","Have you ever hidden something from your partner for more than a year?","What is the most embarrassing thing you have ever bought at a store?","Have you ever gossiped about someone and then acted nice to their face?","What is the most reckless thing you have ever done with money?","Have you ever lied about your virginity or sexual history?","What is the most boring movie you have watched all the way through?","Have you ever pretended to be asleep to avoid a conversation?","What is the most awkward thing you have ever done on a first date?","Have you ever been jealous of a sibling or cousin?","What is the most pathetic excuse you have ever given?","Have you ever thrown something away and then secretly retrieved it?","What is the most humiliating thing you have ever done in school?","Have you ever fancied a teacher or a boss?","What is the worst thing you have ever done while driving?","Have you ever created a fake social media account to spy on someone?","What is the most embarrassing thing you have ever worn to a party?","Have you ever lied about your hobbies to seem more interesting?","What is the most violent thought you have ever had about someone?","Have you ever stolen something small and felt proud of it?","What is the most awkward silence you have ever experienced?","Have you ever pretended not to hear someone calling your name?","What is the worst gift you have ever given to someone?","Have you ever cried in a public place for a stupid reason?","What is the most ridiculous thing you have ever been afraid of?","Have you ever lied to a doctor about your symptoms?","What is the most embarrassing thing you have ever done in a hotel room?","Have you ever been caught dancing alone in your room?","What is the most hurtful thing you have ever said to your mother or father?","Have you ever faked being sick to skip an event?","What is the most reckless thing you have ever done on vacation?","Have you ever wished you were someone else for an entire day?","What is the most cringey old photo of you that still exists?","Have you ever lied about reading a book to impress someone?","What is the worst thing you have ever done to a roommate?","Have you ever secretly recorded someone without their knowledge?","What is the most awkward thing you have ever said to a crush?","Have you ever thrown a tantrum as an adult?","What is the most disgusting thing you have ever found in your food?","Have you ever lied about your weight or height?","What is the most embarrassing thing you have ever done in a gym?","Have you ever pretended to understand a joke you did not get?","What is the worst thing you have ever done out of pure boredom?","Have you ever stolen a moment of someone else's happiness on purpose?","What is the most awkward thing you have ever done in an elevator?","Have you ever blocked someone and then unblocked them to check on them?","What is the most shameful purchase you have ever made online?","Have you ever lied to your best friend about something huge?","What is the most fragile part of your ego that no one knows about?","Have you ever sabotaged someone's chance without them knowing?","What is the most disgusting noise you have ever made in public?","Have you ever wished you had a completely different name?","What is the worst thing you have ever done to get revenge?"
-        ];
+/* ============================ ITEM DATA ============================ */
+const ICONS = {
+  khayal: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 9h24v16H4z"/><path d="M16 9V5m-4 4 4-4 4 4"/><circle cx="16" cy="17" r="3.4"/><path d="M16 13.6v-1.2M16 21.6v-1.2M12.6 17h-1.2M20.6 17h-1.2"/></svg>',
+  hive:   '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4l7 4v8l-7 4-7-4V8l7-4z"/><path d="M9 20l7 4 7-4"/><path d="M13 12c1-1.6 5-1.6 6 0M13 16c1-1.6 5-1.6 6 0"/><path d="M16 26.5c1.4 0 2.4-.9 2.4-2"/></svg>',
+  abq:    '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4c4.4 5 7 8.6 7 12a7 7 0 1 1-14 0c0-3.4 2.6-7 7-12z"/><circle cx="16" cy="17" r="2.2"/><path d="M8 26.5c2.4 1.6 5.3 2.4 8 2.4s5.6-.8 8-2.4"/></svg>',
+  winds:  '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 24c4-6 8-8 13-8s9 2 13 8"/><path d="M6 27c3-3.6 6.4-5.4 10-5.4s7 1.8 10 5.4"/><path d="M4 8c3-2 5-2 8 0s5 2 8 0M4 13c3-2 5-2 8 0s5 2 8 0"/></svg>',
+  net:    '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v22H5z"/><path d="M5 12h22M5 19h22M12 5v22M19 5v22"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="19" r="1.6"/><circle cx="19" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>',
+  mizwala:'<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11"/><path d="M16 5v3M16 24v3M5 16h3M24 16h3M8.2 8.2l2.1 2.1M21.7 21.7l2.1 2.1M23.8 8.2l-2.1 2.1M10.3 21.7l-2.1 2.1"/><path d="M16 16 21 9"/><circle cx="16" cy="16" r="1.4"/></svg>',
+  bells:  '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 6h24"/><path d="M9 6v3M16 6v2M23 6v4"/><rect x="7" y="9" width="4" height="12" rx="2"/><rect x="14" y="8" width="4" height="8" rx="2"/><rect x="21" y="10" width="4" height="15" rx="2"/><path d="M8 24.5c1 1 2 1.4 3 1.4M15 19c1 1 2 1.4 3 1.4"/></svg>',
+  seal:   '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="14" r="9"/><path d="M12 10h8M12 14h8M12 18h5"/><path d="M10 26h12M13 23.5h6"/></svg>',
+  darb:   '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26c6-1 10-3 14-7l6-9-3-3-9 6c-4 4-6 8-7 14z"/><path d="M6 26c2.4-.4 4.2-1 6-2"/><path d="M20 6l6 6"/></svg>',
+  shamsa: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="3.4"/><circle cx="16" cy="16" r="9"/><path d="M16 7c1.8 2.6 1.8 4.4 0 6M16 25c-1.8-2.6-1.8-4.4 0-6M7 16c2.6-1.8 4.4-1.8 6 0M25 16c-2.6 1.8-4.4 1.8-6 0M9.8 9.8c3 .8 4.1 2.1 4.1 4.1M22.2 22.2c-3-.8-4.1-2.1-4.1-4.1M22.2 9.8c-.8 3-2.1 4.1-4.1 4.1M9.8 22.2c.8-3 2.1-4.1 4.1-4.1"/></svg>'
+};
+const ITEMS = [
+  { file:"games/khayal.html", cat:"games", ac:"#f0a35e", icon:"khayal", lines:"~2000",
+    ar:{ name:"خيال الظل", en:"Khayal: Shadow Play", tag:"كوِّن الظلال بضوء المصباح ثم اسرد الحكاية حيًّا أمام جمهورك." },
+    en:{ name:"Khayal", en:"Shadow Play", tag:"Compose hand-shadow silhouettes behind the lamp, then perform the tale live." } },
+  { file:"games/hive-maestro.html", cat:"games", ac:"#ffc93c", icon:"hive", lines:"~2000",
+    ar:{ name:"مايسترو الخلية", en:"Hive Maestro", tag:"ارقص رقصة النحل على الإيقاع لتوجيه السرب إلى الرحيق." },
+    en:{ name:"Hive Maestro", en:"Waggle Conductor", tag:"Dance the waggle on the beat to send the swarm to nectar." } },
+  { file:"games/abq.html", cat:"games", ac:"#d98cb3", icon:"abq", lines:"~2000",
+    ar:{ name:"عَبق", en:"ʿAbq: Scent Ledger", tag:"اطلب ذاكرة زبونك وامزج عطرها قبل أن يتبخر الدليل." },
+    en:{ name:"ʿAbq", en:"The Scent Ledger", tag:"Decode a client's memory and blend its perfume before the evidence evaporates." } },
+  { file:"games/three-winds.html", cat:"games", ac:"#e0b083", icon:"winds", lines:"~2000",
+    ar:{ name:"الرياح الثلاث", en:"The Three Winds", tag:"انحت الكثبان بالرياح لتجوّز القافلة عبر الصحراء حيّة." },
+    en:{ name:"The Three Winds", en:"Dune Sculpting", tag:"Sculpt dunes with the wind itself to carry your caravan through." } },
+  { file:"games/netwright.html", cat:"games", ac:"#4fb3a9", icon:"net", lines:"~2000",
+    ar:{ name:"ناسج الشباك", en:"Netwright", tag:"اعقد شبكتك على المقاس ثم ارمها على أسراب الأسماك." },
+    en:{ name:"Netwright", en:"Knot & Cast", tag:"Knot your net to the blueprint's spec, then cast it among the shoals." } },
+  { file:"apps/mizwala.html", cat:"apps", ac:"#d4a94e", icon:"mizwala", lines:"~2000",
+    ar:{ name:"مِزْوَلة", en:"Mizwala: Sundial Studio", tag:"صمّم ساعة شمس حقيقية لأي خط عرض واطبع قالبها." },
+    en:{ name:"Mizwala", en:"Sundial Studio", tag:"Design a real sundial for any latitude and print its template." } },
+  { file:"apps/windbells.html", cat:"apps", ac:"#e8d28a", icon:"bells", lines:"~2000",
+    ar:{ name:"أجراس الريح", en:"Windbells Studio", tag:"اضبط أجراسًا بفيزياء حقيقية ودع النسيم يعزف عليها." },
+    en:{ name:"Windbells", en:"Chime Composer", tag:"Tune wind bells with real physics and let the breeze perform them." } },
+  { file:"apps/mirrorseal.html", cat:"apps", ac:"#c9584f", icon:"seal", lines:"~2000",
+    ar:{ name:"الخَتم المعكوس", en:"Mirrorseal", tag:"انقش ختمًا معكوسًا ليصح قراءته في الشمع." },
+    en:{ name:"Mirrorseal", en:"Signet Studio", tag:"Engrave mirrored art that reads true when pressed into wax." } },
+  { file:"apps/darb-al-harf.html", cat:"apps", ac:"#7fa8c9", icon:"darb", lines:"~2000",
+    ar:{ name:"ضَرب الحَرف", en:"Darb al-Ḥarf", tag:"ارسم هيكل الحرف واقطعه بقلب القلم ثم اطبع نموذجًا." },
+    en:{ name:"Darb al-Ḥarf", en:"Pocket Type Foundry", tag:"Sketch a letter skeleton, cut it with a broad nib, print a specimen." } },
+  { file:"apps/shamsa.html", cat:"apps", ac:"#3fb8af", icon:"shamsa", lines:"~2000",
+    ar:{ name:"شَمْسَة", en:"Shamsa: Rosette Studio", tag:"ابنِ وردات هندسية بالفرجار وضعيدًا وصدّر وصفتها." },
+    en:{ name:"Shamsa", en:"Compass & Rosettes", tag:"Weave geometric rosettes from compass circles and export the recipe." } }
+];
 
-        const DARES_EN = [
-            "Do your best impression of a celebrity for 30 seconds.","Speak in a British accent for the next 3 rounds.","Let someone draw a moustache on your face with a marker.","Do 20 push-ups right now.","Sing the chorus of your favorite song loudly.","Act like a chicken for 1 minute.","Call a friend and tell them you love them in a silly voice.","Do a dramatic reading of the last text you sent.","Imitate someone in the room (they choose who).","Do a handstand against the wall for 10 seconds.","Speak only in questions for the next 2 minutes.","Let someone give you a new hairstyle using water/gel.","Do your best robot dance for 30 seconds.","Read the last message in your inbox out loud.","Act like a waiter and serve drinks to everyone.","Do a cartwheel (or attempt one).","Talk with an accent of someone's choice for 3 minutes.","Let someone tickle you for 15 seconds (without reacting).","Do 10 squats while singing a song.","Imitate a famous person until someone guesses who.","Swap an item of clothing with someone for 2 rounds.","Do a dramatic monologue from a movie you love.","Eat a spoonful of something spicy/sour (if available).","Walk like a zombie for 1 minute.","Compliment everyone in the room individually.","Do the worm dance (or your best attempt).","Speak in a whisper for the next 5 minutes.","Act like a cat for 30 seconds.","Let someone blindfold you and lead you around.","Do a silly walk across the room and back.","Imitate a robot while answering the next question.","Let someone take a funny photo of you and post it.","Do 15 jumping jacks while counting backwards.","Act like a newscaster reporting on the current situation.","Let someone draw a unibrow on you.","Do your best opera singing for 20 seconds.","Talk only using song lyrics for 2 minutes.","Act like a monkey for 30 seconds.","Do a dramatic fake cry scene.","Let someone write a word on your forehead with marker.","Do a 30-second stand-up comedy routine.","Walk backwards for 2 minutes.","Imitate a sports commentator describing a mundane task.","Let someone give you a funny 'tattoo' with pen.","Do a headstand (or attempt).","Speak in a high-pitched voice for 3 minutes.","Act out a scene from your favorite movie (others guess).","Do 10 lunges while reciting the alphabet backwards.","Let someone draw a beard on you with marker.","Imitate a dinosaur for 30 seconds.","Do a dramatic reading of a grocery list (make it epic).","Act like you're on a reality TV show for 1 minute.","Let someone give you a new name and only respond to it.","Do a slow-motion walk across the room.","Imitate a famous actor's voice for 3 rounds.","Let someone tickle your feet for 10 seconds.","Do a 30-second interpretive dance.","Speak only in rhyme for the next 2 minutes.","Act like a magician performing a trick (with imaginary props).","Let someone apply lipstick or chapstick on you (if available).","Imitate a baby for 1 minute.","Do a dramatic reading of a social media post.","Act like a superhero (choose one) for 2 minutes.","Let someone give you a 'new identity' and act it out.","Do 20 sit-ups without stopping.","Speak like a pirate for 3 rounds.","Act out a commercial for a random object in the room.","Do a yoga pose and hold it for 30 seconds.","Imitate a cat (meowing and all) for 1 minute.","Let someone put makeup on you (if available).","Do a dramatic scene from a soap opera.","Talk in third person for 2 minutes.","Do 10 push-ups while spelling your name out loud.","Act like a robot that's out of battery.","Let someone draw something silly on your hand.","Do a 30-second dance to a song you don't know.","Imitate a fish out of water for 20 seconds.","Let someone record you saying something silly.","Do a slow-motion fight scene with an imaginary opponent.","Act like a grandparent for 2 minutes.","Let someone stack items on your head.","Do a dramatic slow walk while lip-syncing.","Imitate a dog (barking and all) for 1 minute.","Let someone decide your new 'signature walk'.","Do 15 jumping jacks while singing Happy Birthday.","Act like a mirror for someone (copy their movements).","Do a handstand against a wall for 15 seconds.","Let someone write a 'message' on your arm with marker.","Do a dramatic interpretation of the weather forecast.","Act like you're in a music video for 1 minute.","Imitate a llama for 30 seconds.","Let someone give you a 'motivational speech'.","Do a 30-second stand-up comedy routine about the room.","Act like a news reporter describing a mundane event.","Let someone make you a paper hat and wear it.","Do a slow-motion reenactment of a recent event.","Imitate a bird (cawing and all) for 30 seconds.","Let someone 'interview' you as a celebrity.","Do a dramatic reading of a text from your phone.","Act like a genie granting wishes for 2 minutes.","Let someone give you a new 'catchphrase' and use it.","Do 10 squats while reciting the alphabet.","Imitate a horse galloping across the room.","Let someone choose your 'voice' for 3 minutes.","Do a dramatic reenactment of your morning routine.","Act like a tourist in your own home for 2 minutes.","Let someone 'direct' you in a scene.","Do a 30-second silent film performance.","Imitate a cartoon character for 1 minute.","Let someone give you a 'new identity' (name and job)."
-        ];
+/* ============================ STATE ============================ */
+let lang = store.get("originals_lang", "ar");
+let cat  = "all";
+let query = "";
+const $ = (s) => document.querySelector(s);
+const t = (k) => I18N[lang][k] ?? k;
 
-        const TRUTHS_AR = [
-            "ما هو أكثر شيء محرج قمت به في مكان عام؟","هل سبق لك أن كذبت على صديقك المفضل؟ ماذا قلت؟","ما هو أسوأ موعد غرامي كنت فيه؟","ما هو السر الذي لم تخبره لأي شخص؟","من في هذه الغرفة تثق به بحياتك؟","ما هو أكثر شيء غير قانوني قمت به؟","هل سبق لك أن غششت في اختبار؟ كيف؟","ما هي أكبر كذبة قلتها في حياتك؟","ما هو أقسى شيء قلته لشخص ما؟","هل سبق لك أن تجاهلت شخصاً؟ لماذا؟","ما هو أكبر خوف لديك في العلاقات؟","ما هو أكبر مبلغ وجدته واحتفظت به؟","هل سبق لك أن سرقت شيئاً؟ ماذا؟","ما هي عادة غريبة لديك لا يعرفها أحد؟","ما هي أكثر قبلة محرجة كانت لديك؟","هل سبق لك أن ضحكت بشكل مزيف على نكتة؟","ما هي أطول مدة بدون استحمام؟","ما هو أكثر شيء طفولي لا تزال تفعله؟","هل سبق لك أن تجسست على حسابات شخص ما؟","ما هي أسوأ نصيحة قدمتها؟","هل سبق لك أن تظاهرت بإعجابك بهدية؟","ما هو الشيء الذي تفخر به سراً؟","ما هي أكبر مشكلة واجهتها في المدرسة أو العمل؟","هل سبق لك أن أعجبت بشريك صديقك؟","ما هو أكثر شيء ممل فيك؟","هل سبق لك أن كذبت بشأن عمرك؟","ما هو أكثر شيء محرج اشتريته؟","هل سبق لك أن تنصتت على محادثة؟","ما هو خوف لديك يبدو غير منطقي؟","ما هي أسوأ أغنية تحبها سراً؟","هل ندمت على إنهاء علاقة مع شخص؟","ما هي أكثر موهبة عديمة الفائدة لديك؟","هل بكيت أثناء مشاهدة فيلم؟ أي فيلم؟","ما هو أكثر شيء محرج قلته لشخص تعجب به؟","هل سبق لك أن أنشأت حساباً وهمياً؟","ما هي أكبر مخاطرة خضتها؟","هل سبق لك أن آذيت شخصاً ولم تعتذر؟","ما هي تركيبة طعام غريبة تحبها؟","هل سبق لك أن تتبعت شخصاً عبر الإنترنت؟","ما هو أغلى شيء كسرته؟","هل سبق لك أن غششت في لعبة؟","ما هو أسوأ شيء فعلته من أجل المال؟","هل شعرت بالغيرة من صديق؟","ما هو أكثر شيء غير لائق ضحكت عليه؟","هل كذبت للخروج من خطط؟","ما هي أسوأ قصة شعر كانت لديك؟","هل قبلت شخصاً وندمت على ذلك؟","ما هو أكثر لقب محرج كان لديك؟","هل أرسلت رسالة إلى شخص خطأ؟","ما هو أكثر موقف عائلي محرج مررت به؟","هل تظاهرت بفهم شيء لم تفهمه؟","ما هو أسوأ شيء فعلته وأنت ثمل؟","هل كذبت على معلم أو مدير؟","ما هي متعة مذنبة لديك؟","هل تم القبض عليك وأنت تفعل شيئاً ممنوعاً؟","ما هو أكثر شيء محرج رآه والداك تفعله؟","هل حلمت بحلم تحقق؟","ما هو أسوأ شيء أكلته؟","هل كذبت بشأن مرضك؟","ما هو أكثر شيء اندفاعي قمت به؟","ما هو أسوأ شيء فعلته لأخيك؟","هل أعجبت بمدرس؟","ما هي أكثر نغمة رنين محرجة كانت لديك؟","هل كسرت شيئاً وألقيت اللوم على شخص آخر؟","ما هو أسوأ شيء قلته لشريكك؟","هل سبق لك أن سرقت شيئاً صغيراً؟","ما هو أكثر شيء طفولي لا تزال تغضب منه؟","هل جرحت مشاعر شخص عن قصد؟","ما هو أكثر شيء محرج رآه حيوانك الأليف تفعله؟","هل خضت معركة جسدية؟ ماذا حدث؟","ما هو أغرب شيء جمعته؟","هل كذبت للحصول على وظيفة أو ترقية؟","ما هو أسوأ شيء فعلته وأنت غاضب؟","هل كسرت وعداً؟ أي وعد؟","ما هي أكثر ذكرى محرجة من المدرسة الثانوية؟","هل أعجبت بصديق سابق لصديقك؟","ما هو أسوأ اختيار للأزياء قمت به؟","هل غششت في علاقة؟","ما هو أكثر وقت شعرت فيه بالخوف؟","هل تظاهرت بمعرفة شخص لا تعرفه؟","ما هو أسوأ شيء فعلته لصديق؟","هل كذبت لتجنب صراع؟","هل سبق لك أن تظاهرت بأنك مشغول لترد على مكالمة وأنا واقف قبالك؟","ما هو أكثر شيء خبيث فعلته بحجة المزح؟","هل سبق لك أن تصنتت على مكالمة شخص بالصدق؟ ما الذي سمعته؟","ما هو أكثر شيء ندمت على قوله في لحظة غضب؟","هل سبق لك أن دفعت شخصاً تحت الحافلة مجازاً لتنقذ نفسك؟","ما هو أغرب مكان قبلت فيه؟","هل سبق لك أن تخليت عن صديق في وقت كان يحتاجك فيه؟ لماذا؟","ما هو أكثر شيء مقرف تفعله وحدك ولا تعترف به؟","هل سبق لك أن تمنيت لو أن شخصاً مقرباً منك اختفى من حياتك؟","ما هو أكثر شيء كذبت فيه على أهلك بشكل متكرر؟","هل سبق لك أن انتحلت شخصية أخرى في لعبة أو محادثة؟","ما هو أكثر مبلغ صرفته على شيء تافه وندمت عليه؟","هل سبق لك أن أكلت طعاماً سقط على الأرض وتظاهرت بأنه لم يحدث؟","ما هو أكثر شيء قمت بسرقته دون أن يكتشفك أحد؟","هل سبق لك أن كذبت في سيرتك الذاتية؟ ماذا قلت؟","ما هو أكثر عذر سخيف استخدمته لتتأخر؟","هل سبق لك أن تجسست على هاتف شريكك أو صديقك؟","ما هو أكثر شيء محرج كتبته ثم مسحته بسرعة؟","هل سبق لك أن ضحكت على شخص وقع ثم ساعدته وكأنك لم تضحك؟","ما هو أكثر شيء كرهت أن تعترف به لنفسك؟","هل سبق لك أن تمنيت فشل شخص قريب منك؟","ما هو أكثر شيء قمت به وأنت نائم أو شبه نائم؟","هل سبق لك أن تتبعت حساب شخص غريب على وسائل التواصل؟","ما هو أكثر لقب قلته لشخص في غيابه وتمنى لو لم تقله؟","هل سبق لك أن أرسلت صورة غير لائقة لشخص ثم ندمت؟","ما هو أكثر شيء خائف أن يعرفه شخص عنك؟","هل سبق لك أن اتفقت مع رأي وأنا في داخلك تعارضه تماماً؟","ما هو أكثر شيء مزيف في شخصيتك أمام الناس؟","هل سبق لك أن بكيت من فيلم إعلاني أو مشهد تافه؟","ما هو أكثر شيء فعلته بدافع الغيرة وأفسدته؟","هل سبق لك أن تظاهرت بأنك غني أو من طبقة أعلى؟","ما هو أكثر شيء حمقاء قمت به لإثارة إعجاب فتاة أو فتى؟","هل سبق لك أن هجرت حيواناً أليفاً أو أهملته؟","ما هو أكثر شيء حرقته أو كسرته غضباً؟","هل سبق لك أن أعجبت بوالد أو والدة صديقك؟","ما هو أكثر موقف محرج مررت به في مصعد؟","هل سبق لك أن شتمت أحداً في عقلك وابتسمت له بوجهه؟","ما هو أكثر شيء غير أخلاقي فعلته وكان ممتعاً؟","هل سبق لك أن تخليت عن حلم لأنك خفت من الفشل؟","ما هو أكثر شيء دمرته في علاقة بيديك؟","هل سبق لك أن غششت في امتحان ولم يكتشفوك؟ كيف؟","ما هو أكثر شيء تشتهي فعله ولكنك لن تعترف به أبداً؟","هل سبق لك أن ضربت شخصاً وأنت صغير؟ ماذا حدث؟","ما هو أكثر شيء طائش فعلته في المدرسة؟","هل سبق لك أن كتبت رسالة حب أو شعراً ولم ترسله؟","ما هو أكثر شيء ندمت على شرائه بسبب سعره؟","هل سبق لك أن كذبت على طبيب أو ممرض؟","ما هو أكثر شيء محرم أكلته وأنت صائم سراً؟","هل سبق لك أن اتصلت بشخص وأنت تريد غيره بالخطأ؟","ما هو أكثر شيء أخفيته عن شريك حياتك؟","هل سبق لك أن ضحكت في جنازة أو مناسبة حزينة؟","ما هو أكثر شيء أحرجك أمام جمع غفير؟","هل سبق لك أن تمنيت لو أنك لم تولد في عائلتك؟","ما هو أكثر شيء قمت به لإيذاء نفسك دون أن يشعر أحد؟","هل سبق لك أن نسيت اسم حبيب سابق أثناء حديثك عنه؟","ما هو أكثر شيء كرهت في شخص ثم أصبحت مثله؟","هل سبق لك أن سرقت فكرة من شخص وتفاخرت بها؟","ما هو أكثر شيء مزعج تفعله ولا تستطيع التوقف عنه؟","هل سبق لك أن تغيبت عن العمل أو المدرسة بحجة وهمية؟","ما هو أكثر شيء جعلت الآخرين يعتقدون أنه أسوأ مما هو؟","هل سبق لك أن تجاهلت مكالمات شخص لأنه يضايقك؟","ما هو أكثر شيء محرج حدث لك في حمام عمومي؟","هل سبق لك أن قبلت هدية من شخص وأنت لا تحبه؟","ما هو أكثر شيء فعله شريكك وجرحك ولم تخبره به؟","هل سبق لك أن خنت ثقة شخص بك؟ كيف؟","ما هو أكثر شيء تمنيت أن تنساه من ماضيك؟","هل سبق لك أن تفاخرت بشيء لم تفعله؟","ما هو أكثر شيء مقرف وجدته في طعامك وأكلت حوله؟","هل سبق لك أن تخيلت حياة كاملة مع شخص لا يعرفك؟","ما هو أكثر شيء غير عقلاني تفعله عند التوتر؟","هل سبق لك أن تجنبت شخصاً في الشارع لأنه محرج؟","ما هو أكثر شيء أضعت فيه وقتك دون فائدة؟","هل سبق لك أن تظاهرت بالنوم لتتجنب محادثة؟","ما هو أكثر شيء حقير قلته لأخيك أو أختك؟","هل سبق لك أن كذبت عن حالتك المادية؟","ما هو أكثر شيء خوفت من فعله ثم فعلته؟","هل سبق لك أن شتمت أحداً في التعليقات أو المباشر؟","ما هو أكثر شيء مثير للاشمئزاز لمسته دون قفازات؟","هل سبق لك أن نسبت نجاحاً لك هو ليس من عملك؟","ما هو أكثر شيء محرج قلته وأنا أعتقد أن الميكروفون مغلق؟","هل سبق لك أن جرحت شخصاً ثم ضحكت على جرحه؟","ما هو أكثر شيء غير قانوني فكرت فيه ولم تنفذه؟","هل سبق لك أن أعطيت نصيحة وأنت تعلم أنها سيئة؟","ما هو أكثر شيء تمنيت لو أن أحداً لم يره عنك؟","هل سبق لك أن تواصلت مع حبيب سابق وأنت في علاقة؟","ما هو أكثر شيء غبي فعلته لتراهن أو تتحدى؟","هل سبق لك أن نسيت عيد ميلاد شخص قريب وتظاهرت بالنسيان العمدي؟","ما هو أكثر شيء تركته يضيع لأنك كنت كسولاً؟","هل سبق لك أن أكلت بقايا طعام من سلة المهملات؟","ما هو أكثر شيء شعرت بالخزي منه بعد ممارسة الجنس؟","هل سبق لك أن خنت صديقاً في لعبة أو مسابقة؟","ما هو أكثر شيء محجب في شخصيتك يكشفه الغضب فقط؟","هل سبق لك أن تخيلت موت شخص لتريح نفسك منه؟","ما هو أكثر شيء حمقاء قلته وأنا أنظر في المرآة؟","هل سبق لك أن سرقت قلماً أو شيئاً من مكتب شخص؟","ما هو أكثر شيء ندمت عليه في ليلة رأس السنة؟","هل سبق لك أن ادعيت حب شيء فقط لإرضاء الطرف الآخر؟","ما هو أكثر شيء غير صحي تفعله بانتظام وتعرف أنه مضر؟","هل سبق لك أن لعبت دور الضحية وأنت المخطئ؟","ما هو أكثر شيء محرج حدث لك في طابور أو صف؟","هل سبق لك أن خنت شخصاً مع أقرب صديق له؟","ما هو أكثر شيء تقول لنفسك لن أفعله أبداً وتفعله دوماً؟","هل سبق لك أن دفعت شخصاً ليكره شخصاً آخر بسببك؟","ما هو أكثر شيء تافه خسرت من أجله صديقاً؟","هل سبق لك أن أعجبت بنفسك في المرآة أكثر من اللازم؟","ما هو أكثر شيء أخفته عن طبيب نفسي لو زرت واحداً؟","هل سبق لك أن بكيت من الألم الجسدي وتظاهرت أنه لا يؤلم؟","ما هو أكثر شيء غير مفهوم تفعله وأنت لوحدك تماماً؟","هل سبق لك أن تمنيت لو أنك شخص آخر ليوم واحد؟","ما هو أكثر شيء خسرته في الرهان؟","هل سبق لك أن نسيت كلمة مرور حساب مهم وتظاهرت بالاختراق؟"
-        ];
+/* ============================ RENDER ============================ */
+function cardHTML(it){
+  const L = it[lang];
+  const badge = it.cat === "games" ? t("badgeGame") : t("badgeApp");
+  return `
+  <article class="card" style="--ac:${it.ac}" tabindex="0" role="link"
+           data-file="${it.file}" data-cat="${it.cat}" data-search="${(L.name + " " + L.en + " " + L.tag + " " + it.en.name).toLowerCase()}"
+           aria-label="${L.name} — ${L.en}">
+    <div class="card-top">
+      <div class="icon-box" aria-hidden="true">${ICONS[it.icon]}</div>
+      <span class="badge">${badge}</span>
+    </div>
+    <h3>${L.name}<span class="en-name">${L.en}</span></h3>
+    <p class="tag">${L.tag}</p>
+    <div class="card-foot">
+      <span class="launch"><span>${t("launch")}</span><span class="arr" aria-hidden="true">→</span></span>
+      <span class="meta">${it.lines} ${t("lines")}</span>
+    </div>
+  </article>`;
+}
 
-        const DARES_AR = [
-            "قم بتقليد شخص مشهور لمدة 30 ثانية.","تحدث بلكنة بريطانية للجولات الثلاث القادمة.","دع شخصاً يرسم شارباً على وجهك بقلم.","قم بـ 20 ضغطة عسكرية الآن.","غني بصوت عالٍ جوقة أغنيتك المفضلة.","تظاهر بأنك دجاجة لمدة دقيقة.","اتصل بصديق وأخبره أنك تحبه بصوت مضحك.","قم بقراءة درامية لآخر رسالة أرسلتها.","قم بتقليد شخص في الغرفة يختارون من.","قف على يديك لمدة 10 ثوانٍ.","تحدث فقط بالأسئلة للدقيقتين القادمتين.","دع شخصاً يمنحك تسريحة شعر جديدة باستخدام الماء أو الجيل.","ارقص رقصة الروبوت لأفضل ما لديك لمدة 30 ثانية.","اقرأ آخر رسالة في صندوق الوارد الخاص بك بصوت عالٍ.","تظاهر بأنك نادل وقدم المشروبات للجميع.","قف على يديك أو حاول.","تحدث بلكنة من اختيار شخص لمدة 3 دقائق.","دع شخصاً يدغدغك لمدة 15 ثانية دون رد فعل.","قم بـ 10 تمارين قرفصاء أثناء الغناء.","قم بتقليد شخص مشهور حتى يخمنه أحد.","تبادل قطعة ملابس مع شخص لمدة جولتين.","قدم مونولوج درامي من فيلم تحبه.","تناول ملعقة من شيء حار أو حامض إذا كان متوفراً.","امش مثل الزومبي لمدة دقيقة.","امدح كل شخص في الغرفة على حدة.","ارقص رقصة الدودة أو أفضل محاولة.","تحدث بصوت هامس للخمس دقائق القادمة.","تظاهر بأنك قط لمدة 30 ثانية.","دع شخصاً يعصب عينيك ويقودك.","قم بمشية مضحكة عبر الغرفة والعودة.","قم بتقليد روبوت أثناء الإجابة على السؤال التالي.","دع شخصاً يلتقط صورة مضحكة لك وينشرها.","قم بـ 15 قفزة أثناء العد التنازلي.","تظاهر بأنك مذيع أخبار يغطي الوضع الحالي.","دع شخصاً يرسم حاجباً واحداً لك.","قم بأفضل غناء أوبرا لمدة 20 ثانية.","تحدث فقط باستخدام كلمات الأغاني لمدة دقيقتين.","تظاهر بأنك قرد لمدة 30 ثانية.","قم بمشهد بكاء درامي مزيف.","دع شخصاً يكتب كلمة على جبهتك بقلم.","قم بروتين كوميدي لمدة 30 ثانية.","امش للخلف لمدة دقيقتين.","قم بتقليد معلق رياضي يصف مهمة عادية.","دع شخصاً يمنحك وشماً مضحكاً بقلم.","قم بالوقوف على رأسك أو حاول.","تحدث بصوت عالٍ لمدة 3 دقائق.","مثل مشهداً من فيلمك المفضل يخمن الآخرون.","قم بـ 10 اندفاعات أثناء ترديد الأبجدية بشكل عكسي.","دع شخصاً يرسم لحية لك بقلم.","قم بتقليد ديناصور لمدة 30 ثانية.","قم بقراءة درامية لقائمة البقالة اجعلها ملحمية.","تظاهر بأنك في برنامج تلفزيون واقعي لمدة دقيقة.","دع شخصاً يعطيك اسماً جديداً ولا تستجيب إلا له.","قم بمشية بطيئة الحركة عبر الغرفة.","قم بتقليد صوت ممثل مشهور لمدة 3 جولات.","دع شخصاً يدغدغ قدميك لمدة 10 ثوانٍ.","قم برقصة تفسيرية لمدة 30 ثانية.","تحدث فقط بالقافية للدقيقتين القادمتين.","تظاهر بأنك ساحر تؤدي خدعة بدعائم وهمية.","دع شخصاً يضع أحمر شفاه أو مرطب شفاه عليك إذا كان متوفراً.","قم بتقليد طفل لمدة دقيقة.","قم بقراءة درامية لمنشور على وسائل التواصل الاجتماعي.","تظاهر بأنك بطل خارق اختر واحداً لمدة دقيقتين.","دع شخصاً يمنحك هوية جديدة وقم بتمثيلها.","قم بـ 20 تمرين جلوس دون توقف.","تحدث مثل القراصنة لمدة 3 جولات.","قم بتمثيل إعلان لشيء عشوائي في الغرفة.","قم بوضعية يوجا واثبت عليها لمدة 30 ثانية.","قم بتقليد قط مواء وكل شيء لمدة دقيقة.","دع شخصاً يضع مكياجاً عليك إذا كان متوفراً.","قم بمشهد درامي من مسلسل.","تحدث بصيغة الغائب لمدة دقيقتين.","قم بـ 10 تمارين ضغط أثناء نطق اسمك بصوت عالٍ.","تظاهر بأنك روبوت نفدت بطاريته.","دع شخصاً يرسم شيئاً مضحكاً على يدك.","قم برقصة لمدة 30 ثانية على أغنية لا تعرفها.","قم بتقليد سمكة خارج الماء لمدة 20 ثانية.","دع شخصاً يسجلك وأنت تقول شيئاً مضحكاً.","قم بمشهد قتال بطيء الحركة مع خصم وهمي.","تظاهر بأنك جد أو جدة لمدة دقيقتين.","دع شخصاً يكوم أشياء على رأسك.","قم بمشية درامية بطيئة أثناء التزامن الشفوي.","قم بتقليد كلب نباح وكل شيء لمدة دقيقة.","دع شخصاً يقرر مشيتك المميزة الجديدة.","قم بـ 15 قفزة أثناء غناء أغنية عيد الميلاد.","تظاهر بأنك مرآة لشخص انسخ حركاته.","قم بالوقوف على يديك ضد الحائط لمدة 15 ثانية.","دع شخصاً يكتب رسالة على ذراعك بقلم.","قم بتفسير درامي لتوقعات الطقس.","تظاهر بأنك في فيديو موسيقي لمدة دقيقة.","قم بتقليد حيوان اللاما لمدة 30 ثانية.","دع شخصاً يلقي خطاباً تحفيزياً لك.","قم بروتين كوميدي لمدة 30 ثانية عن الغرفة.","تظاهر بأنك مراسل أخبار يصف حدثاً عادياً.","دع شخصاً يصنع لك قبعة ورقية وارتدها.","قم بإعادة تمثيل بطيئة الحركة لحدث حديث.","قم بتقليد طائر نعيق وكل شيء لمدة 30 ثانية.","دع شخصاً يقابلك كشخص مشهور.","قم بقراءة درامية لنص من هاتفك.","تظاهر بأنك جني يحقق الأمنيات لمدة دقيقتين.","دع شخصاً يمنحك عبارة مميزة جديدة واستخدمها.","قم بـ 10 تمارين قرفصاء أثناء ترديد الأبجدية.","قم بتقليد حصان يعدو عبر الغرفة.","دع شخصاً يختار صوتك لمدة 3 دقائق.","قم بإعادة تمثيل درامي لروتينك الصباحي.","تظاهر بأنك سائح في منزلك لمدة دقيقتين.","دع شخصاً يخرجك في مشهد.","قم بأداء فيلم صامت لمدة 30 ثانية.","قم بتقليد شخصية كرتونية لمدة دقيقة.","دع شخصاً يمنحك هوية جديدة اسم ومهنة."
-        ];
+function renderCards(){
+  $("#gridGames").innerHTML = ITEMS.filter(i => i.cat === "games").map(cardHTML).join("");
+  $("#gridApps").innerHTML  = ITEMS.filter(i => i.cat === "apps").map(cardHTML).join("");
+  applyFilter();
+}
 
-        let currentLang = 'ar';
-        let isMultiplayer = false;
-        let truthHistory = [];
-        let dareHistory = [];
-        let totalUsed = 0;
+function applyFilter(){
+  const cards = document.querySelectorAll(".card");
+  let shownGames = 0, shownApps = 0;
+  const q = query.trim().toLowerCase();
+  cards.forEach(c => {
+    const matchCat = (cat === "all") || (c.dataset.cat === cat);
+    const matchQ = !q || c.dataset.search.includes(q);
+    const show = matchCat && matchQ;
+    c.style.display = show ? "" : "none";
+    if (show && c.dataset.cat === "games") shownGames++;
+    if (show && c.dataset.cat === "apps") shownApps++;
+  });
+  $("#gamesWrap").style.display = (cat === "apps" || (cat === "games" && !shownGames)) ? "none" : "";
+  if (cat === "all" && !shownGames && !q) $("#gamesWrap").style.display = "";
+  $("#appsWrap").style.display = (cat === "games" || (cat === "apps" && !shownApps)) ? "none" : "";
+  if (cat === "all" && !shownApps && !q) $("#appsWrap").style.display = "";
+  $("#empty").style.display = (!shownGames && !shownApps) ? "block" : "none";
+}
 
-        let truthPool = [...TRUTHS_AR].sort(() => Math.random() - 0.5);
-        let darePool = [...DARES_AR].sort(() => Math.random() - 0.5);
+function setTab(next){
+  cat = next;
+  ["tabAll","tabGames","tabApps"].forEach(id => $("#"+id).setAttribute("aria-pressed", String($("#"+id).id === "tab"+(next === "all" ? "All" : next === "games" ? "Games" : "Apps"))));
+  applyFilter();
+}
 
-        // DOM refs
-        const promptText = document.getElementById('promptText');
-        const typeBadge = document.getElementById('typeBadge');
-        const promptNumber = document.getElementById('promptNumber');
-        const counterDisplay = document.getElementById('counterDisplay');
-        const promptCard = document.getElementById('promptCard');
-        const titleMain = document.getElementById('titleMain');
-        const subBadge = document.getElementById('subBadge');
-        const truthBtn = document.getElementById('truthBtn');
-        const dareBtn = document.getElementById('dareBtn');
-        const randomBtn = document.getElementById('randomBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const langAr = document.getElementById('langAr');
-        const langEn = document.getElementById('langEn');
-        const mpSolo = document.getElementById('mpSolo');
-        const mpMulti = document.getElementById('mpMulti');
-        const mpSetup = document.getElementById('mpSetup');
-        const chatPanel = document.getElementById('chatPanel');
-        const nickInput = document.getElementById('nickInput');
-        const roomInput = document.getElementById('roomInput');
-        const connectBtn = document.getElementById('connectBtn');
-        const leaveBtn = document.getElementById('leaveBtn');
-        const mpInfo = document.getElementById('mpInfo');
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const chatSendBtn = document.getElementById('chatSendBtn');
-        const chatHeader = document.getElementById('chatHeader');
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
+  $("#langLabel").textContent = (lang === "ar") ? "English" : "عربي";
+  $("#q").placeholder = t("searchPh");
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  renderCards();
+}
 
-        // Multiplayer State (Fresh session)
-        let client = null;
-        let nickname = '';
-        let roomCode = '';
-        let chatHistory = [];
+function toggleLang(){
+  lang = (lang === "ar") ? "en" : "ar";
+  store.set("originals_lang", lang);
+  applyLang();
+}
 
-        function updateCounter() {
-            const total = truthHistory.length + dareHistory.length;
-            counterDisplay.innerHTML = `<strong>${total}</strong> ${currentLang === 'ar' ? 'مستخدم' : 'used'} · ${truthHistory.length}${currentLang === 'ar' ? 'ح' : 'T'} ${dareHistory.length}${currentLang === 'ar' ? 'ج' : 'D'}`;
-        }
+/* ============================ EVENTS ============================ */
+function launch(card){ if (card) window.location.href = card.dataset.file; }
 
-        function displayPrompt(type, text, isRemote = false) {
-            typeBadge.textContent = type.toUpperCase();
-            promptText.innerHTML = text;
-            promptNumber.textContent = `# ${totalUsed}`;
-            const isTruth = type === 'الحقيقة' || type === 'Truth';
-            promptCard.style.background = isTruth ? 'rgba(70, 60, 160, 0.25)' : 'rgba(160, 60, 100, 0.25)';
-            setTimeout(() => promptCard.style.background = 'rgba(10, 8, 28, 0.6)', 180);
-            
-            if (!isRemote && isMultiplayer && client && client.connected) {
-                client.publish(`td_room_${roomCode}/prompt`, JSON.stringify({ type, text }));
-            }
-        }
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".card");
+  if (card) launch(card);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "/" && document.activeElement !== $("#q")){ e.preventDefault(); $("#q").focus(); $("#q").select(); return; }
+  if (e.key === "Enter"){
+    if (document.activeElement === $("#q")){
+      const first = [...document.querySelectorAll(".card")].find(c => c.style.display !== "none");
+      launch(first); return;
+    }
+    if (document.activeElement?.classList.contains("card")) launch(document.activeElement);
+    return;
+  }
+  if (e.key === "Escape"){
+    $("#aboutOverlay").classList.remove("open");
+    if (document.activeElement === $("#q")){ $("#q").value = ""; query = ""; applyFilter(); $("#q").blur(); }
+  }
+  if (e.key === "l" && (e.ctrlKey || e.metaKey)) { /* reserved */ }
+});
+$("#q").addEventListener("input", (e) => { query = e.target.value; applyFilter(); });
+$("#tabAll").addEventListener("click", () => setTab("all"));
+$("#tabGames").addEventListener("click", () => setTab("games"));
+$("#tabApps").addEventListener("click", () => setTab("apps"));
+$("#langBtn").addEventListener("click", toggleLang);
+$("#aboutBtn").addEventListener("click", () => { $("#aboutOverlay").classList.add("open"); $("#aboutClose").focus(); });
+$("#aboutClose").addEventListener("click", () => $("#aboutOverlay").classList.remove("open"));
+$("#aboutOverlay").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.classList.remove("open"); });
 
-        function getNextTruth(isRemote = false) {
-            if (truthPool.length === 0) truthPool = [...(currentLang === 'ar' ? TRUTHS_AR : TRUTHS_EN)].sort(() => Math.random() - 0.5);
-            const prompt = truthPool.pop();
-            if (!isRemote) { truthHistory.push(prompt); totalUsed++; updateCounter(); }
-            displayPrompt(currentLang === 'ar' ? 'الحقيقة' : 'Truth', prompt, isRemote);
-        }
+/* ============================ BACKGROUND PARTICLES ============================ */
+(function background(){
+  const cv = $("#bg"), ctx = cv.getContext("2d");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let W, H, dots = [], raf = 0, running = true;
+  function resize(){
+    W = cv.width = innerWidth * devicePixelRatio;
+    H = cv.height = innerHeight * devicePixelRatio;
+    cv.style.width = innerWidth + "px"; cv.style.height = innerHeight + "px";
+    const n = Math.min(90, Math.floor(innerWidth * innerHeight / 16000));
+    dots = Array.from({length: n}, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      r: (Math.random() * 1.7 + .5) * devicePixelRatio,
+      vx: (Math.random() - .5) * .06 * devicePixelRatio,
+      vy: (-Math.random() * .1 - .02) * devicePixelRatio,
+      tw: Math.random() * Math.PI * 2, s: Math.random() < .12
+    }));
+  }
+  function frame(){
+    if (!running) return;
+    ctx.clearRect(0, 0, W, H);
+    for (const d of dots){
+      d.x += d.vx; d.y += d.vy; d.tw += .015;
+      if (d.y < -10) { d.y = H + 10; d.x = Math.random() * W; }
+      if (d.x < -10) d.x = W + 10; else if (d.x > W + 10) d.x = -10;
+      const a = .25 + Math.abs(Math.sin(d.tw)) * .5;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, 7);
+      ctx.fillStyle = d.s ? `rgba(232,180,90,${a * .8})` : `rgba(190,205,235,${a * .45})`;
+      ctx.fill();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  resize();
+  addEventListener("resize", resize);
+  document.addEventListener("visibilitychange", () => {
+    running = !document.hidden && !reduced;
+    if (running) frame(); else cancelAnimationFrame(raf);
+  });
+  if (reduced || store.get("originals_reduced", false)){
+    document.body.classList.add("reduced");
+    ctx.clearRect(0,0,W,H);
+    for (const d of dots){ ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 7); ctx.fillStyle = "rgba(190,205,235,.28)"; ctx.fill(); }
+  } else {
+    frame();
+  }
+})();
 
-        function getNextDare(isRemote = false) {
-            if (darePool.length === 0) darePool = [...(currentLang === 'ar' ? DARES_AR : DARES_EN)].sort(() => Math.random() - 0.5);
-            const prompt = darePool.pop();
-            if (!isRemote) { dareHistory.push(prompt); totalUsed++; updateCounter(); }
-            displayPrompt(currentLang === 'ar' ? 'الجرأة' : 'Dare', prompt, isRemote);
-        }
-
-        function showRandom() { Math.random() < 0.5 ? getNextTruth() : getNextDare(); }
-
-        function resetHistory() {
-            truthHistory = []; dareHistory = []; totalUsed = 0;
-            truthPool = [...(currentLang === 'ar' ? TRUTHS_AR : TRUTHS_EN)].sort(() => Math.random() - 0.5);
-            darePool = [...(currentLang === 'ar' ? DARES_AR : DARES_EN)].sort(() => Math.random() - 0.5);
-            updateCounter();
-            promptText.innerHTML = currentLang === 'ar' ? '✨ تم إعادة التعيين · جاهز للعب' : '✨ Reset · ready to play';
-            typeBadge.textContent = currentLang === 'ar' ? '✦ إعادة تعيين' : '✦ reset';
-            promptNumber.textContent = '# 0';
-        }
-
-        function switchLanguage(lang) {
-            currentLang = lang;
-            document.body.className = lang === 'ar' ? 'lang-ar' : 'lang-en';
-            langAr.classList.toggle('active', lang === 'ar');
-            langEn.classList.toggle('active', lang === 'en');
-            
-            if (lang === 'ar') {
-                titleMain.textContent = '⚡ الحقيقة · الجرأة'; 
-                subBadge.textContent = '🔥 300+ سؤال · جماعي';
-                truthBtn.innerHTML = '🔮 الحقيقة'; 
-                dareBtn.innerHTML = '⚡ الجرأة'; 
-                randomBtn.innerHTML = '🎲 عشوائي';
-                resetBtn.textContent = '⟳ إعادة تعيين'; 
-                typeBadge.textContent = '✦ جاهز';
-                promptText.innerHTML = 'اختر <strong style="color:#f5c542;">الحقيقة</strong> أو <strong style="color:#ff8a9e;">الجرأة</strong>';
-                mpSolo.innerHTML = '👤 فردي';
-                mpMulti.innerHTML = '👥 جماعي';
-                connectBtn.textContent = 'اتصال';
-                leaveBtn.textContent = 'مغادرة';
-                chatHeader.textContent = '💬 دردشة الغرفة';
-                chatInput.placeholder = 'اكتب رسالة...';
-                chatSendBtn.textContent = 'إرسال';
-                nickInput.placeholder = 'اسمك المستعار';
-                roomInput.placeholder = 'رمز الغرفة';
-                mpInfo.innerHTML = 'أدخل اسمك ورمز غرفة (أو اترك الرمز فارغًا لإنشاء غرفة جديدة).';
-            } else {
-                titleMain.textContent = '⚡ TRUTH · DARE'; 
-                subBadge.textContent = '🔥 300+ prompts · Multiplayer';
-                truthBtn.innerHTML = '🔮 Truth'; 
-                dareBtn.innerHTML = '⚡ Dare'; 
-                randomBtn.innerHTML = '🎲 Random';
-                resetBtn.textContent = '⟳ reset'; 
-                typeBadge.textContent = '✦ ready';
-                promptText.innerHTML = 'Tap <strong style="color:#f5c542;">Truth</strong> or <strong style="color:#ff8a9e;">Dare</strong>';
-                mpSolo.innerHTML = '👤 Solo';
-                mpMulti.innerHTML = '👥 Multiplayer';
-                connectBtn.textContent = 'Connect';
-                leaveBtn.textContent = 'Leave';
-                chatHeader.textContent = '💬 Room Chat';
-                chatInput.placeholder = 'Type a message...';
-                chatSendBtn.textContent = 'Send';
-                nickInput.placeholder = 'Your Nickname';
-                roomInput.placeholder = 'Room Code';
-                mpInfo.innerHTML = 'Enter your name and room code (or leave blank to create a new room).';
-            }
-            truthPool = [...(lang === 'ar' ? TRUTHS_AR : TRUTHS_EN)].sort(() => Math.random() - 0.5);
-            darePool = [...(lang === 'ar' ? DARES_AR : DARES_EN)].sort(() => Math.random() - 0.5);
-            truthHistory = []; dareHistory = []; updateCounter();
-        }
-
-        function toggleMultiplayer(enable) {
-            isMultiplayer = enable;
-            mpSetup.classList.toggle('active', enable);
-            chatPanel.classList.toggle('active', enable);
-            mpSolo.classList.toggle('active', !enable);
-            mpMulti.classList.toggle('active', enable);
-            
-            if (!enable && client) {
-                leaveRoom(false); 
-            }
-        }
-
-        function connectMQTT() {
-            if (typeof mqtt === 'undefined') {
-                mpInfo.innerHTML = currentLang === 'ar' ? "مكتبة الاتصال غير محملة. تأكد من الإنترنت." : "Connection library failed to load. Check internet.";
-                mpInfo.classList.add('err');
-                return;
-            }
-
-            nickname = nickInput.value.trim() || ('Player' + Math.floor(Math.random() * 1000));
-            roomCode = roomInput.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-            if (!roomCode) roomCode = 'ROOM' + Math.floor(Math.random() * 9000 + 1000);
-            
-            nickInput.value = nickname; roomInput.value = roomCode;
-            mpInfo.innerHTML = currentLang === 'ar' ? `جاري الاتصال بالغرفة <b>${roomCode}</b>...` : `Connecting to room <b>${roomCode}</b>...`;
-            mpInfo.classList.remove('err');
-            
-            try {
-                client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
-                    clientId: 'td_' + Math.random().toString(16).slice(3), clean: true, connectTimeout: 5000
-                });
-
-                client.on('connect', () => {
-                    mpInfo.innerHTML = currentLang === 'ar' ? `متصل بالغرفة <b>${roomCode}</b>! شارك الرمز. (Share: ${roomCode})` : `Connected to room <b>${roomCode}</b>! Share the code.`;
-                    mpInfo.classList.remove('err');
-                    client.subscribe(`td_room_${roomCode}/chat`);
-                    client.subscribe(`td_room_${roomCode}/prompt`);
-                    chatMessages.innerHTML = ''; 
-                    
-                    const joinText = currentLang === 'ar' ? `${nickname} انضم للغرفة!` : `${nickname} joined the room!`;
-                    addChatMessage('System', joinText, true);
-                    client.publish(`td_room_${roomCode}/chat`, JSON.stringify({ user: 'System', text: nickname, action: 'join' }));
-                    
-                    connectBtn.style.display = 'none';
-                    leaveBtn.style.display = 'inline-block';
-                    nickInput.disabled = true;
-                    roomInput.disabled = true;
-                });
-
-                client.on('message', (topic, message) => {
-                    try {
-                        const data = JSON.parse(message.toString());
-                        if (topic.endsWith('/chat')) {
-                            if (data.user !== nickname) {
-                                if (data.user === 'System') {
-                                    let text = data.text;
-                                    if (data.action === 'join') text = currentLang === 'ar' ? `${data.text} انضم للغرفة!` : `${data.text} joined!`;
-                                    addChatMessage('System', text, false, true);
-                                } else addChatMessage(data.user, data.text, false);
-                            }
-                        } else if (topic.endsWith('/prompt')) {
-                            const isTruth = data.type === 'الحقيقة' || data.type === 'Truth';
-                            if (isTruth) getNextTruth(true); else getNextDare(true);
-                        }
-                    } catch (e) { console.error("Parse error:", e); }
-                });
-
-                client.on('error', (err) => {
-                    mpInfo.innerHTML = currentLang === 'ar' ? `خطأ في الاتصال. تأكد من الإنترنت.` : `Connection error. Check internet.`;
-                    mpInfo.classList.add('err');
-                });
-
-                client.on('close', () => {
-                    if (isMultiplayer && client && !client.connected) {
-                        mpInfo.innerHTML = currentLang === 'ar' ? "انقطع الاتصال. تحقق من الشبكة." : "Disconnected. Check network.";
-                        mpInfo.classList.add('err');
-                        connectBtn.style.display = 'inline-block';
-                        leaveBtn.style.display = 'none';
-                        nickInput.disabled = false;
-                        roomInput.disabled = false;
-                    }
-                });
-            } catch (e) {
-                mpInfo.innerHTML = currentLang === 'ar' ? "فشل تهيئة الاتصال." : "Failed to init connection.";
-                mpInfo.classList.add('err');
-                console.error(e);
-            }
-        }
-
-        function leaveRoom(resetUI = true) {
-            if (client) {
-                try { client.end(true); } catch(e){}
-                client = null;
-            }
-            try {
-                sessionStorage.removeItem('td_room');
-                sessionStorage.removeItem('td_chat_history');
-            } catch(e) {}
-            
-            chatHistory = [];
-            chatMessages.innerHTML = '';
-            roomInput.value = '';
-            
-            if (resetUI) {
-                connectBtn.style.display = 'inline-block';
-                leaveBtn.style.display = 'none';
-                nickInput.disabled = false;
-                roomInput.disabled = false;
-                mpInfo.innerHTML = currentLang === 'ar' ? "غادرت الغرفة. أدخل رمزاً جديداً للاتصال." : "Left the room. Enter a new code to connect.";
-                mpInfo.classList.remove('err');
-            }
-        }
-
-        function sendChat() {
-            const text = chatInput.value.trim();
-            if (!text || !client || !client.connected) return;
-            client.publish(`td_room_${roomCode}/chat`, JSON.stringify({ user: nickname, text: text }));
-            addChatMessage(nickname, text, true);
-            chatInput.value = '';
-        }
-
-        function addChatMessage(user, text, isMe, isSystem = false) {
-            chatHistory.push({ user, text, system: isSystem });
-            try { sessionStorage.setItem('td_chat_history', JSON.stringify(chatHistory)); } catch(e) {}
-            renderChatMessage(user, text, isMe, isSystem);
-        }
-
-        function renderChatMessage(user, text, isMe, isSystem) {
-            const div = document.createElement('div');
-            if (isSystem) { div.className = 'chat-msg system'; div.textContent = text; }
-            else { div.className = isMe ? 'chat-msg me' : 'chat-msg other'; div.innerHTML = `<span class="nick">${user}</span>${text}`; }
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Event Listeners
-        truthBtn.addEventListener('click', () => getNextTruth());
-        dareBtn.addEventListener('click', () => getNextDare());
-        randomBtn.addEventListener('click', showRandom);
-        resetBtn.addEventListener('click', resetHistory);
-        langAr.addEventListener('click', () => switchLanguage('ar'));
-        langEn.addEventListener('click', () => switchLanguage('en'));
-        mpSolo.addEventListener('click', () => toggleMultiplayer(false));
-        mpMulti.addEventListener('click', () => toggleMultiplayer(true));
-        connectBtn.addEventListener('click', connectMQTT);
-        leaveBtn.addEventListener('click', () => leaveRoom(true));
-        chatSendBtn.addEventListener('click', sendChat);
-        
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
-        [nickInput, roomInput].forEach(input => {
-            input.addEventListener('keypress', (e) => { if (e.key === 'Enter') connectMQTT(); });
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT') return;
-            if (e.key === 't' || e.key === 'T') getNextTruth();
-            else if (e.key === 'd' || e.key === 'D') getNextDare();
-            else if (e.key === 'r' || e.key === 'R') showRandom();
-        });
-
-        // Init
-        switchLanguage('ar');
-        updateCounter();
-        console.log("Game Ready!");
-    })();
+/* ============================ BOOT ============================ */
+$("#nAll").textContent = ITEMS.length;
+$("#nGames").textContent = ITEMS.filter(i => i.cat === "games").length;
+$("#nApps").textContent = ITEMS.filter(i => i.cat === "apps").length;
+applyLang();
 </script>
 </body>
 </html>

@@ -1,0 +1,1747 @@
+<!-- 10 Originals — ʿAbq: The Scent Ledger — original concept, 100% offline -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>عَبق: دفتر العطور — ʿAbq: The Scent Ledger</title>
+<style>
+/* ============ THEME TOKENS — night apothecary (default), ivory, rose ============ */
+:root{
+  --bg:#251425; --bg2:#1c0e1d; --panel:#331e33; --panel2:#3e2441; --line:#50304e; --line2:#5d3a5a;
+  --ink:#f6eaf2; --ink-dim:#cfb2c4; --faint:#a98ba2;
+  --accent:#d98cb3; --accent-deep:#b05f8f; --accent-ink:#2b0f22;
+  --gold:#e8c26a; --good:#95d8a8; --bad:#e79a9a;
+  --canvas:#efe3d0; --canvas-ink:#7a6a58;
+  --shadow:0 12px 34px rgba(10,3,10,.5); --r:14px; --rs:9px;
+}
+body[data-theme="ivory"]{
+  --bg:#f2e9d8; --bg2:#e9dec7; --panel:#faf4e6; --panel2:#f0e6d0; --line:#d8c6a8; --line2:#c4b090;
+  --ink:#38202e; --ink-dim:#6a4f60; --faint:#8d6f80;
+  --accent:#93356f; --accent-deep:#772a5a; --accent-ink:#fff3f8;
+  --gold:#7c5e14; --good:#2c7b4d; --bad:#a53c3c;
+  --canvas:#fdf9f0; --canvas-ink:#8a7a66;
+  --shadow:0 10px 26px rgba(96,66,30,.16);
+}
+body[data-theme="rose"]{
+  --bg:#3b1e2b; --bg2:#2f1622; --panel:#4a2738; --panel2:#583045; --line:#6a3b52; --line2:#7c4660;
+  --ink:#fdeaf3; --ink-dim:#dcb2c8; --faint:#b3889c;
+  --accent:#f0a8cc; --accent-deep:#d67eae; --accent-ink:#3a0f28;
+  --gold:#ecc571; --good:#9cd9ac; --bad:#f0a2a2;
+  --canvas:#f7e9ef; --canvas-ink:#8a6a7a;
+  --shadow:0 12px 34px rgba(24,6,16,.5);
+}
+/* ============ BASE ============ */
+*{box-sizing:border-box; margin:0; padding:0}
+html{height:100%}
+body{
+  min-height:100%; background:
+    radial-gradient(1100px 500px at 85% -10%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 60%),
+    radial-gradient(900px 500px at 5% 110%, color-mix(in srgb, var(--gold) 7%, transparent), transparent 55%),
+    var(--bg);
+  color:var(--ink);
+  font-family:"Segoe UI",Tahoma,system-ui,sans-serif;
+  font-size:16px; line-height:1.65;
+  transition:background .4s ease, color .4s ease;
+  padding-block:0 26px;
+}
+button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+button:disabled{opacity:.45; cursor:not-allowed}
+a{color:var(--accent)}
+:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:6px}
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+::selection{background:var(--accent); color:var(--accent-ink)}
+/* ============ TOP BAR ============ */
+#topbar{
+  position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding:10px clamp(10px,3vw,26px);
+  background:color-mix(in srgb, var(--bg2) 88%, transparent);
+  backdrop-filter:blur(7px); border-block-end:1px solid var(--line);
+}
+.brand{display:flex; flex-direction:column; margin-inline-end:auto; min-width:0}
+.brand b{font-size:1.22rem; letter-spacing:.4px; color:var(--accent); text-shadow:0 2px 12px color-mix(in srgb, var(--accent) 40%, transparent)}
+.brand span{font-size:.8rem; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hud{display:flex; gap:8px; flex-wrap:wrap}
+.chip{
+  display:inline-flex; align-items:center; gap:6px; padding:4px 11px; border-radius:99px;
+  background:var(--panel); border:1px solid var(--line); font-size:.9rem; white-space:nowrap;
+}
+.chip b{color:var(--gold); font-weight:600}
+.chip.rep b{color:var(--accent)}
+.tools{display:flex; gap:7px; flex-wrap:wrap}
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:8px 15px; border-radius:var(--rs); font-size:.93rem; font-weight:600;
+  background:var(--panel2); border:1px solid var(--line2); color:var(--ink);
+  transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+.btn:hover:not(:disabled){transform:translateY(-1.5px); box-shadow:0 6px 16px rgba(0,0,0,.25); border-color:var(--accent)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn.primary{background:linear-gradient(140deg, var(--accent), var(--accent-deep)); color:var(--accent-ink); border-color:transparent}
+.btn.good{background:color-mix(in srgb, var(--good) 20%, var(--panel2)); border-color:var(--good)}
+.btn.danger{background:color-mix(in srgb, var(--bad) 16%, var(--panel2)); border-color:var(--bad)}
+.btn.icon{padding:8px 11px; font-size:1.05rem; line-height:1}
+.btn.tiny{padding:3px 9px; font-size:.8rem}
+.btn[aria-pressed="true"]{background:color-mix(in srgb, var(--accent) 30%, var(--panel2)); border-color:var(--accent)}
+.seg{display:inline-flex; border:1px solid var(--line2); border-radius:var(--rs); overflow:hidden}
+.seg button{padding:6px 13px; font-size:.87rem; background:var(--panel); border-inline-end:1px solid var(--line); transition:background .2s}
+.seg button:last-child{border-inline-end:none}
+.seg button[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink); font-weight:700}
+/* ============ LAYOUT ============ */
+#gameGrid{
+  display:grid; gap:14px; padding:14px clamp(10px,2.6vw,24px);
+  grid-template-columns:minmax(290px,1.05fr) minmax(340px,1.35fr) minmax(300px,1fr);
+  align-items:start; max-width:1460px; margin-inline:auto;
+}
+.card{
+  background:color-mix(in srgb, var(--panel) 92%, transparent);
+  border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow);
+  padding:15px 16px;
+}
+.card>h2{font-size:1.02rem; color:var(--accent); display:flex; align-items:center; gap:8px; margin-block-end:9px; letter-spacing:.3px}
+.card>h2 .sub{margin-inline-start:auto; font-size:.78rem; font-weight:400; color:var(--ink-dim)}
+.divider{border:none; border-block-start:1px dashed var(--line2); margin-block:11px}
+/* ============ CLIENT PANEL ============ */
+#clientHead{display:flex; align-items:center; gap:10px}
+#clientEmoji{font-size:2.2rem; filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+#clientName{font-size:1.15rem; color:var(--ink)}
+#clientRole{font-size:.8rem; color:var(--ink-dim)}
+.patience{display:flex; gap:4px; margin-inline-start:auto}
+.patience i{width:12px; height:12px; border-radius:50%; background:var(--line2); transition:background .3s, transform .3s}
+.patience i.on{background:var(--good); box-shadow:0 0 8px color-mix(in srgb, var(--good) 60%, transparent)}
+.patience i.warn{background:var(--gold)}
+blockquote#clientMemory{
+  margin-block:10px 12px; padding:11px 14px; font-size:.95rem; font-style:italic;
+  background:color-mix(in srgb, var(--panel2) 75%, transparent);
+  border-inline-start:3px solid var(--accent); border-radius:var(--rs); color:var(--ink);
+}
+.h3mini{font-size:.82rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--ink-dim); margin-block:8px 6px}
+#hintList{list-style:none; display:grid; gap:6px}
+#hintList li{
+  padding:7px 11px; font-size:.9rem; border-radius:var(--rs);
+  background:color-mix(in srgb, var(--gold) 7%, var(--panel2)); border:1px solid color-mix(in srgb, var(--gold) 25%, transparent);
+}
+#clueList{display:flex; flex-wrap:wrap; gap:7px}
+.clue{
+  padding:5px 12px; border-radius:99px; font-size:.83rem;
+  background:var(--panel2); border:1px dashed var(--line2); color:var(--ink-dim);
+  transition:all .25s ease; min-height:30px;
+}
+.clue.hidden{cursor:pointer; letter-spacing:3px; color:var(--accent)}
+.clue.shown{border-style:solid; border-color:var(--accent); color:var(--ink); background:color-mix(in srgb, var(--accent) 12%, var(--panel2))}
+#tipLine{margin-block-start:11px; font-size:.8rem; color:var(--faint); min-height:1.3em; transition:opacity .5s}
+/* ============ BLOTTER ============ */
+#blotterWrap{position:relative}
+canvas#blotter{
+  display:block; width:100%; aspect-ratio:5/4; border-radius:var(--rs);
+  border:1px solid var(--line2); touch-action:none; cursor:crosshair;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.14); transition:box-shadow .3s;
+}
+canvas#blotter.pulse{box-shadow:inset 0 0 40px rgba(0,0,0,.14), 0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent)}
+#bloomBar{display:flex; height:9px; border-radius:99px; overflow:hidden; margin-block:9px 4px; border:1px solid var(--line2)}
+#bloomBar i{flex:1; position:relative; background:var(--panel2)}
+#bloomBar i::after{content:""; position:absolute; inset:0; background:var(--segc,#888); transform:scaleX(0); transform-origin:inline-start; transition:none}
+#segTop{--segc:#e9c46a} #segMid{--segc:#d98cb3} #segBase{--segc:#9a6b4f}
+#bloomMeta{display:flex; justify-content:space-between; font-size:.78rem; color:var(--ink-dim)}
+#blotterBtns{display:flex; gap:7px; flex-wrap:wrap; margin-block-start:9px}
+/* ============ SHELF ============ */
+#shelf{display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:8px}
+.shelf-item{
+  position:relative; display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:8px 4px 6px; border-radius:var(--rs); text-align:center;
+  background:var(--panel2); border:1px solid var(--line2); border-inline-start-width:4px;
+  transition:transform .14s ease, box-shadow .2s, border-color .2s;
+}
+.shelf-item:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,.3)}
+.shelf-item .em{font-size:1.5rem; line-height:1.2}
+.shelf-item .nm{font-size:.76rem; line-height:1.25; color:var(--ink)}
+.shelf-item .meta{font-size:.68rem; color:var(--ink-dim); display:flex; gap:5px; align-items:center}
+.shelf-item .dots{letter-spacing:1px; color:var(--gold); font-size:.62rem}
+.shelf-item.selected{border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent)}
+.shelf-item .keynum{position:absolute; top:3px; inset-inline-start:6px; font-size:.62rem; color:var(--faint)}
+.shelf-item.locked{opacity:.55; filter:grayscale(.7)}
+.shelf-item.locked .em::after{content:" 🔒"; font-size:.85rem}
+.shelf-item.poor{opacity:.5}
+/* ============ VIAL ============ */
+#vialArea{display:flex; gap:13px; align-items:stretch}
+#vialSvg{width:96px; flex:none; filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
+#vialRight{flex:1; min-width:0; display:flex; flex-direction:column; gap:7px}
+#vialStats{display:flex; gap:8px; font-size:.8rem; color:var(--ink-dim); flex-wrap:wrap}
+#vialStats b{color:var(--gold); font-weight:600}
+#vialChips{display:flex; flex-wrap:wrap; gap:6px; min-height:34px; align-content:flex-start}
+.vchip{
+  display:inline-flex; align-items:center; gap:5px; padding:3px 6px 3px 10px; border-radius:99px;
+  font-size:.8rem; background:var(--panel2); border:1px solid var(--line2);
+  animation:chipIn .22s ease;
+}
+.vchip button{width:18px; height:18px; border-radius:50%; background:var(--bad); color:var(--accent-ink); font-size:.72rem; line-height:1; display:grid; place-items:center}
+.vchip button:hover{transform:scale(1.12)}
+#vialEmptyMsg{font-size:.82rem; color:var(--faint); font-style:italic}
+#workBtns{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-block-start:10px}
+#workBtns .btn.serve{grid-column:1/-1; padding-block:11px; font-size:1rem}
+@keyframes chipIn{from{transform:scale(.6); opacity:0} to{transform:scale(1); opacity:1}}
+/* ============ OVERLAYS & MODALS ============ */
+.overlay{
+  position:fixed; inset:0; z-index:60; display:grid; place-items:center; padding:16px;
+  background:rgba(12,4,12,.62); backdrop-filter:blur(5px);
+  animation:fadeIn .25s ease;
+}
+.overlay[hidden]{display:none}
+.modal{
+  width:min(620px, 94vw); max-height:88vh; overflow:auto; padding:20px 22px;
+  background:var(--panel); border:1px solid var(--line2); border-radius:18px; box-shadow:var(--shadow);
+  animation:rise .3s ease;
+}
+.modal h2{color:var(--accent); font-size:1.25rem; margin-block-end:10px; display:flex; align-items:center; gap:9px}
+.modal h2 .x{margin-inline-start:auto; font-size:.7em}
+.modal p{margin-block:7px; color:var(--ink-dim); font-size:.94rem}
+.modal p.strong{color:var(--ink)}
+@keyframes fadeIn{from{opacity:0} to{opacity:1}}
+@keyframes rise{from{transform:translateY(16px) scale(.98); opacity:0} to{transform:none; opacity:1}}
+.modalFoot{display:flex; gap:9px; justify-content:flex-end; margin-block-start:16px; flex-wrap:wrap}
+/* ============ SETTINGS ROWS ============ */
+.set-row{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding-block:9px; border-block-end:1px dashed var(--line);
+}
+.set-row>span:first-child{flex:1; min-width:130px; font-size:.93rem}
+.set-row.danger span:first-child{color:var(--bad)}
+/* ============ VERDICT ============ */
+#vdList{list-style:none; display:grid; gap:7px; margin-block:10px}
+#vdList li{
+  display:flex; align-items:center; gap:9px; padding:7px 11px; border-radius:var(--rs);
+  background:var(--panel2); border:1px solid var(--line2); font-size:.92rem;
+}
+#vdList .mark{font-size:1.05rem; width:1.4em; text-align:center}
+#vdList .cnt{margin-inline-start:auto; color:var(--ink-dim); font-size:.83rem}
+#vdLines{display:grid; gap:4px; font-size:.87rem; margin-block:8px}
+#vdLines .pos{color:var(--good)} #vdLines .neg{color:var(--bad)} #vdLines .neu{color:var(--ink-dim)}
+#vdPay{font-size:1.5rem; color:var(--gold); text-align:center; margin-block:6px; font-weight:700}
+#vdPay small{font-size:.85rem; color:var(--ink-dim); font-weight:400}
+/* ============ BOOK / LEDGER / STATS ============ */
+.emptyMsg{color:var(--faint); font-style:italic; text-align:center; padding-block:18px; font-size:.9rem}
+.recipe{
+  display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:var(--rs);
+  background:var(--panel2); border:1px solid var(--line2); margin-block-end:8px;
+}
+.recipe .rname{font-size:.9rem}
+.recipe .rmix{font-size:.8rem; color:var(--ink-dim)}
+.recipe .btn{margin-inline-start:auto}
+table.ledgerT{width:100%; border-collapse:collapse; font-size:.85rem}
+table.ledgerT th{color:var(--ink-dim); font-weight:600; text-align:start; padding:5px 7px; border-block-end:1px solid var(--line2); font-size:.78rem}
+table.ledgerT td{padding:6px 7px; border-block-end:1px dashed var(--line); vertical-align:top}
+.resWin{color:var(--good)} .resFail{color:var(--bad)} .resAged{color:var(--gold)} .resLost{color:var(--bad); font-weight:700}
+.mixmini{font-size:.72rem; color:var(--faint)}
+#statsGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:9px; margin-block-end:14px}
+.statBox{padding:10px 12px; border-radius:var(--rs); background:var(--panel2); border:1px solid var(--line2)}
+.statBox b{display:block; font-size:1.3rem; color:var(--gold)}
+.statBox span{font-size:.78rem; color:var(--ink-dim)}
+#achGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:9px}
+.achBox{padding:9px 11px; border-radius:var(--rs); background:var(--panel2); border:1px solid var(--line2); font-size:.82rem}
+.achBox.got{border-color:var(--gold); background:color-mix(in srgb, var(--gold) 10%, var(--panel2))}
+.achBox .aicon{font-size:1.25rem; margin-inline-end:5px}
+.achBox.locked{opacity:.5; filter:grayscale(.8)}
+.glossItem{padding-block:8px; border-block-end:1px dashed var(--line)}
+.glossItem b{color:var(--accent)}
+.glossItem p{font-size:.88rem}
+/* ============ TOASTS ============ */
+#toasts{position:fixed; inset-block-end:16px; inset-inline-start:50%; transform:translateX(-50%); z-index:90; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none}
+.toast{
+  padding:9px 18px; border-radius:99px; font-size:.9rem; max-width:88vw;
+  background:color-mix(in srgb, var(--panel) 94%, transparent); border:1px solid var(--accent);
+  box-shadow:var(--shadow); animation:toastIn .3s ease; text-align:center;
+}
+.toast.bad{border-color:var(--bad)} .toast.gold{border-color:var(--gold)}
+@keyframes toastIn{from{transform:translateY(14px); opacity:0} to{transform:none; opacity:1}}
+.toast.out{opacity:0; transition:opacity .5s}
+/* ============ ONBOARDING DIAGRAM ============ */
+.onbFig{display:flex; justify-content:center; margin-block:12px}
+.onbFig svg{max-width:300px; width:100%; filter:drop-shadow(0 8px 20px rgba(0,0,0,.3))}
+kbd{
+  padding:1px 7px; border-radius:5px; font-family:inherit; font-size:.82em;
+  background:var(--panel2); border:1px solid var(--line2); border-block-end-width:2.5px; color:var(--gold);
+}
+.ctlGrid{display:grid; grid-template-columns:auto 1fr; gap:5px 14px; font-size:.88rem; margin-block:8px}
+.ctlGrid span{color:var(--ink-dim)}
+.credit{margin-block-start:14px; padding-block-start:11px; border-block-start:1px dashed var(--line2); font-size:.82rem; color:var(--faint); text-align:center}
+/* ============ MOTION / RESPONSIVE ============ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
+}
+body[data-motion="reduced"] *,body[data-motion="reduced"] *::before,body[data-motion="reduced"] *::after{
+  animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;
+}
+@media (max-width:1080px){
+  #gameGrid{grid-template-columns:1fr 1fr}
+  #blotterPanel{order:3; grid-column:1/-1}
+}
+@media (max-width:700px){
+  #gameGrid{grid-template-columns:1fr}
+  .brand span{display:none}
+  #vialArea{flex-direction:row}
+}
+</style>
+</head>
+<body data-theme="night">
+<header id="topbar">
+  <div class="brand">
+    <b>عَبق <span data-i18n="brandEn"></span></b>
+    <span data-i18n="tagline"></span>
+  </div>
+  <div class="hud">
+    <span class="chip" id="hudDay">📅 <b id="dayVal">1</b></span>
+    <span class="chip" id="hudCoins">🪙 <b id="coinVal">40</b></span>
+    <span class="chip rep" id="hudRep">★ <b id="repVal">0</b></span>
+    <span class="chip" id="hudPhase" hidden></span>
+  </div>
+  <nav class="tools" aria-label="tools">
+    <button class="btn icon" id="btnBook" data-i18n-title="book" data-i18n-aria="book">📖</button>
+    <button class="btn icon" id="btnLedger" data-i18n-title="ledger" data-i18n-aria="ledger">📜</button>
+    <button class="btn icon" id="btnStats" data-i18n-title="stats" data-i18n-aria="stats">📊</button>
+    <button class="btn icon" id="btnGloss" data-i18n-title="glossary" data-i18n-aria="glossary">📚</button>
+    <button class="btn icon" id="btnAbout" data-i18n-title="about" data-i18n-aria="about">ⓘ</button>
+    <button class="btn icon" id="btnSettings" data-i18n-title="settings" data-i18n-aria="settings">⚙️</button>
+    <button class="btn icon" id="btnLang" aria-label="English / عربي">EN</button>
+    <a class="btn icon" href="../index.html" data-i18n-title="backAria" data-i18n-aria="backAria">↩</a>
+  </nav>
+</header>
+
+<main id="gameGrid">
+  <!-- ===== CLIENT ===== -->
+  <section class="card" id="clientPanel" aria-labelledby="clientH">
+    <h2 id="clientH" data-i18n="clientH"></h2>
+    <div id="clientHead">
+      <span id="clientEmoji" aria-hidden="true">👤</span>
+      <div>
+        <div id="clientName">—</div>
+        <div id="clientRole">—</div>
+      </div>
+      <div class="patience" id="clientPatience" role="img" data-i18n-aria="patienceAria"></div>
+    </div>
+    <blockquote id="clientMemory"></blockquote>
+    <div class="h3mini" data-i18n="hintsH"></div>
+    <ul id="hintList"></ul>
+    <div class="h3mini" id="clueH" data-i18n="whispersH"></div>
+    <div id="clueList"></div>
+    <p id="tipLine"></p>
+  </section>
+
+  <!-- ===== BLOTTER ===== -->
+  <section class="card" id="blotterPanel" aria-labelledby="blotterH">
+    <h2 id="blotterH"><span data-i18n="blotterH"></span><span class="sub" id="bloomState"></span></h2>
+    <div id="blotterWrap">
+      <canvas id="blotter" role="img"></canvas>
+    </div>
+    <div id="bloomBar" aria-hidden="true"><i id="segTop"></i><i id="segMid"></i><i id="segBase"></i></div>
+    <div id="bloomMeta"><span id="bloomTime">0s</span><span id="bloomHintTxt"></span></div>
+    <div id="blotterBtns">
+      <button class="btn primary" id="btnTest" data-i18n="testBtn"></button>
+      <button class="btn" id="btnFF" aria-pressed="false" data-i18n="ffBtn"></button>
+      <button class="btn" id="btnLabels" aria-pressed="true" data-i18n="labelsBtn"></button>
+    </div>
+  </section>
+
+  <!-- ===== WORKBENCH ===== -->
+  <section class="card" id="workPanel" aria-labelledby="workH">
+    <h2 id="workH"><span data-i18n="shelfH"></span><span class="sub" id="shelfSub"></span></h2>
+    <div id="shelf" role="group" data-i18n-aria="shelfAria"></div>
+    <hr class="divider">
+    <h2 data-i18n="vialH"></h2>
+    <div id="vialArea">
+      <svg id="vialSvg" viewBox="0 0 120 200" role="img" aria-hidden="false">
+        <defs>
+          <linearGradient id="liqGrad" x1="0" y1="1" x2="0" y2="0"></linearGradient>
+          <clipPath id="vialClip"><rect x="31" y="40" width="58" height="148" rx="22"/></clipPath>
+        </defs>
+        <rect x="48" y="8" width="24" height="36" rx="5" fill="none" stroke="var(--line2)" stroke-width="3"/>
+        <rect id="liqNeck" x="50" y="34" width="20" height="10" fill="#888" opacity=".85"/>
+        <g clip-path="url(#vialClip)">
+          <rect id="liqRect" x="31" y="188" width="58" height="0" fill="url(#liqGrad)"/>
+          <ellipse id="liqSurf" cx="60" cy="188" rx="29" ry="4.5" fill="#fff" opacity=".22"/>
+        </g>
+        <rect x="29" y="38" width="62" height="152" rx="24" fill="none" stroke="var(--line2)" stroke-width="3.5"/>
+        <path d="M38 60 q-6 24 0 52" fill="none" stroke="#fff" stroke-width="3" opacity=".14"/>
+      </svg>
+      <div id="vialRight">
+        <div id="vialStats">
+          <span data-i18n="dropsLbl"></span> <b id="dropCount">0/9</b>
+          <span data-i18n="costLbl"></span> <b id="costSpent">0</b> 🪙
+        </div>
+        <div id="vialChips"></div>
+        <div id="vialEmptyMsg" data-i18n="vialEmpty"></div>
+      </div>
+    </div>
+    <div id="workBtns">
+      <button class="btn primary serve" id="btnServe" data-i18n="serveBtn"></button>
+      <button class="btn" id="btnClear" data-i18n="clearBtn"></button>
+      <button class="btn" id="btnAge" data-i18n="ageBtn"></button>
+    </div>
+  </section>
+</main>
+
+<!-- ===== ONBOARDING ===== -->
+<div class="overlay" id="ovOnboard" hidden role="dialog" aria-modal="true" aria-labelledby="onbTitle">
+  <div class="modal">
+    <h2 id="onbTitle">🌸 <span data-i18n="onbTitle"></span></h2>
+    <div class="onbFig" aria-hidden="true">
+      <svg viewBox="0 0 300 170">
+        <rect x="8" y="8" width="284" height="154" rx="14" fill="var(--canvas)"/>
+        <circle cx="95" cy="62" r="17" fill="#e9c46a" opacity=".55"/><circle cx="95" cy="62" r="17" fill="none" stroke="#e9c46a"/>
+        <circle cx="150" cy="95" r="30" fill="#d98cb3" opacity=".5"/><circle cx="150" cy="95" r="30" fill="none" stroke="#d98cb3"/>
+        <circle cx="212" cy="120" r="44" fill="#9a6b4f" opacity=".45"/><circle cx="212" cy="120" r="44" fill="none" stroke="#9a6b4f"/>
+        <text x="95" y="36" font-size="11" fill="var(--canvas-ink)" text-anchor="middle" data-i18n="vol0"></text>
+        <text x="150" y="140" font-size="11" fill="var(--canvas-ink)" text-anchor="middle" data-i18n="vol1"></text>
+        <text x="212" y="120" font-size="11" fill="#fdf6ee" text-anchor="middle" data-i18n="vol2"></text>
+      </svg>
+    </div>
+    <p class="strong" data-i18n="onb1"></p>
+    <p data-i18n="onb2"></p>
+    <div class="modalFoot"><button class="btn primary" id="onbBtn" data-i18n="onbBtn"></button></div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS ===== -->
+<div class="overlay" id="ovSettings" hidden role="dialog" aria-modal="true" aria-labelledby="setH">
+  <div class="modal">
+    <h2>⚙️ <span data-i18n="settings"></span><button class="btn icon x" data-close>✕</button></h2>
+    <div class="set-row"><span data-i18n="sound"></span><button class="btn tiny" id="setSound" aria-pressed="true"></button></div>
+    <div class="set-row"><span data-i18n="motion"></span>
+      <div class="seg" id="setMotion"><button data-v="full" data-i18n="motionFull"></button><button data-v="reduced" data-i18n="motionReduced"></button></div>
+    </div>
+    <div class="set-row"><span data-i18n="hintsGen"></span>
+      <div class="seg" id="setHints"><button data-v="3">3</button><button data-v="2">2</button><button data-v="1">1</button></div>
+    </div>
+    <div class="set-row"><span data-i18n="bloomSpeed"></span>
+      <div class="seg" id="setBloom"><button data-v="1">1×</button><button data-v="2">2×</button><button data-v="4">4×</button></div>
+    </div>
+    <div class="set-row"><span data-i18n="theme"></span>
+      <div class="seg" id="setTheme"><button data-v="night" data-i18n="themeNight"></button><button data-v="ivory" data-i18n="themeIvory"></button><button data-v="rose" data-i18n="themeRose"></button></div>
+    </div>
+    <div class="set-row"><span data-i18n="labelsSet"></span><button class="btn tiny" id="setLabels" aria-pressed="true"></button></div>
+    <div class="set-row danger"><span data-i18n="resetData"></span><button class="btn tiny danger" id="setReset" data-i18n="resetBtn"></button></div>
+    <div class="modalFoot"><button class="btn" data-close data-i18n="close"></button></div>
+  </div>
+</div>
+
+<!-- ===== ABOUT ===== -->
+<div class="overlay" id="ovAbout" hidden role="dialog" aria-modal="true" aria-labelledby="aboutH">
+  <div class="modal">
+    <h2>ⓘ <span data-i18n="about"></span><button class="btn icon x" data-close>✕</button></h2>
+    <p class="strong" data-i18n="aboutPitch"></p>
+    <div class="h3mini" data-i18n="controlsH"></div>
+    <div class="ctlGrid" id="ctlGrid"></div>
+    <div class="modalFoot">
+      <button class="btn" id="aboutOnb" data-i18n="replayOnb"></button>
+      <button class="btn" data-close data-i18n="close"></button>
+    </div>
+    <p class="credit" data-i18n="credit"></p>
+  </div>
+</div>
+
+<!-- ===== CONFIRM ===== -->
+<div class="overlay" id="ovConfirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="cfTitle">
+  <div class="modal">
+    <h2 id="cfTitle">⚠️ <span data-i18n="confirmTitle"></span></h2>
+    <p class="strong" id="cfBody"></p>
+    <div class="modalFoot">
+      <button class="btn danger" id="cfYes" data-i18n="resetYes"></button>
+      <button class="btn" id="cfNo" data-i18n="cancel"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VERDICT ===== -->
+<div class="overlay" id="ovVerdict" hidden role="dialog" aria-modal="true" aria-labelledby="vdTitle">
+  <div class="modal">
+    <h2 id="vdTitle">🧪 <span data-i18n="verdictH"></span></h2>
+    <p id="vdClient" class="strong"></p>
+    <ul id="vdList"></ul>
+    <div id="vdLines"></div>
+    <div id="vdPay"></div>
+    <div class="modalFoot"><button class="btn primary" id="vdNext" data-i18n="nextBtn"></button></div>
+  </div>
+</div>
+
+<!-- ===== STORY END ===== -->
+<div class="overlay" id="ovStoryEnd" hidden role="dialog" aria-modal="true" aria-labelledby="seTitle">
+  <div class="modal">
+    <h2 id="seTitle">🌙 <span data-i18n="seTitle"></span></h2>
+    <p class="strong" data-i18n="seBody"></p>
+    <p id="seStats"></p>
+    <div class="modalFoot"><button class="btn primary" id="seBtn" data-i18n="seBtn"></button></div>
+  </div>
+</div>
+
+<!-- ===== RECIPE BOOK ===== -->
+<div class="overlay" id="ovBook" hidden role="dialog" aria-modal="true" aria-labelledby="bookH">
+  <div class="modal">
+    <h2>📖 <span data-i18n="book"></span><button class="btn icon x" data-close>✕</button></h2>
+    <p data-i18n="bookIntro"></p>
+    <div id="bookList"></div>
+    <div class="modalFoot"><button class="btn" data-close data-i18n="close"></button></div>
+  </div>
+</div>
+
+<!-- ===== LEDGER ===== -->
+<div class="overlay" id="ovLedger" hidden role="dialog" aria-modal="true" aria-labelledby="ledH">
+  <div class="modal">
+    <h2>📜 <span data-i18n="ledger"></span><button class="btn icon x" data-close>✕</button></h2>
+    <div id="ledgerBody"></div>
+    <div class="modalFoot"><button class="btn" data-close data-i18n="close"></button></div>
+  </div>
+</div>
+
+<!-- ===== STATS ===== -->
+<div class="overlay" id="ovStats" hidden role="dialog" aria-modal="true" aria-labelledby="stH">
+  <div class="modal">
+    <h2>📊 <span data-i18n="stats"></span><button class="btn icon x" data-close>✕</button></h2>
+    <div id="statsGrid"></div>
+    <div class="h3mini" data-i18n="achH"></div>
+    <div id="achGrid"></div>
+    <div class="modalFoot"><button class="btn" data-close data-i18n="close"></button></div>
+  </div>
+</div>
+
+<!-- ===== GLOSSARY ===== -->
+<div class="overlay" id="ovGloss" hidden role="dialog" aria-modal="true" aria-labelledby="glH">
+  <div class="modal">
+    <h2>📚 <span data-i18n="glossary"></span><button class="btn icon x" data-close>✕</button></h2>
+    <p data-i18n="glossIntro"></p>
+    <div id="glossList"></div>
+    <div class="modalFoot"><button class="btn" data-close data-i18n="close"></button></div>
+  </div>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+<script>
+'use strict';
+/* ============================================================
+   1 · I18N — every user-visible string, Arabic (default) + English
+   ============================================================ */
+const I18N = {
+ar:{
+  brandEn:"دفتر العطور",
+  tagline:"محترفُ عطورٍ صغير: اقرأ الذكرى، امزج القطرات، ودَع التطايرَ يحكي",
+  onbTitle:"مرحبًا في عَبق",
+  onb1:"أنتَ صاحبُ دكّانِ عطورٍ صغير: اقرأ ذاكرةَ كلِّ زبون، وامزج قطراتٍ من الرفِّ في قارورتك، ثم جرّبها على البلاط — تتفتح الحلقاتُ بترتيب التطاير: المقدّماتُ أولًا ثم القلوبُ ثم القواعد — فقارنها بالأوصافِ واخمُل التركيبةَ السرّية وقدّمها حين تثق.",
+  onb2:"الخدمةُ الناجحةُ تحتاجُ نوتتين صحيحتين على الأقلِّ بكمّياتٍ قريبة؛ الخطأُ يُنقص صبرَ الزبون، والسمعةُ العالية تفتحُ المكوناتِ النادرة. مفتاحا F وB والفأرةُ كلُّها في خدمتك.",
+  onbBtn:"فهمت، لنبدأ",
+  day:"اليوم", coins:"الجوخال", rep:"السمعة", weekLbl:"أسبوع",
+  clientH:"زبون اليوم", hintsH:"أحاديثُ الزبون", whispersH:"همساتُ المُوسِرة (تلميحات ميكانيكية)",
+  blotterH:"ورقةُ الاختبار", shelfH:"رفُّ الأسرار", vialH:"القارورة",
+  testBtn:"جرّب على البلاط (B)", ffBtn:"تسريع ⏩ (F)", labelsBtn:"الأسماء 🔖",
+  serveBtn:"قدِّم للزبون (Enter)", clearBtn:"إفراغ (استرجاع)", ageBtn:"أَعِمْرُها ليلةً 🌙",
+  dropsLbl:"قطرات:", costLbl:"تكلفة:", vialEmpty:"القارورة فارغة — أضِف قطراتٍ من الرفّ",
+  bloomStateIdle:"جاهزة", bloomStateRun:"تتفتّح…", bloomStateDone:"اكتمل التفتّح",
+  bloomHintTxt:"اضغط على الورقة أو B للبدء", patienceAria:"صبر الزبون المتبقي",
+  vol0:"مقدّمة", vol1:"قلب", vol2:"قاعدة",
+  famCitrus:"حمضيات", famGreen:"أخضر", famFloral:"زهرات", famSpice:"بهارات",
+  famWood:"أخشاب", famSweet:"حلوى", famMusk:"مسكيات", famAnimal:"حيوانيّ",
+  note:"النوتة", volatility:"التطاير", accord:"التوافق", clash:"المشاجرة", blotter:"البلاطة",
+  clueTotal:"تلائم الذاكرةَ {n} قطراتٍ فقط.",
+  clueLayers:"حكايتُها تمتدُّ على {n} طبقة/طبقاتٍ من اليوم.",
+  clueFamily:"إحدى نوتاتِها من عائلةِ {fam}.",
+  clueLayerDrops:"طبقةُ {layer} تحملُ {n} قطراتٍ بالضبط.",
+  clueClash:"إحدى نوتاتِها تُشاجرُ {ess} إن اقتربتَ منها.",
+  clueFriends:"نوتانِ فيها صديقتانِ قديمتان.",
+  clueNoFriends:"لا صداقةَ بين نوتاتِها؛ كلٌّ وحده.",
+  clueMax:"لا نوتةً تتكرَّرُ أكثرَ من {n} مرات.",
+  clueCost:"أغلى قطرةٍ فيها تبلغُ {c} جواخيل.",
+  clueRareYes:"تحتاجُ التركيبةُ قطرةً نادرةً واحدةً على الأقل.",
+  clueRareNo:"لا حاجةَ فيها لأيِّ نوتةٍ نادرة.",
+  verdictH:"حكمُ الزبون", verdictSuccess:"أَعجبَهُ العطر! التقطتَ الحكاية.",
+  verdictPerfect:"عطرٌ مثالي — حفظتَ الذاكرةَ كلَّها!",
+  verdictFail:"لم يقتنع… حاولتَ ثم ابتعدَ قليلًا.",
+  verdictFailStay:"لم يقتنع… لكنّه سيمنحك فرصةً أخرى.",
+  matchOk:"صحيحة", matchNear:"صحيحةُ النوتة، الكمّيةُ بعيدة", matchNo:"غائبة",
+  bonusAffin:"وئامُ النوتات: +10٪", malusClash:"مشاجرةُ نوتات: −25٪", lineMellowed:"التعتيقُ ليَّنَ المشاجرة",
+  bonusPerfect:"ذاكرةٌ كاملة: ×1.25", payoutLine:"الجرعة: {p} جوخال", repLine:"السمعة: {r}★",
+  revealLine:"التركيبةُ الحقيقية:", nextBtn:"الزبونُ التالي",
+  poorToast:"لا يكفي جوخالك! هذهُ القطرةُ بـ{c} جواخيل.",
+  lockedToast:"مكوّنٌ نادر — افتحه بسمعة {r}★ على الأقل.",
+  stipendToast:"سلفةُ النقابة: +{n} جوخال لصعبِ اليوم.",
+  mellowToast:"ليلةُ التعتيق ليّنتْ مشاجرةَ القارورة.",
+  ageDoneToast:"عُمِّرتِ القارورةُ ليلةً، ومرَّ الزبونُ بسِعةِ صدر.",
+  bloomNoVial:"القارورةُ فارغة — لا شيءَ ليُسكَبَ على البلاط.",
+  bloomRunning:"التفتّحُ جارٍ بالفعل…",
+  clientLeftToast:"غادر {name} — فقدتَ سمعتَه.",
+  seTitle:"اكتمل فصلُ الحكايات",
+  seBody:"مرَّتِ الحادثةُ الثمانيةُ الكبار، وصارَ اسمُك يُذكَرُ في سوقِ العطارين. من اليوم تبدأ أسابيعُ الزبائن المولَّدين — النقابةُ تضعُ هدفًا أسبوعيًّا لكلِّ هلال.",
+  seStats:"أرباحُ الفصل: {c} جوخال · سمعة: {r}★ · وصفاتٌ محفوظة: {b}",
+  seBtn:"ادخل الأسابيعَ المفتوحة",
+  weekTarget:"هدف الأسبوع {w}: {t} جوخال (حصّلتَ {e})",
+  weekWin:"أسبوعٌ موفَّق! مكافأةُ النقابة: +{n} جوخال.",
+  weekLose:"انقضى الأسبوعُ دون بلوغِ الهدف ({e}/{t}).",
+  book:"دفتر الوصفات", bookIntro:"الوصفاتُ التي فازتْ بقلوبِ الزبائن — حمِّل أيَّها إلى قارورتك مقابلِ ثمنِ قطراتِها.",
+  bookEmpty:"لا وصفاتٍ بعدُ — قدِّم عطرًا ناجحًا أولًا.",
+  bookLoad:"حمِّل إلى القارورة", bookLoadPoor:"لا يكفي الجوخالُ لتحميلِ هذهِ الوصفة.",
+  ledger:"دفتر الأستاذ", ledgerEmpty:"لا شيءَ مدوَّنٌ بعد.",
+  ledgerDay:"اليوم", ledgerClient:"الزبون", ledgerRes:"النتيجة", ledgerPay:"الحساب", ledgerMix:"الخلطة",
+  resWin:"نجاح", resPerfect:"مثالي", resFail:"خطأ", resLost:"غادر", resAged:"عُمِّرت",
+  stats:"الإحصاءات", achH:"الأوسمة", stServed:"عطورٌ مُقدَّمة", stSuccess:"نسبةُ النجاح",
+  stPerfect:"تقديماتٌ مثالية", stEarned:"مُكسبٌ كليّ", stStreak:"سلسلةٌ حالية",
+  stBest:"أطولُ سلسلة", stDays:"أيامُ العمل", stFam:"عائلاتٌ مُجرَّبة", stRecipes:"وصفاتٌ محفوظة",
+  glossary:"مُعجَمُ العطّارين", glossIntro:"مفاهيمُ الحرفةِ التي ستساعدك على قراءةِ البلاطِ والزبون.",
+  settings:"الإعدادات", sound:"الصوت", soundOn:"مُفعَّل", soundOff:"صامت",
+  motion:"الحركة", motionFull:"كاملة", motionReduced:"مخفَّضة",
+  hintsGen:"سخاءُ الهمسات", bloomSpeed:"سرعةُ التفتّح",
+  theme:"السمة", themeNight:"صيدلية ليلية", themeIvory:"صيدلية عاجية", themeRose:"ورديّ",
+  labelsSet:"أسماءُ الحلقات على البلاط", resetData:"مسحُ كلِّ البيانات", resetBtn:"مسح",
+  resetWarn:"سيُمحى كلُّ شيءٍ: الجوخالُ والسمعةُ والأيامُ والوصفاتُ والأوسمة. لا رجعةَ بعدها. أتممتَ؟",
+  resetYes:"نعم، امسح", cancel:"تراجع", close:"إغلاق",
+  confirmTitle:"تأكيد", about:"عن عَبق", controlsH:"التحكُّم", replayOnb:"إعادةُ شرحِ المبتدئ",
+  credit:"جزءٌ من مجموعة «الأصيلة العشرة» — تعملُ دون اتصالٍ بالكامل.",
+  aboutPitch:"عَبق محترفُ عطورٍ صغير: اقرأ ذاكرةَ الزبون، وامزج مقدِّماتٍ وقلوبًا وقواعدًا من رفِّك، ودَع التطايرَ نفسَه يكشفُ إن كنتَ التقطتَ حكايته — الحلقاتُ التي تتفتحُ على البلاطِ هي لغزُك وخريطةُ حلِّه.",
+  ctlRow1:"الأرقام 1–14", ctlRow1d:"إضافةُ قطرةٍ من الرفّ",
+  ctlRow2:"Backspace", ctlRow2d:"سحبُ آخرِ قطرةٍ (مع استرجاعِ ثمنها)",
+  ctlRow3:"B", ctlRow3d:"سكبُ الخلطةِ على البلاط",
+  ctlRow4:"F", ctlRow4d:"مبدّلُ التسريعِ الإضافي",
+  ctlRow5:"Enter", ctlRow5d:"تقديمُ العطرِ للزبون",
+  ctlRow6:"الأسهم + مسافة", ctlRow6d:"تنقّلٌ في الرفِّ ثم إضافةُ القطرةِ المحدَّدة",
+  ctlRow7:"Esc", ctlRow7d:"إغلاقُ اللوحات",
+  ctlRow8:"الفأرة / اللمس", ctlRow8d:"كلُّ شيءٍ قابلٌ للنقر — والورقةُ نفسُها تُسكَبُ بالنقرِ عليها",
+  backAria:"رجوع إلى فهرس المجموعة",
+  toastAch:"وسامٌ جديد: {a}!",
+  toastLang:"Switched to English",
+  weekChip:"أسبوع {n}",
+  vialFull:"القارورةُ ممتلئة (9 قطرات) — قدِّمْ أو أفرِغْ.",
+  phaseStory:"فصلُ الحكايات", phaseEndless:"الأسابيعُ المفتوحة",
+  genH1a:"تهبُّ مع الريحِ أولًا ثم تستقرُّ ببطء.", genH1b:"لا تطفو؛ تستقرُّ فورًا كالأرض.",
+  genH2:"قلبُ الحكايةِ من أهلِ {fam}.", genH3:"ثلاثُ نوتاتٍ فقط، لا رابعةَ لها.",
+},
+en:{
+  brandEn:"The Scent Ledger",
+  tagline:"A tiny scent atelier: read the memory, blend the drops, let evaporation speak",
+  onbTitle:"Welcome to ʿAbq",
+  onb1:"You run a tiny scent atelier: read each client's memory, blend drops from your organ shelf into the vial, then pour it on the blotter — rings bloom in volatility order: tops first, then hearts, then bases. Compare the sequence with their words, deduce the secret formula, and serve when confident.",
+  onb2:"A successful serve needs at least 2 correct notes at close quantities; a miss costs the client's patience, and high reputation unlocks rare ingredients. Keys F and B and the mouse are all at your service.",
+  onbBtn:"Got it, start",
+  day:"Day", coins:"Coins", rep:"Renown", weekLbl:"Week",
+  clientH:"Today's Client", hintsH:"The client's sayings", whispersH:"The muse's whispers (mechanical clues)",
+  blotterH:"The Blotter", shelfH:"The Organ Shelf", vialH:"The Vial",
+  testBtn:"Pour on blotter (B)", ffBtn:"Fast-forward ⏩ (F)", labelsBtn:"Labels 🔖",
+  serveBtn:"Serve the client (Enter)", clearBtn:"Empty (refund)", ageBtn:"Age overnight 🌙",
+  dropsLbl:"Drops:", costLbl:"Cost:", vialEmpty:"The vial is empty — add drops from the shelf",
+  bloomStateIdle:"ready", bloomStateRun:"blooming…", bloomStateDone:"bloom complete",
+  bloomHintTxt:"Press the paper or B to begin", patienceAria:"Client's remaining patience",
+  vol0:"Top", vol1:"Heart", vol2:"Base",
+  famCitrus:"Citrus", famGreen:"Green", famFloral:"Floral", famSpice:"Spice",
+  famWood:"Woods", famSweet:"Sweet", famMusk:"Musk", famAnimal:"Animalic",
+  note:"Note", volatility:"Volatility", accord:"Accord", clash:"Clash", blotter:"Blotter",
+  clueTotal:"The whole memory fits in {n} drops.",
+  clueLayers:"Its story spans {n} layer(s) of the day.",
+  clueFamily:"One of its notes belongs to the {fam} family.",
+  clueLayerDrops:"The {layer} layer carries exactly {n} drops.",
+  clueClash:"One of its notes quarrels with {ess} if you bring them close.",
+  clueFriends:"Two of its notes are old friends.",
+  clueNoFriends:"No friendship among its notes; each stands alone.",
+  clueMax:"No note appears more than {n} times.",
+  clueCost:"Its dearest drop costs {c} coins.",
+  clueRareYes:"The formula needs at least one rare drop.",
+  clueRareNo:"No rare note is needed at all.",
+  verdictH:"The Client's Verdict", verdictSuccess:"They love it! You captured the story.",
+  verdictPerfect:"A perfect perfume — the whole memory, bottled!",
+  verdictFail:"Not convinced… and they have walked a step away.",
+  verdictFailStay:"Not convinced… but they will grant you another chance.",
+  matchOk:"correct", matchNear:"right note, off quantity", matchNo:"missing",
+  bonusAffin:"Note harmony: +10%", malusClash:"Clashing notes: −25%", lineMellowed:"Aging mellowed the clash",
+  bonusPerfect:"Complete memory: ×1.25", payoutLine:"Payout: {p} coins", repLine:"Renown: {r}★",
+  revealLine:"The true formula:", nextBtn:"Next client",
+  poorToast:"Not enough coins! That drop costs {c} coins.",
+  lockedToast:"A rare ingredient — unlock it with at least {r}★ renown.",
+  stipendToast:"The guild advances you {n} coins for a hard day.",
+  mellowToast:"A night of aging mellowed the vial's clash.",
+  ageDoneToast:"The vial aged overnight; the client moved on graciously.",
+  bloomNoVial:"The vial is empty — nothing to pour on the blotter.",
+  bloomRunning:"A bloom is already running…",
+  clientLeftToast:"{name} has left — you lost their regard.",
+  seTitle:"The chapter of stories is complete",
+  seBody:"All eight great encounters have passed, and your name is spoken in the perfumers' souq. From today the weeks of generated clients begin — the guild sets a target for every crescent.",
+  seStats:"Chapter earnings: {c} coins · Renown: {r}★ · Recipes kept: {b}",
+  seBtn:"Enter the open weeks",
+  weekTarget:"Week {w} target: {t} coins (earned {e})",
+  weekWin:"A prosperous week! Guild bonus: +{n} coins.",
+  weekLose:"The week ended short of its target ({e}/{t}).",
+  book:"Recipe Book", bookIntro:"Formulas that won clients' hearts — load any into your vial for the price of its drops.",
+  bookEmpty:"No recipes yet — serve a successful perfume first.",
+  bookLoad:"Load into vial", bookLoadPoor:"Not enough coins to load this recipe.",
+  ledger:"The Ledger", ledgerEmpty:"Nothing recorded yet.",
+  ledgerDay:"Day", ledgerClient:"Client", ledgerRes:"Result", ledgerPay:"Account", ledgerMix:"Blend",
+  resWin:"Success", resPerfect:"Perfect", resFail:"Miss", resLost:"Lost", resAged:"Aged",
+  stats:"Statistics", achH:"Achievements", stServed:"Perfumes served", stSuccess:"Success rate",
+  stPerfect:"Perfect serves", stEarned:"Lifetime earnings", stStreak:"Current streak",
+  stBest:"Longest streak", stDays:"Days worked", stFam:"Families tried", stRecipes:"Recipes kept",
+  glossary:"Perfumer's Glossary", glossIntro:"Craft concepts that will help you read the blotter and the client.",
+  settings:"Settings", sound:"Sound", soundOn:"On", soundOff:"Muted",
+  motion:"Motion", motionFull:"Full", motionReduced:"Reduced",
+  hintsGen:"Whisper generosity", bloomSpeed:"Bloom speed",
+  theme:"Theme", themeNight:"Night apothecary", themeIvory:"Ivory apothecary", themeRose:"Rose",
+  labelsSet:"Ring labels on blotter", resetData:"Reset all data", resetBtn:"Reset",
+  resetWarn:"Everything will be erased: coins, renown, days, recipes, achievements. There is no way back. Are you sure?",
+  resetYes:"Yes, erase", cancel:"Cancel", close:"Close",
+  confirmTitle:"Confirmation", about:"About ʿAbq", controlsH:"Controls", replayOnb:"Replay beginner's guide",
+  credit:"Part of '10 Originals' — fully offline.",
+  aboutPitch:"ʿAbq is a tiny scent atelier: read the client's memory, blend top-heart-base notes from your organ, and let evaporation itself reveal whether you captured their story — the rings blooming on the blotter are both your riddle and your map to solving it.",
+  ctlRow1:"Number keys 1–14", ctlRow1d:"Add a drop from the shelf",
+  ctlRow2:"Backspace", ctlRow2d:"Withdraw the last drop (refund included)",
+  ctlRow3:"B", ctlRow3d:"Pour the blend on the blotter",
+  ctlRow4:"F", ctlRow4d:"Toggle extra fast-forward",
+  ctlRow5:"Enter", ctlRow5d:"Serve the perfume to the client",
+  ctlRow6:"Arrows + Space", ctlRow6d:"Walk the shelf, then add the selected drop",
+  ctlRow7:"Esc", ctlRow7d:"Close panels",
+  ctlRow8:"Mouse / touch", ctlRow8d:"Everything is tappable — the paper itself pours when tapped",
+  backAria:"Back to the collection index",
+  toastAch:"New achievement: {a}!",
+  toastLang:"تم التبديل إلى العربية",
+  weekChip:"Week {n}",
+  vialFull:"The vial is full (9 drops) — serve or empty it.",
+  phaseStory:"Story chapter", phaseEndless:"Open weeks",
+  genH1a:"It blows with the wind first, then settles slowly.", genH1b:"It does not float; it settles at once like earth.",
+  genH2:"The heart of the story belongs to the {fam} folk.", genH3:"Only three notes, and no fourth.",
+},
+};
+/* ============================================================
+   2 · GAME DATA — 14 essences, 8 story clients, endless pools
+   ============================================================ */
+const ESSENCES = [
+ {id:"lemon",    em:"🍋", name:{ar:"قشرُ ليمون",en:"Lemon peel"},    fam:"citrus", vol:0, int:4, cost:2,  col:"#e9c46a"},
+ {id:"bergamot", em:"🍊", name:{ar:"برغموت",en:"Bergamot"},         fam:"citrus", vol:0, int:3, cost:2,  col:"#f4a259"},
+ {id:"mint",     em:"🌱", name:{ar:"نعناع",en:"Mint"},              fam:"green",  vol:0, int:4, cost:2,  col:"#7fb069"},
+ {id:"lavender", em:"🪻", name:{ar:"خزامى",en:"Lavender"},          fam:"floral", vol:1, int:3, cost:4,  col:"#b08bc0"},
+ {id:"jasmine",  em:"🤍", name:{ar:"ياسمين",en:"Jasmine"},          fam:"floral", vol:1, int:4, cost:4,  col:"#efe0c0"},
+ {id:"rose",     em:"🌹", name:{ar:"وردة",en:"Rose"},               fam:"floral", vol:1, int:4, cost:4,  col:"#d98cb3"},
+ {id:"clove",    em:"🌰", name:{ar:"قرنفل",en:"Clove"},             fam:"spice",  vol:1, int:5, cost:4,  col:"#a05c3b"},
+ {id:"nutmeg",   em:"🥜", name:{ar:"جوزة الطيب",en:"Nutmeg"},       fam:"spice",  vol:1, int:3, cost:4,  col:"#c68a53"},
+ {id:"cedar",    em:"🌲", name:{ar:"أرز",en:"Cedar"},               fam:"wood",   vol:1, int:3, cost:4,  col:"#8c6a4f"},
+ {id:"vetiver",  em:"🌾", name:{ar:"فيتيفر",en:"Vetiver"},          fam:"wood",   vol:2, int:4, cost:5,  col:"#6b705c"},
+ {id:"vanilla",  em:"🍦", name:{ar:"فانيليا",en:"Vanilla"},         fam:"sweet",  vol:2, int:3, cost:5,  col:"#e8cda0"},
+ {id:"musk",     em:"🦌", name:{ar:"مسك",en:"Musk"},                fam:"musk",   vol:2, int:4, cost:5,  col:"#9d8d9c"},
+ {id:"ambergris",em:"🐋", name:{ar:"عنبرٌ رمادي",en:"Ambergris"},   fam:"animal", vol:2, int:5, cost:10, col:"#c9a87c", rare:true},
+ {id:"oud",      em:"🪵", name:{ar:"عود",en:"Oud"},                 fam:"wood",   vol:2, int:5, cost:10, col:"#6f4e37", rare:true},
+];
+const ESSENCE_BY_ID = Object.fromEntries(ESSENCES.map(e=>[e.id,e]));
+/* symmetric relationship pairs (referenced by hints, bloom notes and scoring) */
+const CLASH_PAIRS = [["lemon","vanilla"],["lemon","vetiver"],["lemon","oud"],["mint","vanilla"],
+ ["mint","clove"],["mint","lavender"],["bergamot","musk"],["bergamot","nutmeg"],
+ ["jasmine","clove"],["rose","cedar"],["ambergris","mint"]];
+const AFFIN_PAIRS = [["lemon","bergamot"],["lemon","mint"],["lemon","rose"],["lemon","lavender"],
+ ["bergamot","jasmine"],["bergamot","cedar"],["mint","cedar"],["lavender","rose"],
+ ["lavender","cedar"],["lavender","vanilla"],["jasmine","rose"],["jasmine","musk"],
+ ["clove","vanilla"],["clove","oud"],["clove","nutmeg"],["nutmeg","vetiver"],
+ ["nutmeg","vanilla"],["cedar","vetiver"],["vetiver","musk"],["musk","ambergris"],
+ ["ambergris","oud"],["rose","oud"]];
+const clashes=(a,b)=>CLASH_PAIRS.some(p=>(p[0]===a&&p[1]===b)||(p[0]===b&&p[1]===a));
+const affins =(a,b)=>AFFIN_PAIRS.some(p=>(p[0]===a&&p[1]===b)||(p[0]===b&&p[1]===a));
+const famKey = f=>({citrus:"famCitrus",green:"famGreen",floral:"famFloral",spice:"famSpice",
+ wood:"famWood",sweet:"famSweet",musk:"famMusk",animal:"famAnimal"}[f]);
+
+/* ---- 8 authored story clients (order = chapter order) ---- */
+const STORY_CLIENTS = [
+ {id:"ummKhalil", em:"👵", name:{ar:"أمُّ خليل",en:"Umm Khalil"}, role:{ar:"خبّازةُ الحيِّ المتقاعدة",en:"the retired neighbourhood baker"},
+  mem:{ar:"طفلًا، كان أخي يركضُ أمامنا إلى المخبزِ قبل الفجر، وكانت رائحةُ الليمونِ على أيديِ الباعةِ تفوقُ رائحةَ الخبزِ نفسِه. أعطني شيئًا يفتحُ مثل ذلك الصبح.",
+       en:"As a child, my brother raced ahead to the bakery before dawn, and the lemon scent on the vendors' hands outshone the bread itself. Give me something that opens like that morning."},
+  formula:[["lemon",3],["bergamot",2],["jasmine",1]], pay:30,
+  hints:[
+   {ar:"يبدأُ مشرقًا مثل شارعٍ صباحيٍّ بعد الرَّيّ.",en:"It opens bright like a morning street after watering."},
+   {ar:"قلبٌ من زهرِ ليلٍ يجيبُ اللمعانَ الأول.",en:"A heart of night flowers answers the first shine."},
+   {ar:"لا شيء ثقيلٌ يبقى منه بعد الظهر.",en:"Nothing heavy of it survives past noon."}]},
+ {id:"layla", em:"📚", name:{ar:"ليلى الطالبة",en:"Layla the student"}, role:{ar:"طالبةٌ في كلية الحقوق",en:"a law student"},
+  mem:{ar:"أذاكرُ على السطحِ حتى ينتصرَ البرد. عطري؟ شيءٌ باردٌ كأنفاسِ الصباح، وحادٌّ كضحكةِ صديقتي، ثم يُنهي ليلةَ المذاكرةِ بشيءٍ حلوٍ خفيفٍ في العمق.",
+       en:"I study on the rooftop until the cold wins. My perfume? Something cold like morning breath, sharp like my friend's laugh, ending the study night with something lightly sweet, deep down."},
+  formula:[["mint",2],["lemon",1],["vanilla",1]], pay:35,
+  hints:[
+   {ar:"يبدأُ باردًا أخضرَ كأوراقِ النعناعِ المبلول.",en:"It begins cold and green like drenched mint leaves."},
+   {ar:"ثم ضحكةٌ حمضيّةٌ حادّةٌ تعتري الجو.",en:"Then a sharp citrusy laugh cuts the air."},
+   {ar:"ونهايةٌ سُكَّريّةٌ صغيرةٌ سرقَتها العصفورة.",en:"And a tiny sugary ending the sparrow stole."}]},
+ {id:"yusuf", em:"🖋", name:{ar:"الأخُ يوسف",en:"Brother Yusuf"}, role:{ar:"أديبٌ يعاني الأرق",en:"an insomniac scribe"},
+  mem:{ar:"كتبتُ لغيري منذ ثلاثين سنة، والنومُ لا يزالُ يرفضُ دعوتي. أريدُ عطرًا لذراعِ كرسيِّ الليل: ساعاتٌ بنفسجيّةٌ هادئة، حلاوةٌ نائمة، وطاولةُ خشبٍ تحملُ كلَّ ذلك.",
+       en:"I have written for others for thirty years, and sleep still refuses my invitation. I want a perfume for the arm of my night chair: quiet purple hours, sleeping sweetness, and a wooden table holding it all."},
+  formula:[["lavender",2],["vanilla",2],["cedar",1]], pay:38,
+  hints:[
+   {ar:"ساعاتٌ بنفسجيّةٌ هادئةٌ كأزهارِ المساء.",en:"Quiet purple hours like evening blossoms."},
+   {ar:"حلاوةٌ نائمةٌ في الأعماقِ لا تزعجُ أحدًا.",en:"A sleeping sweetness in the depths, troubling no one."},
+   {ar:"ألواحُ خشبٍ تحت كلِّ شيءٍ آخر.",en:"Wooden planks beneath everything else."}]},
+ {id:"dawud", em:"🎣", name:{ar:"داوودُ الصيّاد",en:"Dawud the fisherman"}, role:{ar:"صيّادٌ عجوز",en:"an old fisherman"},
+  mem:{ar:"منذ أربعين سنةً وأنا أحملُ البحرَ على ظهري. رائحتي؟ الجلدُ المالحُ بعد المرفأ، وطينُ النهرِ عند الجذور، وابتسامةٌ برتقاليّةٌ واحدةٌ قبل الغوص.",
+       en:"For forty years I have carried the sea on my back. My scent? Salted skin after the harbour, river mud at the roots, and a single orange smile before the dive."},
+  formula:[["bergamot",1],["musk",2],["vetiver",2]], pay:42,
+  hints:[
+   {ar:"جلدٌ وملحٌ ودفءُ رجُلٍ من المرفأ.",en:"Skin and salt and the warmth of a harbour man."},
+   {ar:"جذورٌ وطينٌ تحت الماءِ الجاري.",en:"Roots and mud beneath the running water."},
+   {ar:"تحيّةٌ برّاقةٌ برتقاليّةٌ واحدةٌ في البداية.",en:"One bright orange greeting at the start."}]},
+ {id:"hajjFuad", em:"🐪", name:{ar:"الحاجُ فؤاد",en:"Hajj Fuad"}, role:{ar:"حارسُ قافلةٍ متقاعد",en:"a retired caravan guard"},
+  mem:{ar:"قطعتُ الصحراءَ مرتين وعادتُ كلُّ مرّةٍ برائحةٍ جديدةٍ تُلازمني. خشبٌ مدخَّنٌ كبابِ بيتِ أبي، بهارٌ صارَ كالجلدِ القديم، وأبوابُ أرزٍ في مدينةٍ عريقة.",
+       en:"I crossed the desert twice, and each time a new scent stayed with me. Smoked wood like my father's door, spice grown old as leather, and cedar doors in an ancient city."},
+  formula:[["oud",2],["clove",1],["cedar",2]], pay:48,
+  hints:[
+   {ar:"شيءٌ مدخَّنٌ عريقٌ يجلسُ في الأعماق.",en:"Something ancient and smoked sitting in the depths."},
+   {ar:"بهارٌ اشتدَّ حتى صارَ كالجلد.",en:"A spice that hardened until it became leather."},
+   {ar:"يقفُ في الوسطِ كبابِ أرزٍ عريق.",en:"It stands in the middle like an old cedar door."}]},
+ {id:"rima", em:"🪶", name:{ar:"ريما الشاعرة",en:"Rima the poet"}, role:{ar:"شاعرةٌ تنشرُ أبياتها على الأسطح",en:"a poet who reads from rooftops"},
+  mem:{ar:"أنشرُ أبياتي فوق أسطحِ المدينةِ القديمة. عطريّ؟ بيتٌ مفتوحٌ كصفحةٍ بيضاء، ووردٌ مضغوطٌ في كتابٍ قديم، وحبرٌ داكنٌ عريقٌ في قاعِ كلِّ شيء.",
+       en:"I read my verses from the old city's rooftops. My perfume? An opening like a blank page, roses pressed inside an old book, and dark ancient ink at the bottom of everything."},
+  formula:[["lemon",2],["rose",2],["oud",1]], pay:55,
+  hints:[
+   {ar:"يفتحُ كأبياتٍ مشرقةٍ كقشرِ الليمون.",en:"It opens like bright verses, like lemon peel."},
+   {ar:"قلبٌ من وردٍ مضغوطٍ في كتابٍ قديم.",en:"A heart of roses pressed in an old book."},
+   {ar:"حبرٌ داكنٌ عريقٌ في القاعِ لا يمحوه الماء.",en:"Dark ancient ink at the bottom that water cannot wash."}]},
+ {id:"najwa", em:"💍", name:{ar:"السيدةُ نجوى",en:"Sayida Najwa"}, role:{ar:"عروسٌ تُعدُّ لعرسها",en:"a bride preparing her wedding"},
+  mem:{ar:"أتزوَّجُ مع أولِ قمرٍ من الربيع. أريدُ ما يليقُ بيومي: حديقةٌ تفتحُ وتفتحُ ولا تنتهي، وأثرٌ نفيسٌ من البحرِ لا يزولُ حتى الفجر.",
+       en:"I marry with the first moon of spring. I want what befits my day: a garden that keeps opening without end, and a precious trace of the sea that stays until dawn."},
+  formula:[["rose",3],["jasmine",2],["ambergris",1]], pay:60,
+  hints:[
+   {ar:"حديقةٌ تفتحُ وتفتحُ ولا تنتهي.",en:"A garden that opens and opens without end."},
+   {ar:"سبعُ ورداتٍ هي سيدةُ الحديقة.",en:"Seven roses are the ladies of the garden."},
+   {ar:"أثرٌ نفيسٌ جاءَ من قاعِ البحر.",en:"A precious trace come from the bottom of the sea."}]},
+ {id:"imad", em:"⚓", name:{ar:"القبطانُ عماد",en:"Captain Imad"}, role:{ar:"ربّانٌ شارفٌ على التقاعد",en:"a sea captain near retirement"},
+  mem:{ar:"آخرُ رحلاتي قبل الرصيفِ الأخير. عطرُ الغيابِ عن البحر: عودٌ كشُحومِ السفنِ القديمة، وجذورُ نهرٍ عند المرسى، وشيئانِ نفيسانِ جاءتا من أعماقِ المحيط.",
+       en:"My last voyages before the final dock. The scent of being away from the sea: oud like the tar of old ships, river roots at the anchorage, and two precious things come up from the deep."},
+  formula:[["vetiver",2],["ambergris",2],["oud",1]], pay:72,
+  hints:[
+   {ar:"أخشابٌ عريقةٌ كدهنِ السفنِ القديمة.",en:"Ancient woods like the tar of old ships."},
+   {ar:"شيئانِ نفيسانِ من الأعماقِ لا ثلاثة.",en:"Two precious things from the deep, not three."},
+   {ar:"جذورٌ أرضيّةٌ عند المرسى.",en:"Earthy roots at the anchorage."}]},
+];
+/* ---- endless mode pools ---- */
+const GEN_NAMES = [
+ {em:"🧕",name:{ar:"الخالّة سُعاد",en:"Aunt Su'ad"}}, {em:"🧑‍🏫",name:{ar:"الأستاذ مروان",en:"Teacher Marwan"}},
+ {em:"🧳",name:{ar:"المسافر سليم",en:"Salim the traveller"}}, {em:"👩‍🍳",name:{ar:"الطاهية أم يوسف",en:"Chef Umm Yusuf"}},
+ {em:"🎻",name:{ar:"عازفُ الكمان كريم",en:"Karim the violinist"}}, {em:"🧗",name:{ar:"متسلِّقةُ الجبال هدى",en:"Huda the climber"}},
+ {em:"🐝",name:{ar:"النحّاط أبو نحل",en:"Abu Nahl the beekeeper"}}, {em:"🪴",name:{ar:"بائعةُ النباتات لمياء",en:"Lamia the plant seller"}},
+ {em:"🚪",name:{ar:"نجّارُ الأبواب عمر",en:"Omar the door carpenter"}}, {em:"🧶",name:{ar:"الحائكة سلمى",en:"Salma the weaver"}},
+ {em:"🏇",name:{ar:"مدرِّبُ الخيل فراس",en:"Firas the horse trainer"}}, {em:"🍵",name:{ar:"بائعُ الشاي معتز",en:"Moataz the tea seller"}},
+];
+const GEN_OPEN = [
+ {ar:"كلُّ ذكرى عندي لها رائحة، وهذهِ هي التي أطلبُها:",en:"Every memory of mine has a scent; this is the one I ask for:"},
+ {ar:"أريدُ عطرًا يحملُ ما سأقولُه لك الآن:",en:"I want a perfume that carries what I am about to say:"},
+ {ar:"قالت جدتي إنّ لكلِّ إنسانٍ عطرًا واحدًا يحفظُ حكاياتِه:",en:"My grandmother said every person has one perfume that keeps their stories:"},
+ {ar:"خذ وقتك، لكن اصنع لي هذا بالضبط:",en:"Take your time, but make me exactly this:"},
+];
+const GEN_FAM = {
+ citrus:{ar:"قشرَ حمضيّاتٍ ينفتحُ في الصباح",en:"citrus peel opening in the morning"},
+ green:{ar:"ورقًا أخضرَ ما زالَ مبلولًا بالندى",en:"green leaves still wet with dew"},
+ floral:{ar:"زهراتٍ تتنافسُ على انتباهِ النحل",en:"flowers competing for the bees' attention"},
+ spice:{ar:"بهاراتٍ دافئةً كالمطبخِ في الأعياد",en:"warm spice like a holiday kitchen"},
+ wood:{ar:"خشبًا صلبًا يحملُ بيتًا كاملًا",en:"solid wood carrying a whole house"},
+ sweet:{ar:"حلاوةً هادئةً كرغيفٍ من الفرن",en:"quiet sweetness like bread from the oven"},
+ musk:{ar:"دفءَ جلدٍ وذِرابَ مسكٍ خفيف",en:"the warmth of skin and a light musk"},
+ animal:{ar:"أثرًا نفيسًا عجيبًا جاءَ من البحر",en:"a strange precious trace come from the sea"},
+};
+const GEN_CLOSE = [
+ {ar:"وسيكونُ هذا عطري في كلِّ عيد.",en:"And this will be my perfume for every feast."},
+ {ar:"لا تخيّبْ ظنّي، فالذكرى ثمينة.",en:"Do not disappoint me; the memory is precious."},
+ {ar:"سمعتُ أنّ يدك أخفُّ من جميعِ الأيدي.",en:"They say your hand is the lightest of all."},
+ {ar:"إن نجحتَ، سأحكي عنك في كلِّ مقهًى.",en:"Succeed, and I will speak of you in every café."},
+];
+/* ---- glossary / tips / achievements ---- */
+const GLOSSARY = [
+ {t:"note",d:{ar:"وحدةُ العطر: مكوّنٌ واحدٌ من الرفِّ يُقاسُ بعددِ قطراتِه (1–4 في الصيغِ السرّية، حتى 9 في القارورة).",en:"The unit of perfume: one ingredient from the shelf, measured in drops (1–4 in secret formulas, up to 9 in your vial)."}},
+ {t:"volatility",d:{ar:"سرعةُ تبخُّرِ النوتة؛ هي التي تُرتِّبُ الحلقاتَ على البلاط: المقدّماتُ أولًا فالقلوبُ فالقواعد.",en:"How fast a note evaporates; it orders the rings on the blotter: tops first, then hearts, then bases."}},
+ {t:"vol0",d:{ar:"النوتاتُ الأولَى: خفيفةٌ طائشة، تلمعُ كبيرًا على البلاطِ ثم تتلاشى.",en:"The first notes: light and fleeting — they bloom big on the blotter then fade."}},
+ {t:"vol1",d:{ar:"زخمُ العطرِ ووسطُه؛ حلقاتُها تدومُ أطولُ وتحملُ الرائحةَ الحقيقية.",en:"The perfume's body; its rings last longer and carry the true character."}},
+ {t:"vol2",d:{ar:"العمقُ الذي يبقى على البلاطِ حتى الجفافِ الكامل.",en:"The depth that remains on the blotter until it is fully dry."}},
+ {t:"accord",d:{ar:"نوتتانِ صديقتانِ في خلطةٍ واحدة ترفعانِ الجرعةَ بنسبة ٪10.",en:"Two friendly notes in one blend raise the payout by 10%."}},
+ {t:"clash",d:{ar:"نوتتانِ تتخاصمانِ فتنقصانِ الجرعةَ بنسبة ٪25؛ ليلةُ التعتيقِ تليّنُ المشاجرة.",en:"Two notes that fight and cut the payout by 25%; a night of aging mellows the clash."}},
+ {t:"blotter",d:{ar:"ورقةُ تذوّقِ العطّارين: سكبْ خلطتك عليها وشاهدْ الحلقاتَ تتفتحُ بترتيبِ التطايرِ وبحجمِ الشدّةِ والقطرات.",en:"The perfumer's tasting strip: pour your blend on it and watch rings bloom in volatility order, sized by intensity and drops."}},
+];
+const TIPS = [
+ {ar:"المقدّماتُ رخيصةٌ (2 جوخال) لكنّها تتلاشى من البلاطِ أولًا — لا تحكمْ قبل اكتمالِ الحلقات.",en:"Tops are cheap (2 coins) but fade from the blotter first — judge only when the rings complete."},
+ {ar:"حجمُ الحلقةِ = شدّةُ النوتة × عددُ قطراتِها؛ الحلقةُ الضخمةُ تعني قطرةً كثيرة.",en:"Ring size = intensity × drops; a huge ring means many drops of that note."},
+ {ar:"إذا همستِ الهمساتُ عن مشاجرةٍ، اسألْ نفسك: هل أريدُ هذهِ النوتةَ أصلًا؟",en:"If a whisper mentions a quarrel, ask yourself: do I even want that note?"},
+ {ar:"«أَعِمْرُها ليلةً» تُمرِّرُ الزبونَ دون خسارةِ سمعةٍ — وتبقي قارورتك كما هي.",en:"'Age overnight' passes a client without renown loss — and keeps your vial as is."},
+ {ar:"القواعدُ بـ5 جواخيل والنادرةُ بـ10 — وفِّرها للحينِ الذي تثقُ فيه.",en:"Bases cost 5 coins, rares 10 — save them for the moment you are confident."},
+ {ar:"ثلاثُ طبقاتٍ واضحةٍ (مقدمة/قلب/قاعدة) أقربُ إلى ذاكرةٍ كاملة.",en:"Three clear layers (top/heart/base) come closest to a complete memory."},
+ {ar:"دفترُ الوصفاتِ يعيدُ صياغةَ نجاحٍ قديمٍ مقابلَ ثمنِ قطراتِه.",en:"The recipe book replays an old success for the price of its drops."},
+ {ar:"الكميّةُ المطلوبةُ تقبلُ فرقَ قطرةٍ واحدة: إن كانت المطلوبة 3 فيُقبلُ 2 و4.",en:"The right note still counts if your count is within one drop of the secret amount."},
+ {ar:"سمعة 5 تفتحُ العود، و10 تفتحُ العنبرَ الرمادي، و15 تضيفُ همسةً رابعة.",en:"Renown 5 unlocks oud, 10 ambergris, and 15 adds a fourth whisper."},
+ {ar:"ما يبقى على البلاطِ بعد الجفافِ هو قاعدةُ الزبون — راقبْ الحلقةَ الباقية.",en:"What survives the dry blotter is the client's base — watch the last ring standing."},
+];
+const ACH = [
+ {id:"firstServe", icon:"🧪", n:{ar:"أولُ تقديم",en:"First Serve"}, d:{ar:"قدَّمتَ عطرًا لأول مرة.",en:"Served your very first perfume."}},
+ {id:"firstWin", icon:"🌟", n:{ar:"أولُ إعجاب",en:"First Approval"}, d:{ar:"أعجبَ زبونٌ بعطرك.",en:"A client loved your perfume."}},
+ {id:"firstPerfect", icon:"💯", n:{ar:"ذاكرةٌ كاملة",en:"Complete Memory"}, d:{ar:"قدَّمتَ تركيبةً مثاليةً بالثلاثِ نوتات.",en:"Served a perfect three-note formula."}},
+ {id:"streak3", icon:"🔥", n:{ar:"ثلاثةٌ متتالية",en:"Three in a Row"}, d:{ar:"ثلاثةُ نجاحاتٍ متتالية.",en:"Three successes in a row."}},
+ {id:"rich", icon:"💰", n:{ar:"ثريُّ العطارين",en:"Souq Magnate"}, d:{ar:"اجتمعت في صندوقك 150 جوخالًا.",en:"Held 150 coins at once."}},
+ {id:"oudOpen", icon:"🚪", n:{ar:"بابُ العود",en:"The Oud Gate"}, d:{ar:"فتحتَ المكوّنَ النادر: العود.",en:"Unlocked the rare ingredient: oud."}},
+ {id:"amberOpen", icon:"🌊", n:{ar:"هديةُ البحر",en:"Gift of the Sea"}, d:{ar:"فتحتَ العنبرَ الرمادي.",en:"Unlocked ambergris."}},
+ {id:"storyDone", icon:"📖", n:{ar:"حاوي الحكايات",en:"Keeper of Stories"}, d:{ar:"أتممتَ فصلَ الزبائنِ الثمانية.",en:"Finished the chapter of eight story clients."}},
+ {id:"week1", icon:"📈", n:{ar:"أسبوعٌ موفَّق",en:"Prosperous Week"}, d:{ar:"بلّغتَ هدفَ أسبوعٍ مفتوح.",en:"Met an open week's target."}},
+ {id:"collector", icon:"🧺", n:{ar:"جامعُ الروائح",en:"Scent Collector"}, d:{ar:"استعملتَ النواتَ الأربعَ عشرة كلَّها.",en:"Used all fourteen essences."}},
+];
+/* ============================================================
+   3 · UTILS — i18n access, formatting, seeded RNG, colors
+   ============================================================ */
+const t = k => (I18N[S.lang] && I18N[S.lang][k]) || I18N.en[k] || k;
+const L = o => o ? (o[S.lang] ?? o.en ?? o.ar) : "";
+const hintTxt = h => h && h.k ? fmt(h.k, h.vars || {}) : L(h);
+const fmt = (k, vars) => t(k).replace(/\{(\w+)\}/g, (_, v) => (vars && vars[v] !== undefined ? String(vars[v]) : "{" + v + "}"));
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, x) => a + (b - a) * x;
+const easeOut = x => 1 - Math.pow(1 - clamp(x, 0, 1), 3);
+function hashStr(s){ let h = 2166136261; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let x = Math.imul(a ^ a >>> 15, 1 | a); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; }; }
+function hexRgb(h){ return {r:parseInt(h.slice(1,3),16), g:parseInt(h.slice(3,5),16), b:parseInt(h.slice(5,7),16)}; }
+function mixCols(list){ /* weighted additive mix {col,w} → css rgb */
+  let r=0,g=0,b=0,w=0; for (const {col,wt} of list){ const c=hexRgb(col); r+=c.r*wt; g+=c.g*wt; b+=c.b*wt; w+=wt; }
+  if(!w) return "#8888aa";
+  return "rgb("+Math.round(r/w)+","+Math.round(g/w)+","+Math.round(b/w)+")";
+}
+/* ============================================================
+   4 · AUDIO — Web Audio synth, lazy context, 6 cues
+   ============================================================ */
+const AU = {
+  ctx:null, master:null,
+  ensure(){
+    if (!this.ctx){
+      try{
+        const AC = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AC();
+        this.master = this.ctx.createGain();
+        this.master.gain.value = 0.42;
+        this.master.connect(this.ctx.destination);
+      }catch(e){ this.ctx = null; }
+    }
+    if (this.ctx && this.ctx.state === "suspended") this.ctx.resume().catch(()=>{});
+    return !!this.ctx;
+  },
+  tone(f, d, type="sine", v=0.4, at=0, slide=0){
+    if (!S.settings.sound || !this.ensure()) return;
+    const t0 = this.ctx.currentTime + at;
+    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(Math.max(30, f), t0);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f + slide), t0 + d);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.linearRampToValueAtTime(v, t0 + 0.014);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    o.connect(g); g.connect(this.master);
+    o.start(t0); o.stop(t0 + d + 0.06);
+  },
+  blip(){ this.tone(690, .1, "sine", .3, 0, 300); },                     // droplet added
+  pop(){ this.tone(340, .07, "sine", .22, 0, -160); },                   // drop withdrawn
+  click(){ this.tone(1150, .035, "triangle", .14); },                    // ui
+  chime(i){ const sc=[523.25,587.33,659.25,783.99,880,1046.5], f=sc[i%sc.length];
+    this.tone(f, .55, "triangle", .2); this.tone(f*2, .4, "sine", .07); },  // bloom ring arpeggio
+  bell(){ [880,1108.73,1318.51].forEach((f,i)=>{ this.tone(f,.75,"sine",.2,i*.1); this.tone(f*2,.5,"sine",.05,i*.1); }); }, // success
+  thud(){ this.tone(130,.3,"sine",.5,0,-70); this.tone(88,.34,"triangle",.3,.02,-30); }, // failure
+  fanfare(){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>this.tone(f,.4,"triangle",.18,i*.12)); }, // unlock
+};
+/* ============================================================
+   5 · STORAGE & STATE — safe wrapper, single save blob
+   ============================================================ */
+const store = {
+  mem:{}, ok:false,
+  init(){ try{ localStorage.setItem("_t1","1"); localStorage.removeItem("_t1"); this.ok = true; }catch(e){ this.ok = false; } },
+  get(k, d){ try{ if(this.ok){ const v = localStorage.getItem(k); if(v != null) return JSON.parse(v); } }catch(e){}
+    return (k in this.mem) ? this.mem[k] : d; },
+  set(k, v){ try{ if(this.ok){ localStorage.setItem(k, JSON.stringify(v)); return; } }catch(e){} this.mem[k] = v; },
+  del(k){ try{ if(this.ok){ localStorage.removeItem(k); return; } }catch(e){} delete this.mem[k]; }
+};
+store.init();
+const DEFAULT_SETTINGS = { sound:true, motion:"full", hints:3, bloom:1, theme:"night", labels:true };
+function freshState(){
+  return {
+    coins:40, rep:0, day:1, phase:"story", storyIdx:0, storyEnded:false,
+    week:1, weekEarn:0, weekStart:1, seed:977, strikes:0,
+    vial:{ items:{}, order:[], mellowed:false },
+    cur:null, unlocked:[], book:[], ledger:[], ach:[], usedEss:[], cluesShown:[],
+    stats:{ served:0, success:0, perfect:0, earned:0, streak:0, best:0 },
+    settings:{ ...DEFAULT_SETTINGS },
+  };
+}
+let S = freshState();
+function loadState(){
+  const d = store.get("abq_save", null);
+  if (d && typeof d === "object"){
+    S = Object.assign(freshState(), d);
+    S.settings = Object.assign({ ...DEFAULT_SETTINGS }, d.settings || {});
+    S.vial = Object.assign({ items:{}, order:[], mellowed:false }, d.vial || {});
+    S.stats = Object.assign({ served:0, success:0, perfect:0, earned:0, streak:0, best:0 }, d.stats || {});
+  }
+  S.lang = store.get("abq_lang", "ar");
+  if (S.lang !== "ar" && S.lang !== "en") S.lang = "ar";
+  S.ff = false;
+  /* migration: rebuild the current client if it predates a data revision */
+  if (S.cur && !S.cur.name){
+    const idx = STORY_CLIENTS.findIndex(c => c.id === S.cur.id);
+    S.cur = idx >= 0 ? storyClient(idx) : genClient();
+  }
+}
+const save = () => { S.unlocked = ESSENCES.filter(isUnlocked).map(e => e.id); store.set("abq_save", S); };
+const isUnlocked = e => !e.rare || (e.id === "oud" ? S.rep >= 5 : S.rep >= 10);
+const vialCount = () => Object.values(S.vial.items).reduce((a, b) => a + b, 0);
+const vialCost  = () => Object.entries(S.vial.items).reduce((a, [id, n]) => a + ESSENCE_BY_ID[id].cost * n, 0);
+/* ============================================================
+   6 · SHELL — language, static i18n, overlays, toasts, settings
+   ============================================================ */
+const openStack = []; let lastFocus = null;
+function buildStatic(){
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => { el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria"))); });
+  document.querySelectorAll("[data-i18n-title]").forEach(el => { el.setAttribute("title", t(el.getAttribute("data-i18n-title"))); });
+  $("blotter").setAttribute("aria-label", t("blotterH") + " — " + t("bloomHintTxt"));
+}
+function applyLang(){
+  document.documentElement.lang = S.lang;
+  document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
+  $("btnLang").textContent = S.lang === "ar" ? "EN" : "عربي";
+  buildStatic(); renderHud(); renderClient(); renderShelf(); renderVial(); renderBlotterChrome(); renderAbout();
+  $("tipLine").textContent = "💡 " + L(TIPS[tipIdx]);
+  if (!$("ovBook").hidden) renderBook();
+  if (!$("ovLedger").hidden) renderLedger();
+  if (!$("ovStats").hidden) renderStats();
+  if (!$("ovGloss").hidden) renderGloss();
+}
+function toggleLang(){
+  S.lang = S.lang === "ar" ? "en" : "ar";
+  store.set("abq_lang", S.lang); save(); applyLang(); AU.click(); toast(t("toastLang"));
+}
+function toast(msg, cls=""){
+  const box = $("toasts");
+  while (box.children.length >= 3) box.firstChild.remove();
+  const d = document.createElement("div");
+  d.className = "toast " + cls; d.textContent = msg;
+  box.appendChild(d);
+  setTimeout(() => { d.classList.add("out"); setTimeout(() => d.remove(), 500); }, 3100);
+}
+function openOv(id){
+  const ov = $(id);
+  if (!ov.hidden) return;
+  if (openStack.length === 0) lastFocus = document.activeElement;
+  ov.hidden = false; openStack.push(id);
+  const f = ov.querySelector(".btn:not([disabled])");
+  if (f) f.focus();
+}
+function closeOv(id){
+  const ov = $(id);
+  if (ov.hidden) return;
+  ov.hidden = true;
+  const i = openStack.indexOf(id); if (i >= 0) openStack.splice(i, 1);
+  if (openStack.length === 0 && lastFocus){ try{ lastFocus.focus(); }catch(e){} lastFocus = null; }
+}
+function closeTop(){ if (openStack.length) closeOv(openStack[openStack.length - 1]); }
+function renderAbout(){
+  const rows = [[1,"1–14"],[2,"Backspace"],[3,"B"],[4,"F"],[5,"Enter"],[6,"⇦⇨ + ␣"],[7,"Esc"],[8,"🖱"]];
+  $("ctlGrid").innerHTML = rows.map(([n, k]) =>
+    `<span><kbd>${k}</kbd></span><span>${t("ctlRow"+n+"d")}</span>`).join("");
+}
+/* ---- settings ---- */
+function syncSettingsUI(){
+  $("setSound").textContent = S.settings.sound ? "🔊 " + t("soundOn") : "🔇 " + t("soundOff");
+  $("setSound").setAttribute("aria-pressed", String(S.settings.sound));
+  $("setLabels").textContent = S.settings.labels ? "🔖 " + t("soundOn") : t("soundOff");
+  $("setLabels").setAttribute("aria-pressed", String(S.settings.labels));
+  [["setMotion","motion"],["setHints","hints"],["setBloom","bloom"],["setTheme","theme"]].forEach(([id, key]) => {
+    $(id).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === String(S.settings[key]))));
+  });
+  $("btnLabels").setAttribute("aria-pressed", String(S.settings.labels));
+}
+function bindSettings(){
+  $("setSound").addEventListener("click", () => { S.settings.sound = !S.settings.sound; syncSettingsUI(); save(); AU.click(); });
+  $("setLabels").addEventListener("click", () => { S.settings.labels = !S.settings.labels; syncSettingsUI(); save(); markBlotterDirty(); AU.click(); });
+  $("setMotion").addEventListener("click", e => { const v = e.target.dataset?.v; if(!v) return;
+    S.settings.motion = v; document.body.dataset.motion = v; syncSettingsUI(); save(); AU.click(); });
+  $("setHints").addEventListener("click", e => { const v = e.target.dataset?.v; if(!v) return;
+    S.settings.hints = +v; syncSettingsUI(); save(); renderClient(); AU.click(); });
+  $("setBloom").addEventListener("click", e => { const v = e.target.dataset?.v; if(!v) return;
+    S.settings.bloom = +v; syncSettingsUI(); save(); AU.click(); });
+  $("setTheme").addEventListener("click", e => { const v = e.target.dataset?.v; if(!v) return;
+    S.settings.theme = v; document.body.dataset.theme = v; syncSettingsUI(); save(); markBlotterDirty(); AU.click(); });
+  $("setReset").addEventListener("click", () => {
+    $("cfBody").textContent = t("resetWarn"); openOv("ovConfirm");
+  });
+  $("cfNo").addEventListener("click", () => { closeOv("ovConfirm"); AU.click(); });
+  $("cfYes").addEventListener("click", () => { store.del("abq_save"); store.del("abq_lang"); store.del("abq_seen"); location.reload(); });
+}
+/* ============================================================
+   7 · SHELF & VIAL — the organ, drop economy, liquid rendering
+   ============================================================ */
+let shelfSel = 0;
+function buildShelf(){
+  $("shelf").innerHTML = ESSENCES.map((e, i) => `
+    <button class="shelf-item" data-id="${e.id}" data-i="${i}" aria-label="${L(e.name)}">
+      <span class="keynum" aria-hidden="true">${i + 1}</span>
+      <span class="em" aria-hidden="true">${e.em}</span>
+      <span class="nm">${L(e.name)}</span>
+      <span class="meta"><span class="dots">${"●".repeat(e.int)}</span> ${e.cost}🪙</span>
+    </button>`).join("");
+  $("shelf").querySelectorAll(".shelf-item").forEach(b => {
+    b.addEventListener("click", () => { shelfSel = +b.dataset.i; addDrop(b.dataset.id); });
+  });
+  renderShelf();
+}
+function renderShelf(){
+  $("shelfSub").textContent = (S.phase === "story" ? t("phaseStory") : t("phaseEndless")) + " · " + t("day") + " " + S.day;
+  $("shelf").querySelectorAll(".shelf-item").forEach((b, i) => {
+    const e = ESSENCES[i], unlocked = isUnlocked(e);
+    b.classList.toggle("locked", !unlocked);
+    b.classList.toggle("poor", unlocked && S.coins < e.cost);
+    b.classList.toggle("selected", i === shelfSel);
+    b.disabled = false;
+    b.style.borderInlineStartColor = e.col;
+    b.title = L(e.name) + " · " + t(famKey(e.fam)) + " · " + t("vol" + e.vol);
+  });
+}
+function addDrop(id){
+  const e = ESSENCE_BY_ID[id];
+  if (!isUnlocked(e)){ toast(fmt("lockedToast", {r: e.id === "oud" ? 5 : 10})); AU.thud(); return; }
+  if (vialCount() >= 9){ toast(t("vialFull"), "bad"); AU.thud(); return; }
+  if (S.coins < e.cost){ toast(fmt("poorToast", {c: e.cost}), "bad"); AU.thud(); return; }
+  S.coins -= e.cost;
+  S.vial.items[id] = (S.vial.items[id] || 0) + 1;
+  S.vial.order.push(id);
+  if (!S.usedEss.includes(id)) S.usedEss.push(id);
+  shelfSel = ESSENCES.indexOf(e);
+  AU.blip(); pulseBlotter(); renderHud(); renderShelf(); renderVial(); checkAch(); save();
+}
+function removeOne(id){
+  if (!S.vial.items[id]) return;
+  S.vial.items[id]--; if (!S.vial.items[id]) delete S.vial.items[id];
+  const k = S.vial.order.lastIndexOf(id); if (k >= 0) S.vial.order.splice(k, 1);
+  S.coins += ESSENCE_BY_ID[id].cost;
+  AU.pop(); renderHud(); renderShelf(); renderVial(); save();
+}
+function removeLast(){
+  const order = S.vial.order;
+  if (!order.length) return;
+  removeOne(order[order.length - 1]);
+}
+function clearVial(){
+  if (!vialCount()) return;
+  S.coins += vialCost();
+  S.vial = { items:{}, order:[], mellowed:S.vial.mellowed };
+  AU.click(); renderHud(); renderShelf(); renderVial(); save();
+}
+function loadRecipe(rec){
+  const cost = rec.ess.reduce((a, [id, n]) => a + ESSENCE_BY_ID[id].cost * n, 0);
+  if (S.coins < cost){ toast(t("bookLoadPoor"), "bad"); AU.thud(); return; }
+  S.coins -= cost;
+  S.vial = { items:Object.fromEntries(rec.ess), order:rec.ess.flatMap(([id, n]) => Array(n).fill(id)), mellowed:false };
+  AU.blip(); closeOv("ovBook"); renderHud(); renderShelf(); renderVial(); save();
+  toast("🧪 " + L(rec.name));
+}
+function renderVial(){
+  const n = vialCount(), spent = vialCost();
+  $("dropCount").textContent = n + "/9";
+  $("costSpent").textContent = spent;
+  $("vialEmptyMsg").hidden = n > 0;
+  const H = 14.2, h = n * H, y = 188 - h;
+  $("liqRect").setAttribute("y", y); $("liqRect").setAttribute("height", h);
+  $("liqSurf").setAttribute("cy", Math.max(y, 41));
+  $("liqNeck").setAttribute("y", Math.min(y, 44) - 0 + 0);
+  $("liqNeck").setAttribute("height", Math.max(0, 44 - Math.min(y, 44)) + 2);
+  /* layered gradient: bases settle bottom, tops float top */
+  const bands = [];
+  for (let v = 2; v >= 0; v--){
+    const list = Object.entries(S.vial.items).filter(([id]) => ESSENCE_BY_ID[id].vol === v);
+    if (list.length) bands.push(mixCols(list.map(([id, c]) => ({ col:ESSENCE_BY_ID[id].col, wt:c }))));
+  }
+  let stops = "", acc = 0;
+  bands.forEach((c, i) => {
+    const from = acc / Math.max(bands.length, 1);
+    acc += 1; const to = acc / Math.max(bands.length, 1);
+    stops += `<stop offset="${from}" stop-color="${c}"/><stop offset="${to}" stop-color="${c}"/>`;
+  });
+  if (!stops) stops = `<stop offset="0" stop-color="#777"/><stop offset="1" stop-color="#777"/>`;
+  $("liqGrad").innerHTML = stops;
+  const chips = Object.entries(S.vial.items).map(([id, c]) => {
+    const e = ESSENCE_BY_ID[id];
+    return `<span class="vchip" style="border-color:${e.col}">${e.em} ${L(e.name)} ×${c}` +
+      `<button aria-label="− ${L(e.name)}" data-id="${id}">−</button></span>`;
+  }).join("");
+  $("vialChips").innerHTML = chips;
+  $("vialChips").querySelectorAll("button").forEach(b => b.addEventListener("click", () => removeOne(b.dataset.id)));
+  $("vialSvg").setAttribute("aria-label", t("vialH") + ": " + n + " / 9");
+}
+/* ============================================================
+   8 · HUD & CLIENT PANEL — patience, memory, hints, whispers
+   ============================================================ */
+function renderHud(){
+  $("dayVal").textContent = S.day;
+  $("coinVal").textContent = S.coins;
+  $("repVal").textContent = S.rep;
+  const ph = $("hudPhase");
+  if (S.phase === "endless"){ ph.hidden = false; ph.textContent = "🕯 " + fmt("weekChip", {n:S.week}) + " · " + fmt("weekTarget", {w:S.week, t:weekTarget(), e:S.weekEarn}); }
+  else { ph.hidden = false; ph.textContent = "🕯 " + t("phaseStory"); }
+}
+function renderClient(){
+  const c = S.cur;
+  if (!c){ $("clientName").textContent = "…"; $("clientRole").textContent = ""; $("clientMemory").textContent = ""; return; }
+  $("clientEmoji").textContent = c.em;
+  $("clientName").textContent = L(c.name);
+  $("clientRole").textContent = L(c.role);
+  $("clientMemory").textContent = L(c.mem);
+  const remain = 2 - S.strikes;
+  const pat = $("clientPatience"); pat.innerHTML = "";
+  for (let i = 0; i < 2; i++){
+    const d = document.createElement("i");
+    if (i < remain){ d.className = i === remain - 1 && S.strikes > 0 ? "on warn" : "on"; }
+    pat.appendChild(d);
+  }
+  pat.setAttribute("aria-label", t("patienceAria") + ": " + remain + "/2");
+  $("hintList").innerHTML = c.hints.map(h => `<li>💬 ${hintTxt(h)}</li>`).join("");
+  renderClues();
+}
+function genClues(c){
+  const rng = mulberry32(hashStr(c.id));
+  const ess = c.formula.map(f => f[0]), cnts = c.formula.map(f => f[1]);
+  const sum = cnts.reduce((a, b) => a + b, 0);
+  const layers = [...new Set(c.formula.map(([id]) => ESSENCE_BY_ID[id].vol))];
+  const builders = [
+    () => ({ k:"clueTotal", vars:{n:sum} }),
+    () => ({ k:"clueLayers", vars:{n:layers.length} }),
+    () => { const f = ess[Math.floor(rng() * ess.length)];
+      return { k:"clueFamily", vars:{fam:t(famKey(ESSENCE_BY_ID[f].fam))} }; },
+    () => { const vol = layers[Math.floor(rng() * layers.length)];
+      const n = c.formula.filter(([id]) => ESSENCE_BY_ID[id].vol === vol).reduce((a, [, n2]) => a + n2, 0);
+      return { k:"clueLayerDrops", vars:{layer:t("vol" + vol), n} }; },
+    () => { const cands = ESSENCES.filter(e => !ess.includes(e.id) && ess.some(f => clashes(f, e.id)) && isUnlocked(e));
+      if (!cands.length) return null;
+      const e = cands[Math.floor(rng() * cands.length)];
+      return { k:"clueClash", vars:{ess:L(e.name)} }; },
+    () => ess.some((a, i) => ess.slice(i + 1).some(b => affins(a, b)))
+      ? { k:"clueFriends", g:"fr" } : { k:"clueNoFriends", g:"fr" },
+    () => ({ k:"clueMax", vars:{n:Math.max(...cnts)} }),
+    () => ({ k:"clueCost", vars:{c:Math.max(...c.formula.map(([id]) => ESSENCE_BY_ID[id].cost))} }),
+    () => ess.some(id => ESSENCE_BY_ID[id].rare) ? { k:"clueRareYes" } : { k:"clueRareNo" },
+  ];
+  const order = builders.map((b, i) => i).sort(() => rng() - .5);
+  const out = [], seen = new Set();
+  const want = clamp(S.settings.hints + (S.rep >= 15 ? 1 : 0), 1, 4);
+  for (const i of order){
+    const cl = builders[i](); if (!cl) continue;
+    const key = cl.g || cl.k; if (seen.has(key)) continue;
+    seen.add(key); out.push(cl);
+    if (out.length >= want) break;
+  }
+  return out;
+}
+function renderClues(){
+  const box = $("clueList"); box.innerHTML = "";
+  if (!S.cur) return;
+  genClues(S.cur).forEach((cl, i) => {
+    const shown = S.cluesShown.includes(i);
+    const b = document.createElement("button");
+    b.className = "clue " + (shown ? "shown" : "hidden");
+    b.textContent = shown ? fmt(cl.k, cl.vars || {}) : "•••";
+    b.setAttribute("aria-label", t("whispersH") + " " + (i + 1));
+    b.addEventListener("click", () => {
+      if (S.cluesShown.includes(i)) return;
+      S.cluesShown.push(i); AU.click(); save(); renderClues();
+    });
+    box.appendChild(b);
+  });
+}
+/* ============================================================
+   9 · BLOTTER — the signature bloom simulation (canvas)
+   ============================================================ */
+const blot = { cv:null, ctx:null, w:0, h:0, dpr:1, dirty:true, specks:[], ghosts:[], bloom:null };
+const markBlotterDirty = () => { blot.dirty = true; };
+function cssVar(n){ return getComputedStyle(document.body).getPropertyValue(n).trim() || "#efe3d0"; }
+function setupBlotter(){
+  blot.cv = $("blotter"); blot.ctx = blot.cv.getContext("2d");
+  resizeBlotter();
+}
+function resizeBlotter(){
+  const r = blot.cv.getBoundingClientRect();
+  blot.dpr = Math.min(2, window.devicePixelRatio || 1);
+  blot.cv.width = Math.max(2, Math.round(r.width * blot.dpr));
+  blot.cv.height = Math.max(2, Math.round(r.height * blot.dpr));
+  blot.w = blot.cv.width; blot.h = blot.cv.height;
+  const rng = mulberry32(777); blot.specks = [];
+  for (let i = 0; i < 240; i++) blot.specks.push({ x:rng(), y:rng(), a:.03 + rng() * .06, r:.5 + rng() * 1.3 });
+  markBlotterDirty();
+}
+function pulseBlotter(){
+  blot.cv.classList.remove("pulse"); void blot.cv.offsetWidth;
+  blot.cv.classList.add("pulse");
+  setTimeout(() => blot.cv.classList.remove("pulse"), 460);
+}
+function startBloom(){
+  if (blot.bloom && blot.bloom.active){ toast(t("bloomRunning")); return; }
+  if (!vialCount()){ toast(t("bloomNoVial"), "bad"); AU.thud(); return; }
+  const layers = [[], [], []];
+  Object.entries(S.vial.items).forEach(([id, n]) => layers[ESSENCE_BY_ID[id].vol].push({ id, n }));
+  layers.forEach(l => l.sort((a, b) => ESSENCE_BY_ID[b.id].int - ESSENCE_BY_ID[a.id].int));
+  const rings = []; let idx = 0;
+  const minD = Math.min(blot.w, blot.h);
+  for (let v = 0; v < 3; v++) layers[v].forEach((r, k) => {
+    const e = ESSENCE_BY_ID[r.id];
+    const ang = (hashStr(r.id) % 628) / 100;
+    const dist = (hashStr(r.id + "d") % 55) / 100;
+    const r1 = (15 + e.int * 4 + r.n * 6.5) * (minD / 430);
+    rings.push({
+      x: blot.w / 2 + Math.cos(ang) * dist * minD * .42,
+      y: blot.h / 2 + Math.sin(ang) * dist * minD * .42,
+      r1, col:e.col, start:v * 6.5 + k * 1.5 + .3, grow:5, idx:idx++,
+      fadeR: v === 0 ? .22 : v === 1 ? .55 : 1,
+      fadeA: v === 0 ? .38 : v === 1 ? .62 : 1,
+      fadeFrom: v === 0 ? 9.5 : v === 1 ? 13 : 999,
+      name:L(e.name), chimed:false,
+    });
+  });
+  const dur = Math.max(...rings.map(r => r.start + r.grow)) + 2;
+  blot.bloom = { active:true, t:0, rings, dur };
+  $("bloomState").textContent = t("bloomStateRun");
+  $("bloomHintTxt").textContent = "";
+  AU.click(); save();
+}
+function updateBloom(dt){
+  const b = blot.bloom; if (!b || !b.active) return;
+  const mult = Math.max(1, S.settings.bloom) * (S.ff ? 3 : 1);
+  b.t += dt * mult;
+  for (const r of b.rings) if (!r.chimed && b.t >= r.start){ r.chimed = true; AU.chime(r.idx); }
+  updateBloomBar();
+  if (b.t >= b.dur) finishBloom();
+  markBlotterDirty();
+}
+function finishBloom(){
+  const b = blot.bloom; if (!b) return;
+  b.active = false;
+  blot.ghosts.push(b.rings.map(r => {
+    const f = r.fadeFrom === 999 ? 0 : clamp((b.dur - r.fadeFrom) / 6, 0, 1);
+    return { x:r.x, y:r.y, r:r.r1 * lerp(1, r.fadeR, f), col:r.col, a:.85 * lerp(1, r.fadeA, f) };
+  }));
+  if (blot.ghosts.length > 3) blot.ghosts.shift();
+  $("bloomState").textContent = t("bloomStateDone");
+  $("bloomTime").textContent = Math.ceil(b.dur) + "s";
+  AU.chime(4); markBlotterDirty();
+}
+function updateBloomBar(){
+  const b = blot.bloom; if (!b) return;
+  ["segTop", "segMid", "segBase"].forEach((id, i) => {
+    const p = clamp((b.t - i * 6.5) / 6.5, 0, 1);
+    $(id).style.transform = `scaleX(${p})`;
+  });
+}
+function drawBlotter(){
+  const g = blot.ctx, w = blot.w, h = blot.h; if (!g) return;
+  g.clearRect(0, 0, w, h);
+  g.fillStyle = cssVar("--canvas"); g.fillRect(0, 0, w, h);
+  const ink = cssVar("--canvas-ink");
+  g.fillStyle = ink;
+  for (const s of blot.specks){
+    g.globalAlpha = s.a;
+    g.beginPath(); g.arc(s.x * w, s.y * h, s.r * blot.dpr, 0, 6.29); g.fill();
+  }
+  g.globalAlpha = 1;
+  const drawRing = (x, y, r, col, a) => {
+    const c = hexRgb(col);
+    const gr = g.createRadialGradient(x, y, Math.max(1, r * .12), x, y, Math.max(2, r));
+    gr.addColorStop(0, `rgba(${c.r},${c.g},${c.b},${a * .5})`);
+    gr.addColorStop(.82, `rgba(${c.r},${c.g},${c.b},${a * .85})`);
+    gr.addColorStop(1, `rgba(${c.r},${c.g},${c.b},0)`);
+    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.29); g.fill();
+    g.strokeStyle = `rgba(${c.r},${c.g},${c.b},${Math.min(1, a + .15)})`;
+    g.lineWidth = 1.4 * blot.dpr; g.stroke();
+  };
+  for (const gh of blot.ghosts) for (const r of gh) drawRing(r.x, r.y, r.r, r.col, r.a * .3);
+  const b = blot.bloom;
+  if (b) for (const r of b.rings){
+    const age = b.t - r.start; if (age <= 0) continue;
+    const grow = easeOut(age / r.grow);
+    let rad = r.r1 * (.12 + .88 * grow), a = .85 * Math.min(1, age / .8);
+    if (age > r.fadeFrom){
+      const f = clamp((age - r.fadeFrom) / 6, 0, 1);
+      rad *= lerp(1, r.fadeR, f); a *= lerp(1, r.fadeA, f);
+    }
+    drawRing(r.x, r.y, rad, r.col, a);
+    if (S.settings.labels && age > .6){
+      g.globalAlpha = .55; g.fillStyle = ink;
+      g.font = `${11 * blot.dpr}px "Segoe UI",Tahoma,system-ui,sans-serif`;
+      g.textAlign = "center";
+      g.fillText(r.name, r.x, Math.min(h - 6, r.y + rad + 13 * blot.dpr));
+      g.globalAlpha = 1;
+    }
+  }
+}
+function renderBlotterChrome(){
+  const b = blot.bloom;
+  $("bloomState").textContent = b && !b.active ? t("bloomStateDone") : t("bloomStateIdle");
+  $("bloomHintTxt").textContent = t("bloomHintTxt");
+  if (!b || !b.active){
+    $("bloomTime").textContent = "0s";
+    ["segTop", "segMid", "segBase"].forEach(id => $(id).style.transform = "scaleX(0)");
+  }
+  markBlotterDirty();
+}
+/* ============================================================
+   10 · SERVE, ECONOMY & VERDICT — deduction scoring, payouts
+   ============================================================ */
+let tipIdx = 0;
+function serve(){
+  if (openStack.length) return;
+  if (!S.cur) return;
+  if (!vialCount()){ toast(t("vialEmpty"), "bad"); AU.thud(); return; }
+  const c = S.cur, items = { ...S.vial.items };
+  const details = c.formula.map(([id, n]) => {
+    const vc = items[id] || 0;
+    return { id, n, vc, st: !vc ? "no" : (Math.abs(vc - n) <= 1 ? "ok" : "near") };
+  });
+  const matched = details.filter(d => d.st !== "no");
+  const okAll = matched.length >= 2 && matched.every(d => d.st === "ok");
+  const perfect = details.every(d => d.st === "ok");
+  const vIds = Object.keys(items);
+  let pay = c.pay; const lines = [];
+  if (okAll){
+    if (vIds.some((a, i) => vIds.slice(i + 1).some(b => affins(a, b)))){ pay *= 1.1; lines.push({ k:"bonusAffin", cls:"pos" }); }
+    const hasClash = vIds.some((a, i) => vIds.slice(i + 1).some(b => clashes(a, b)));
+    if (hasClash){
+      if (S.vial.mellowed) lines.push({ k:"lineMellowed", cls:"neu" });
+      else { pay *= .75; lines.push({ k:"malusClash", cls:"neg" }); }
+    }
+    if (perfect){ pay *= 1.25; lines.push({ k:"bonusPerfect", cls:"pos" }); }
+  }
+  pay = Math.round(pay);
+  S.stats.served++;
+  if (okAll){
+    S.coins += pay; S.stats.success++; S.stats.earned += pay;
+    S.stats.streak++; S.stats.best = Math.max(S.stats.best, S.stats.streak);
+    if (perfect) S.stats.perfect++;
+    const repGain = perfect ? 3 : 2; S.rep += repGain;
+    if (!S.book.some(b => b.cid === c.id)) S.book.push({ cid:c.id, name:c.name, ess:c.formula.map(([id, n]) => [id, n]) });
+    pushLedger({ d:S.day, nm:c.name, res:perfect ? "perfect" : "win", pay, ess:vIds.map(id => [id, items[id]]) });
+    if (S.phase === "endless") S.weekEarn += pay;
+    S.vial = { items:{}, order:[], mellowed:false };
+    AU.bell();
+    showVerdict({ ok:true, perfect, details, pay, repGain, lines, c, advance:true });
+  } else {
+    S.strikes++; S.stats.streak = 0;
+    S.vial = { items:{}, order:[], mellowed:false };
+    AU.thud();
+    const lost = S.strikes >= 2;
+    if (lost){
+      S.rep = Math.max(0, S.rep - 1);
+      pushLedger({ d:S.day, nm:c.name, res:"lost", pay:0, ess:c.formula });
+      toast(fmt("clientLeftToast", { name:L(c.name) }), "bad");
+    } else {
+      pushLedger({ d:S.day, nm:c.name, res:"fail", pay:0, ess:vIds.map(id => [id, items[id]]) });
+    }
+    showVerdict({ ok:false, perfect:false, details, pay:0, repGain:0, lines, c, advance:lost, reveal:lost });
+  }
+  checkAch(); save(); renderHud(); renderShelf(); renderVial();
+}
+function pushLedger(e){ S.ledger.unshift(e); if (S.ledger.length > 36) S.ledger.pop(); }
+function showVerdict(v){
+  $("vdTitle").textContent = (v.ok ? (v.perfect ? "💯 " : "🌟 ") : "🥀 ") + t("verdictH");
+  $("vdClient").textContent = v.c.em + " " + L(v.c.name) + " — " + L(v.c.role);
+  const marks = { ok:"✓", near:"≈", no:"✗" };
+  const cols = { ok:"var(--good)", near:"var(--gold)", no:"var(--bad)" };
+  $("vdList").innerHTML = v.details.map(d => {
+    const secret = !(v.ok || v.reveal);
+    const nm = secret ? "•••" : L(ESSENCE_BY_ID[d.id].name);
+    const cnt = secret ? "" : `${d.vc}/${d.n}`;
+    const lbl = d.st === "ok" ? t("matchOk") : d.st === "near" ? t("matchNear") : t("matchNo");
+    return `<li><span class="mark" style="color:${cols[d.st]}">${marks[d.st]}</span><span>${nm}</span>` +
+      `<span class="cnt">${lbl}${cnt ? " · " + cnt : ""}</span></li>`;
+  }).join("");
+  let html = v.lines.map(l => `<div class="${l.cls}">${fmt(l.k)}</div>`).join("");
+  if (!v.ok) html += `<div class="neu">💧 ${2 - S.strikes}/2</div>`;
+  if (v.reveal){
+    html += `<div class="neu">${t("revealLine")} ` + v.c.formula.map(([id, n]) => {
+      const e = ESSENCE_BY_ID[id]; return `${e.em} ${L(e.name)} ×${n}`;
+    }).join(" · ") + `</div>`;
+  }
+  $("vdLines").innerHTML = html;
+  $("vdPay").innerHTML = v.ok
+    ? fmt("payoutLine", { p:v.pay }) + ` <small>· ${fmt("repLine", { r:"+" + v.repGain })}</small>`
+    : "";
+  $("vdNext").onclick = () => {
+    closeOv("ovVerdict"); AU.click();
+    if (v.advance) advanceClient(); else { renderClient(); renderShelf(); }
+  };
+  openOv("ovVerdict");
+}
+function ageOvernight(){
+  if (!S.cur || openStack.length) return;
+  S.vial.mellowed = true;
+  pushLedger({ d:S.day, nm:S.cur.name, res:"aged", pay:0, ess:Object.entries(S.vial.items) });
+  toast(t("ageDoneToast")); if (vialCount()) toast(t("mellowToast"));
+  AU.click(); advanceClient();
+}
+/* ============================================================
+   11 · CLIENTS, STORY & ENDLESS WEEKS — flow of days
+   ============================================================ */
+const weekTarget = () => 70 + 25 * (S.week - 1);
+function storyClient(i){
+  const c = STORY_CLIENTS[i];
+  return { id:c.id, em:c.em, name:c.name, role:c.role, mem:c.mem, formula:c.formula, pay:c.pay, hints:c.hints };
+}
+function genClient(){
+  S.seed = (Math.imul(S.seed, 1103515245) + 12345) >>> 0;
+  const rng = mulberry32(S.seed);
+  const pers = GEN_NAMES[Math.floor(rng() * GEN_NAMES.length)];
+  const pool = ESSENCES.filter(e => isUnlocked(e));
+  const picks = [...pool].sort(() => rng() - .5).slice(0, 3);
+  const counts = [1 + Math.floor(rng() * 4), 1 + Math.floor(rng() * 4), 1 + Math.floor(rng() * 4)];
+  let tot = counts.reduce((a, b) => a + b, 0);
+  while (tot > 9){ const i = counts.indexOf(Math.max(...counts)); counts[i]--; tot--; }
+  const formula = picks.map((e, i) => [e.id, counts[i]]);
+  const pay = Math.round(24 + tot * 3 + Math.min(S.rep, 24) * 1.2 + rng() * 8);
+  let dom = 0; counts.forEach((c, i) => { if (c > counts[dom]) dom = i; });
+  const dominant = picks[dom];
+  const topDrops = formula.filter(([id]) => ESSENCE_BY_ID[id].vol === 0).reduce((a, [, n]) => a + n, 0);
+  const o = GEN_OPEN[Math.floor(rng() * GEN_OPEN.length)];
+  const f = GEN_FAM[dominant.fam];
+  const cl = GEN_CLOSE[Math.floor(rng() * GEN_CLOSE.length)];
+  return {
+    id:"g" + S.seed, em:pers.em, name:pers.name,
+    role:{ ar:"زبونٌ من السوقِ الأسبوعيّ", en:"a client of the weekly souq" },
+    mem:{ ar:`${o.ar} ${f.ar}، ${cl.ar}`, en:`${o.en} ${f.en}, ${cl.en}` },
+    formula, pay,
+    hints:[
+      topDrops >= 2 ? { k:"genH1a" } : { k:"genH1b" },
+      { k:"genH2", vars:{ fam:t(famKey(dominant.fam)) } },
+      { k:"genH3" },
+    ],
+  };
+}
+function pickNextClient(){
+  if (S.phase === "story" && S.storyIdx >= STORY_CLIENTS.length) return null;
+  return S.phase === "story" ? storyClient(S.storyIdx++) : genClient();
+}
+function advanceClient(){
+  S.day++;
+  if (S.phase === "endless" && S.day - S.weekStart >= 7){
+    const tgt = weekTarget();
+    if (S.weekEarn >= tgt){
+      S.coins += 20; unlockAch("week1");
+      toast(fmt("weekWin", { n:20 }), "gold"); AU.fanfare();
+    } else toast(fmt("weekLose", { e:S.weekEarn, t:tgt }));
+    S.week++; S.weekEarn = 0; S.weekStart = S.day;
+  }
+  if (S.coins < 15){ S.coins += 10; toast(fmt("stipendToast", { n:10 })); }
+  S.strikes = 0; S.cluesShown = []; S.ff = false;
+  $("btnFF").setAttribute("aria-pressed", "false");
+  blot.bloom = null; blot.ghosts = [];
+  const next = pickNextClient();
+  if (!next){ storyComplete(); return; }
+  S.cur = next;
+  renderHud(); renderClient(); renderShelf(); renderVial(); renderBlotterChrome(); save();
+}
+function storyComplete(){
+  S.cur = null; S.storyEnded = true;
+  unlockAch("storyDone");
+  $("seStats").textContent = fmt("seStats", { c:S.stats.earned, r:S.rep, b:S.book.length });
+  renderHud(); renderClient(); save();
+  openOv("ovStoryEnd");
+}
+function beginEndless(){
+  closeOv("ovStoryEnd");
+  S.phase = "endless"; S.week = 1; S.weekEarn = 0; S.weekStart = S.day;
+  S.cur = genClient();
+  renderHud(); renderClient(); renderShelf(); renderVial(); renderBlotterChrome(); save();
+}
+/* ============================================================
+   12 · ACHIEVEMENTS, BOOK, LEDGER, STATS, GLOSSARY, TIPS
+   ============================================================ */
+function unlockAch(id){
+  if (S.ach.includes(id)) return;
+  const a = ACH.find(x => x.id === id); if (!a) return;
+  S.ach.push(id);
+  toast("🏅 " + fmt("toastAch", { a:L(a.n) }), "gold");
+  AU.fanfare(); save();
+}
+function checkAch(){
+  if (S.stats.served >= 1) unlockAch("firstServe");
+  if (S.stats.success >= 1) unlockAch("firstWin");
+  if (S.stats.perfect >= 1) unlockAch("firstPerfect");
+  if (S.stats.streak >= 3) unlockAch("streak3");
+  if (S.coins >= 150) unlockAch("rich");
+  if (S.rep >= 5) unlockAch("oudOpen");
+  if (S.rep >= 10) unlockAch("amberOpen");
+  if (S.usedEss.length >= ESSENCES.length) unlockAch("collector");
+}
+function renderBook(){
+  const box = $("bookList");
+  if (!S.book.length){ box.innerHTML = `<div class="emptyMsg">${t("bookEmpty")}</div>`; return; }
+  box.innerHTML = "";
+  S.book.forEach((rec, i) => {
+    const cost = rec.ess.reduce((a, [id, n]) => a + ESSENCE_BY_ID[id].cost * n, 0);
+    const d = document.createElement("div"); d.className = "recipe";
+    d.innerHTML = `<div><div class="rname">${L(rec.name)}</div>` +
+      `<div class="rmix">${rec.ess.map(([id, n]) => { const e = ESSENCE_BY_ID[id]; return `${e.em}×${n}`; }).join(" + ")} · ${cost}🪙</div></div>` +
+      `<button class="btn tiny">${t("bookLoad")}</button>`;
+    d.querySelector("button").addEventListener("click", () => loadRecipe(S.book[i]));
+    box.appendChild(d);
+  });
+}
+function renderLedger(){
+  const box = $("ledgerBody");
+  if (!S.ledger.length){ box.innerHTML = `<div class="emptyMsg">${t("ledgerEmpty")}</div>`; return; }
+  const cls = { win:"resWin", perfect:"resWin", fail:"resFail", lost:"resLost", aged:"resAged" };
+  box.innerHTML = `<table class="ledgerT"><thead><tr>` +
+    ["ledgerDay","ledgerClient","ledgerRes","ledgerPay","ledgerMix"].map(k => `<th>${t(k)}</th>`).join("") +
+    `</tr></thead><tbody>` +
+    S.ledger.map(e => `<tr><td>${e.d}</td><td>${L(e.nm)}</td>` +
+      `<td class="${cls[e.res] || ""}">${t("res" + e.res[0].toUpperCase() + e.res.slice(1))}</td>` +
+      `<td>${e.pay ? e.pay + "🪙" : "—"}</td>` +
+      `<td class="mixmini">${e.ess.map(([id, n]) => { const x = ESSENCE_BY_ID[id]; return x ? x.em + "×" + n : "?"; }).join(" ")}</td></tr>`).join("") +
+    `</tbody></table>`;
+}
+function renderStats(){
+  const st = S.stats;
+  const fams = new Set(S.usedEss.map(id => ESSENCE_BY_ID[id] && ESSENCE_BY_ID[id].fam).filter(Boolean));
+  const pct = st.served ? Math.round(100 * st.success / st.served) + "%" : "—";
+  const boxes = [[st.served,"stServed"],[pct,"stSuccess"],[st.perfect,"stPerfect"],[st.earned,"stEarned"],
+    [st.streak,"stStreak"],[st.best,"stBest"],[S.day,"stDays"],[fams.size,"stFam"],[S.book.length,"stRecipes"]];
+  $("statsGrid").innerHTML = boxes.map(([v, k]) => `<div class="statBox"><b>${v}</b><span>${t(k)}</span></div>`).join("");
+  $("achGrid").innerHTML = ACH.map(a => {
+    const got = S.ach.includes(a.id);
+    return `<div class="achBox ${got ? "got" : "locked"}" title="${L(a.d)}">` +
+      `<span class="aicon">${a.icon}</span><b>${L(a.n)}</b><br><span>${L(a.d)}</span></div>`;
+  }).join("");
+}
+function renderGloss(){
+  $("glossList").innerHTML = GLOSSARY.map(g =>
+    `<div class="glossItem"><b>${t(g.t)}</b><p>${L(g.d)}</p></div>`).join("");
+}
+function startTips(){
+  const el = $("tipLine");
+  el.textContent = "💡 " + L(TIPS[0]);
+  setInterval(() => {
+    if (document.hidden || openStack.length) return;
+    tipIdx = (tipIdx + 1) % TIPS.length;
+    el.style.opacity = 0;
+    setTimeout(() => { el.textContent = "💡 " + L(TIPS[tipIdx]); el.style.opacity = 1; }, 420);
+  }, 9000);
+}
+/* ============================================================
+   13 · INPUT — full keyboard (1–14, B/F/Enter/Esc/arrows) + pointer
+   ============================================================ */
+function fireSlot(n){
+  const i = clamp(n, 1, 14) - 1;
+  shelfSel = i; addDrop(ESSENCES[i].id);
+}
+function feedDigit(d){
+  if (feedDigit.pend !== null){
+    const p = feedDigit.pend; feedDigit.pend = null; clearTimeout(feedDigit.tm);
+    const n = p * 10 + d;
+    if (n >= 10 && n <= 14){ fireSlot(n); return; }
+    fireSlot(p);
+    if (d >= 2 && d <= 9) fireSlot(d); else if (d === 0) fireSlot(10);
+    return;
+  }
+  if (d === 1){
+    feedDigit.pend = 1;
+    feedDigit.tm = setTimeout(() => { feedDigit.pend = null; fireSlot(1); }, 330);
+    return;
+  }
+  fireSlot(d === 0 ? 10 : d);
+}
+feedDigit.pend = null;
+function toggleFF(){
+  S.ff = !S.ff;
+  $("btnFF").setAttribute("aria-pressed", String(S.ff));
+  AU.click();
+}
+function moveSel(step){
+  shelfSel = (shelfSel + step + ESSENCES.length) % ESSENCES.length;
+  renderShelf();
+  const el = $("shelf").children[shelfSel];
+  if (el) el.scrollIntoView({ block:"nearest" });
+}
+function bindShell(){
+  $("btnBook").addEventListener("click", () => { renderBook(); openOv("ovBook"); AU.click(); });
+  $("btnLedger").addEventListener("click", () => { renderLedger(); openOv("ovLedger"); AU.click(); });
+  $("btnStats").addEventListener("click", () => { renderStats(); openOv("ovStats"); AU.click(); });
+  $("btnGloss").addEventListener("click", () => { renderGloss(); openOv("ovGloss"); AU.click(); });
+  $("btnAbout").addEventListener("click", () => { renderAbout(); openOv("ovAbout"); AU.click(); });
+  $("btnSettings").addEventListener("click", () => { syncSettingsUI(); openOv("ovSettings"); AU.click(); });
+  $("btnLang").addEventListener("click", toggleLang);
+  $("onbBtn").addEventListener("click", () => { store.set("abq_seen", true); closeOv("ovOnboard"); AU.click(); });
+  $("aboutOnb").addEventListener("click", () => { openOv("ovOnboard"); AU.click(); });
+  $("seBtn").addEventListener("click", beginEndless);
+  $("btnTest").addEventListener("click", startBloom);
+  $("btnFF").addEventListener("click", toggleFF);
+  $("btnLabels").addEventListener("click", () => {
+    S.settings.labels = !S.settings.labels; syncSettingsUI(); save(); markBlotterDirty(); AU.click();
+  });
+  $("btnServe").addEventListener("click", serve);
+  $("btnClear").addEventListener("click", clearVial);
+  $("btnAge").addEventListener("click", ageOvernight);
+  $("blotter").addEventListener("pointerdown", e => { e.preventDefault(); startBloom(); });
+  document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => {
+    const ov = b.closest(".overlay"); if (ov) closeOv(ov.id); AU.click();
+  }));
+  window.addEventListener("keydown", e => {
+    if (e.defaultPrevented) return;
+    const tag = (e.target && e.target.tagName) || "";
+    if (e.key === "Escape"){
+      const top = openStack[openStack.length - 1];
+      if (top && top !== "ovVerdict" && top !== "ovConfirm"){ e.preventDefault(); closeTop(); }
+      return;
+    }
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (openStack.length) return; // decision dialogs & panels swallow the rest
+    const k = e.key;
+    if (/^[0-9]$/.test(k)){ e.preventDefault(); feedDigit(+k); return; }
+    if (k === "Backspace"){ e.preventDefault(); removeLast(); return; }
+    if (k === "b" || k === "B"){ e.preventDefault(); startBloom(); return; }
+    if (k === "f" || k === "F"){ e.preventDefault(); toggleFF(); return; }
+    if (k === "Enter"){
+      if (tag !== "BUTTON" && tag !== "A"){ e.preventDefault(); serve(); }
+      return;
+    }
+    if (k === " " || k === "Spacebar"){
+      if (tag !== "BUTTON" && tag !== "A"){ e.preventDefault(); addDrop(ESSENCES[shelfSel].id); }
+      return;
+    }
+    if (k === "ArrowRight" || k === "ArrowLeft" || k === "ArrowUp" || k === "ArrowDown"){
+      e.preventDefault();
+      const rtl = S.lang === "ar" ? -1 : 1;
+      if (k === "ArrowRight") moveSel(rtl);
+      else if (k === "ArrowLeft") moveSel(-rtl);
+      else moveSel(k === "ArrowUp" ? -4 : 4);
+      return;
+    }
+  });
+  window.addEventListener("pointerdown", () => AU.ensure(), { once:true, capture:true });
+  let rsTm = 0;
+  window.addEventListener("resize", () => { clearTimeout(rsTm); rsTm = setTimeout(resizeBlotter, 160); });
+}
+/* ============================================================
+   14 · MAIN LOOP & INIT — rAF, dt clamp, pause when hidden
+   ============================================================ */
+let rafId = 0, lastTs = 0, hiddenTab = false, timeTxtAt = 0;
+function loop(ts){
+  rafId = requestAnimationFrame(loop);
+  if (hiddenTab){ lastTs = ts; return; }
+  const dt = Math.min(.05, (ts - lastTs) / 1000 || 0);
+  lastTs = ts;
+  const b = blot.bloom;
+  if (b && b.active){
+    updateBloom(dt);
+    if (ts - timeTxtAt > 250){
+      timeTxtAt = ts;
+      $("bloomTime").textContent = Math.floor(b.t) + "s / " + Math.ceil(b.dur) + "s";
+    }
+  }
+  if (blot.dirty){ blot.dirty = false; drawBlotter(); }
+}
+function init(){
+  loadState();
+  document.body.dataset.theme = S.settings.theme;
+  document.body.dataset.motion = S.settings.motion;
+  bindShell();
+  buildShelf();
+  setupBlotter();
+  if (!S.cur){
+    S.cur = pickNextClient();
+    if (!S.cur) storyComplete();
+  }
+  applyLang();
+  syncSettingsUI();
+  renderHud(); renderVial(); renderBlotterChrome();
+  startTips();
+  if (!store.get("abq_seen", false)) openOv("ovOnboard");
+  lastTs = performance.now();
+  rafId = requestAnimationFrame(loop);
+}
+document.addEventListener("visibilitychange", () => { hiddenTab = document.hidden; });
+init();
+</script>
+</body>
+</html>

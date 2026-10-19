@@ -1,0 +1,1759 @@
+<!-- 10 Originals — Khayal: Shadow Play — original concept, 100% offline -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="oil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>خيال الظل — Khayal: Shadow Play</title>
+<style>
+/* ===== ROOT + THEMES ===== */
+:root{
+  --bg:#141020; --bg2:#1b1430; --panel:#221a38; --panel2:#2b2148;
+  --ink:#f4ead9; --muted:#b7abcf; --line:#3b2f58;
+  --accent:#f0a35e; --accent2:#ffd9a8; --accent-ink:#2a1708;
+  --cloth:#f7e3b8; --cloth2:#e8c98e; --shadowc:rgba(38,20,8,.86);
+  --good:#8fd694; --bad:#ef7d6d; --gold:#f5c84c;
+  --r:14px; --sh:0 10px 30px rgba(0,0,0,.45);
+}
+html[data-theme="night"]{
+  --bg:#0b1424; --bg2:#0f1c33; --panel:#13223c; --panel2:#1a2e4e;
+  --ink:#eaf2fa; --muted:#a8bcd4; --line:#27405f;
+  --accent:#8fc1e8; --accent2:#d7ecff; --accent-ink:#0a1a2c;
+  --cloth:#eef4f9; --cloth2:#c9dcec; --shadowc:rgba(12,26,44,.85);
+  --good:#8fd6b0; --bad:#e88098; --gold:#f0d27a;
+}
+html[data-theme="festival"]{
+  --bg:#200f13; --bg2:#2b141a; --panel:#331820; --panel2:#421f28;
+  --ink:#fbeee6; --muted:#d3b3ac; --line:#5c2e35;
+  --accent:#ff8161; --accent2:#ffc9ae; --accent-ink:#33100a;
+  --cloth:#ffe6c9; --cloth2:#f4c9a0; --shadowc:rgba(52,16,10,.86);
+  --good:#a5d68f; --bad:#ef6d6d; --gold:#ffd25e;
+}
+/* ===== BASE ===== */
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  margin:0; background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+  color:var(--ink); font:15.5px/1.6 "Segoe UI",Tahoma,system-ui,sans-serif;
+  display:flex; flex-direction:column; overflow:hidden;
+  -webkit-user-select:none; user-select:none;
+}
+button{font:inherit; color:inherit; cursor:pointer; background:none; border:none; padding:0}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px}
+.icon-btn{
+  inline-size:40px; block-size:40px; display:inline-grid; place-items:center;
+  border-radius:12px; background:var(--panel); border:1px solid var(--line);
+  font-size:19px; transition:background .2s ease, transform .2s ease, border-color .2s ease;
+}
+.icon-btn:hover{background:var(--panel2); border-color:var(--accent)}
+.icon-btn:active{transform:scale(.93)}
+.btn{
+  padding:9px 18px; border-radius:999px; border:1px solid var(--line);
+  background:var(--panel); transition:background .2s ease, transform .2s ease, border-color .2s ease;
+  font-weight:600; min-block-size:40px;
+}
+.btn:hover{background:var(--panel2); border-color:var(--accent)}
+.btn:active{transform:scale(.96)}
+.btn.primary{background:var(--accent); color:var(--accent-ink); border-color:transparent}
+.btn.primary:hover{background:var(--accent2)}
+.btn.danger{border-color:var(--bad); color:var(--bad)}
+/* ===== TOPBAR ===== */
+#topbar{
+  display:flex; align-items:center; gap:10px; padding:8px 12px;
+  padding-inline-end:96px; border-block-end:1px solid var(--line);
+  background:color-mix(in srgb, var(--panel) 55%, transparent); backdrop-filter:blur(6px);
+  z-index:5;
+}
+#topbar .brand{display:flex; align-items:baseline; gap:10px; margin-inline-end:auto; min-inline-size:0}
+#topbar h1{font-size:19px; margin:0; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+#topbar h1 small{color:var(--accent); font-size:12px; font-weight:600; margin-inline-start:8px}
+#repBadge{font-size:13px; color:var(--gold); white-space:nowrap}
+#langBtn{
+  position:fixed; inset-block-start:9px; inset-inline-end:10px; z-index:60;
+  padding:7px 12px; border-radius:999px; background:var(--accent); color:var(--accent-ink);
+  font-weight:700; font-size:13px; border:none; box-shadow:var(--sh);
+  transition:transform .2s ease, background .2s ease;
+}
+#langBtn:hover{background:var(--accent2)}
+#langBtn:active{transform:scale(.94)}
+/* ===== MAIN LAYOUT ===== */
+main{flex:1; display:flex; flex-direction:column; min-height:0}
+#stageWrap{position:relative; flex:1; min-block-size:220px; overflow:hidden}
+#stage{position:absolute; inset:0; inline-size:100%; block-size:100%; touch-action:none; display:block; cursor:grab}
+#stage.dragging{cursor:grabbing}
+/* HUD overlays */
+.hud{position:absolute; z-index:4; pointer-events:none}
+.hud > *{pointer-events:auto}
+#sceneHud{
+  inset-block-start:10px; inset-inline-start:10px; display:flex; align-items:center; gap:8px;
+  background:color-mix(in srgb, var(--panel) 78%, transparent); border:1px solid var(--line);
+  border-radius:999px; padding:4px 8px; box-shadow:var(--sh);
+}
+#sceneHud .nav{inline-size:32px; block-size:32px; border-radius:50%; font-size:17px; display:grid; place-items:center}
+#sceneHud .nav:hover{background:var(--panel2)}
+#sceneName{font-weight:700; font-size:14.5px; max-inline-size:34vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+#sceneTier{font-size:11.5px; color:var(--accent); text-align:center; line-height:1.2}
+#matchWrap{
+  inset-block-start:14px; inset-inline-end:14px; display:flex; align-items:center; gap:8px;
+  background:color-mix(in srgb, var(--panel) 78%, transparent); border:1px solid var(--line);
+  border-radius:999px; padding:6px 12px;
+}
+#matchTrack{inline-size:110px; block-size:8px; border-radius:99px; background:var(--bg); overflow:hidden}
+#matchBar{block-size:100%; inline-size:0%; background:var(--bad); border-radius:99px; transition:inline-size .25s ease, background .25s ease}
+#matchPct{font-size:13px; font-weight:700; min-inline-size:38px; text-align:center}
+#moodWrap{
+  inset-block-start:56px; inset-inline-end:14px; display:none; align-items:center; gap:8px;
+  background:color-mix(in srgb, var(--panel) 78%, transparent); border:1px solid var(--line);
+  border-radius:999px; padding:5px 12px; font-size:12.5px;
+}
+#moodTrack{inline-size:100px; block-size:8px; border-radius:99px; background:var(--bg); overflow:hidden}
+#moodBar{block-size:100%; inline-size:70%; background:linear-gradient(90deg,var(--bad),var(--gold),var(--good)); border-radius:99px}
+#multTag{color:var(--gold); font-weight:700; min-inline-size:34px; text-align:center}
+#hintLine{
+  inset-block-start:14px; inset-inline-start:50%; transform:translateX(50%);
+  background:color-mix(in srgb, var(--bad) 18%, var(--panel)); border:1px solid var(--bad);
+  color:var(--ink); border-radius:12px; padding:7px 14px; font-size:13.5px; max-inline-size:80vw;
+  display:none; box-shadow:var(--sh);
+}
+[dir="ltr"] #hintLine{transform:translateX(-50%)}
+#judgeBtn{
+  position:absolute; z-index:4; inset-block-end:16px; inset-inline-end:16px;
+  padding:12px 22px; border-radius:999px; background:var(--accent); color:var(--accent-ink);
+  font-weight:800; font-size:16px; border:none; box-shadow:var(--sh);
+  transition:transform .2s ease, background .2s ease;
+}
+#judgeBtn:hover{background:var(--accent2)}
+#judgeBtn:active{transform:scale(.95)}
+#freeSaveBtn{
+  position:absolute; z-index:4; inset-block-end:16px; inset-inline-end:16px; display:none;
+  padding:12px 22px; border-radius:999px; background:var(--good); color:#10240f;
+  font-weight:800; font-size:15px; border:none; box-shadow:var(--sh);
+}
+#liveMsg{
+  position:absolute; z-index:4; inset-block-start:96px; inset-inline-start:50%; transform:translateX(50%);
+  font-size:22px; font-weight:800; color:var(--accent2); text-shadow:0 2px 12px rgba(0,0,0,.6);
+  opacity:0; transition:opacity .3s ease, transform .3s ease; pointer-events:none; text-align:center;
+}
+[dir="ltr"] #liveMsg{transform:translateX(-50%)}
+#liveMsg.pop{opacity:1}
+#beatCanvas{
+  position:absolute; z-index:4; inset-block-end:14px; inset-inline-start:50%; transform:translateX(50%);
+  inline-size:min(430px, 62vw); block-size:64px; display:none; border-radius:14px;
+  background:color-mix(in srgb, var(--panel) 80%, transparent); border:1px solid var(--line);
+  touch-action:none;
+}
+[dir="ltr"] #beatCanvas{transform:translateX(-50%)}
+#beatPad{
+  position:absolute; z-index:5; inset-block-end:18px; inset-inline-start:18px; display:none;
+  inline-size:84px; block-size:84px; border-radius:50%; font-size:34px;
+  background:radial-gradient(circle at 32% 28%, var(--accent2), var(--accent) 65%);
+  color:var(--accent-ink); border:3px solid var(--accent2); box-shadow:var(--sh);
+  transition:transform .12s ease;
+}
+#beatPad:active,#beatPad.hit{transform:scale(.9)}
+#beatPad span{font-size:11px; font-weight:800; display:block; margin-block-start:-4px}
+/* ===== CONSOLE ===== */
+#console{
+  border-block-start:1px solid var(--line); background:color-mix(in srgb, var(--panel) 62%, transparent);
+  padding:8px 10px 6px; display:flex; flex-direction:column; gap:6px; z-index:5;
+}
+#trayRow{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+#trayLabel{font-size:12px; color:var(--muted); font-weight:700; white-space:nowrap}
+#tray{display:flex; gap:6px; overflow-x:auto; padding:2px; scrollbar-width:thin; flex:1; min-inline-size:0}
+.trayTok{
+  flex:0 0 auto; inline-size:54px; block-size:54px; border-radius:12px; border:1px solid var(--line);
+  background:var(--bg2); display:grid; place-items:center; transition:border-color .2s ease, transform .2s ease;
+  position:relative;
+}
+.trayTok:hover{border-color:var(--accent); transform:translateY(-2px)}
+.trayTok canvas{inline-size:46px; block-size:46px}
+.trayTok .cnt{
+  position:absolute; inset-block-start:-5px; inset-inline-end:-5px; background:var(--accent); color:var(--accent-ink);
+  font-size:10px; font-weight:800; border-radius:99px; padding:1px 5px; display:none;
+}
+#toolsRow{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+#toolsRow .sep{inline-size:1px; block-size:26px; background:var(--line); margin-inline:4px}
+.tool{inline-size:38px; block-size:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg2); font-size:17px; display:grid; place-items:center; transition:background .2s ease, transform .2s ease}
+.tool:hover{background:var(--panel2); border-color:var(--accent)}
+.tool:active{transform:scale(.9)}
+.tool.on{background:var(--accent); color:var(--accent-ink); border-color:transparent}
+#tipLine{font-size:12px; color:var(--muted); min-block-size:18px; text-align:center; transition:opacity .4s ease}
+body.touch-off #touchTools{display:none}
+body.touch-on #kbdHint{display:none}
+/* ===== OVERLAYS / PANELS ===== */
+.overlay{
+  position:fixed; inset:0; z-index:50; display:grid; place-items:center; padding:16px;
+  background:rgba(8,5,16,.62); backdrop-filter:blur(5px);
+  opacity:0; pointer-events:none; transition:opacity .24s ease;
+}
+.overlay.open{opacity:1; pointer-events:auto}
+.panel{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--sh);
+  inline-size:min(560px, 94vw); max-block-size:88dvh; overflow:auto; padding:18px 20px 20px;
+  transform:translateY(14px) scale(.98); transition:transform .24s ease;
+}
+.overlay.open .panel{transform:none}
+.panel h2{margin:0 0 4px; font-size:20px; color:var(--accent)}
+.panel .sub{color:var(--muted); font-size:13.5px; margin:0 0 14px}
+.closeX{position:sticky; inset-block-start:0; float:inline-end; margin-inline-start:8px}
+/* settings */
+.setRow{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 2px; border-block-end:1px dashed var(--line)}
+.setRow:last-of-type{border-block-end:none}
+.setRow .lbl{font-weight:600; font-size:14.5px}
+.setRow .lbl small{display:block; color:var(--muted); font-weight:400; font-size:12px}
+.seg{display:flex; gap:4px; background:var(--bg2); border:1px solid var(--line); border-radius:10px; padding:3px}
+.seg button{padding:5px 12px; border-radius:8px; font-size:12.5px; font-weight:700; color:var(--muted); transition:background .2s ease, color .2s ease}
+.seg button[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink)}
+.switch{inline-size:52px; block-size:28px; border-radius:99px; background:var(--bg2); border:1px solid var(--line); position:relative; transition:background .2s ease}
+.switch::after{content:""; position:absolute; inset-block-start:2px; inset-inline-start:2px; inline-size:22px; block-size:22px; border-radius:50%; background:var(--muted); transition:transform .2s ease, background .2s ease; inset-inline-start:2px}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch[aria-checked="true"]::after{transform:translateX(-24px); background:var(--accent-ink)}
+html[dir="ltr"] .switch[aria-checked="true"]::after{transform:translateX(24px)}
+input[type="range"]{accent-color:var(--accent); inline-size:150px}
+.themeDots{display:flex; gap:8px}
+.themeDots button{inline-size:30px; block-size:30px; border-radius:50%; border:2px solid var(--line); transition:transform .2s ease, border-color .2s ease}
+.themeDots button[aria-pressed="true"]{border-color:var(--accent); transform:scale(1.15)}
+/* onboarding diagram */
+.diagram{display:grid; place-items:center; margin:10px 0 4px}
+.diagram svg{inline-size:min(340px,80vw); block-size:auto}
+/* stats + gallery + achievements */
+.statGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-block:8px 4px}
+.statCard{background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:10px 12px}
+.statCard b{display:block; font-size:22px; color:var(--accent)}
+.statCard span{font-size:12px; color:var(--muted)}
+.galGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px}
+.galItem{background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:8px; display:flex; flex-direction:column; gap:6px}
+.galItem canvas{inline-size:100%; border-radius:8px; background:var(--cloth2)}
+.galItem .gname{font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.galItem .grow{display:flex; gap:6px}
+.galItem .grow button{flex:1; font-size:11.5px; padding:5px 4px; border-radius:8px; background:var(--panel2); border:1px solid var(--line); font-weight:700}
+.galItem .grow button:hover{border-color:var(--accent)}
+.achList{display:flex; flex-direction:column; gap:8px}
+.ach{display:flex; gap:10px; align-items:center; background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:8px 12px; opacity:.5}
+.ach.got{opacity:1; border-color:var(--gold)}
+.ach .ic{font-size:22px}
+.ach b{font-size:14px; display:block}
+.ach small{color:var(--muted); font-size:12px}
+/* end screen */
+#endPanel{text-align:center}
+#endPanel .bigScore{font-size:46px; font-weight:900; color:var(--accent); line-height:1.1; margin:6px 0}
+#endStars{font-size:30px; letter-spacing:4px; margin-block:2px 8px}
+#endStars .dim{opacity:.25}
+#endBreak{display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin-block:10px}
+#endBreak .statCard{min-inline-size:110px}
+#newBestTag{display:none; background:var(--gold); color:#3a2a00; font-weight:800; border-radius:99px; padding:4px 16px; margin-inline:auto; inline-size:fit-content; animation:pulse 1s ease infinite alternate}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.07)}}
+#endBtns{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-block-start:14px}
+/* help table */
+.kbd{background:var(--bg2); border:1px solid var(--line); border-block-end-width:3px; border-radius:7px; padding:2px 9px; font-size:12.5px; font-weight:700; font-family:consolas,monospace}
+.helpRow{display:flex; justify-content:space-between; gap:12px; padding:7px 2px; border-block-end:1px dashed var(--line); font-size:13.5px; align-items:center}
+.helpRow:last-child{border-block-end:none}
+/* toasts */
+#toasts{position:fixed; inset-block-end:18px; inset-inline-start:50%; transform:translateX(50%); z-index:80; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none}
+[dir="ltr"] #toasts{transform:translateX(-50%)}
+.toast{
+  background:var(--panel2); border:1px solid var(--accent); color:var(--ink);
+  border-radius:12px; padding:9px 18px; font-size:13.5px; font-weight:600; box-shadow:var(--sh);
+  opacity:0; transform:translateY(8px); transition:opacity .25s ease, transform .25s ease; max-inline-size:86vw; text-align:center;
+}
+.toast.show{opacity:1; transform:none}
+/* keymap table + tips strip */
+.kbdTab{inline-size:100%; border-collapse:collapse; font-size:13.5px}
+.kbdTab th,.kbdTab td{border-block-end:1px dashed var(--line); padding:7px 8px; text-align:start; vertical-align:top}
+.kbdTab tbody tr:last-child th,.kbdTab tbody tr:last-child td{border-block-end:none}
+.kbdTab thead th{color:var(--muted); font-size:12px; letter-spacing:.4px}
+.kbdTab tbody th{font-family:consolas,monospace; font-weight:700; color:var(--accent); white-space:nowrap}
+#tipStrip{
+  position:fixed; inset-block-end:16px; inset-inline-start:16px; z-index:70;
+  inline-size:min(340px,86vw); background:var(--panel2); border:1px solid var(--accent);
+  border-radius:12px; padding:9px 12px; box-shadow:var(--sh); color:var(--ink);
+  display:flex; gap:8px; align-items:flex-start; font-size:13px; font-weight:600;
+  opacity:0; transform:translateY(8px); visibility:hidden;
+  transition:opacity .3s ease, transform .3s ease, visibility 0s linear .3s;
+}
+#tipStrip.show{opacity:1; transform:none; visibility:visible; transition:opacity .3s ease, transform .3s ease, visibility 0s}
+.tipNav{display:flex; gap:4px; margin-inline-start:auto}
+#tipStrip .icon-btn{inline-size:24px; block-size:24px; padding:0; font-size:12px; flex:none}
+/* ===== MOTION / RESPONSIVE ===== */
+body.reduced *{animation:none!important; transition-duration:.01ms!important}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important; transition-duration:.01ms!important}
+}
+@media (max-width:640px){
+  #topbar{padding-inline-end:88px; gap:6px}
+  #topbar h1{font-size:16px}
+  .icon-btn{inline-size:36px; block-size:36px; font-size:16px}
+  #repBadge{display:none}
+  #matchTrack{inline-size:70px}
+  #beatPad{inline-size:72px; block-size:72px; inset-block-end:12px; inset-inline-start:12px}
+  #judgeBtn,#freeSaveBtn{padding:10px 16px; font-size:14px; inset-block-end:12px; inset-inline-end:12px}
+  .panel{padding:14px}
+}
+</style>
+</head>
+<body>
+<button id="langBtn" type="button">EN</button>
+<header id="topbar">
+  <a id="backLink" class="icon-btn" href="../index.html" data-i18n-aria="back_aria" aria-label="رجوع">↩</a>
+  <div class="brand">
+    <h1><span data-i18n="title">خيال الظل</span><small data-i18n="subtitle">مسرح الظل التفاعلي</small></h1>
+  </div>
+  <span id="repBadge">★ 0</span>
+  <button id="btnStats" class="icon-btn" data-i18n="statsIco" data-i18n-aria="stats_aria" aria-label="الإحصائيات">📊</button>
+  <button id="btnGallery" class="icon-btn" data-i18n="galIco" data-i18n-aria="gal_aria" aria-label="المعرض">🖼️</button>
+  <button id="btnHelp" class="icon-btn" data-i18n="helpIco" data-i18n-aria="help_aria" aria-label="الاختصارات">❔</button>
+  <button id="btnAbout" class="icon-btn" data-i18n="aboutIco" data-i18n-aria="about_aria" aria-label="حول">ⓘ</button>
+  <button id="btnKbd" class="icon-btn" data-i18n="kbdIco" data-i18n-aria="kbd_aria" aria-label="خريطة المفاتيح">⌨</button>
+  <button id="btnSettings" class="icon-btn" data-i18n="setIco" data-i18n-aria="set_aria" aria-label="الإعدادات">⚙️</button>
+</header>
+<main>
+  <section id="stageWrap">
+    <canvas id="stage" tabindex="0" role="img" data-i18n-aria="stage_aria" aria-label="مسرح خيال الظل: اسحب المصباح والظلال" aria-describedby="tipLine"></canvas>
+    <div id="sceneHud" class="hud">
+      <button id="prevScene" class="nav" data-i18n-aria="prev_aria" aria-label="المشهد السابق">‹</button>
+      <div><div id="sceneName">—</div><div id="sceneTier">—</div></div>
+      <button id="nextScene" class="nav" data-i18n-aria="next_aria" aria-label="المشهد التالي">›</button>
+    </div>
+    <div id="matchWrap" class="hud"><span id="matchPct">0%</span><div id="matchTrack"><div id="matchBar"></div></div></div>
+    <div id="moodWrap" class="hud"><span data-i18n="mood">المزاج</span><div id="moodTrack"><div id="moodBar"></div></div><span id="multTag">×1</span></div>
+    <div id="hintLine" class="hud" role="status"></div>
+    <div id="liveMsg" aria-live="polite"></div>
+    <canvas id="beatCanvas" aria-hidden="true"></canvas>
+    <button id="beatPad" data-i18n-aria="beat_aria" aria-label="إيقاع"><span>🥁</span><span data-i18n="beat">إيقاع</span></button>
+    <button id="judgeBtn">✓ <span data-i18n="judge">طابق المشهد</span></button>
+    <button id="freeSaveBtn">💾 <span data-i18n="savePiece">احفظ العملة</span></button>
+  </section>
+  <section id="console">
+    <div id="trayRow">
+      <span id="trayLabel" data-i18n="tray">صندوق الظلال</span>
+      <div id="tray" role="listbox" data-i18n-aria="tray_aria" aria-label="صندوق الظلال"></div>
+    </div>
+    <div id="toolsRow">
+      <div id="touchTools" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center">
+        <button class="tool" data-act="rotL" data-i18n-aria="rotL_aria" aria-label="تدوير يسارًا">⟲</button>
+        <button class="tool" data-act="rotR" data-i18n-aria="rotR_aria" aria-label="تدوير يمينًا">⟳</button>
+        <button class="tool" data-act="scaleUp" data-i18n-aria="sup_aria" aria-label="تكبير">＋</button>
+        <button class="tool" data-act="scaleDn" data-i18n-aria="sdn_aria" aria-label="تصغير">－</button>
+        <span class="sep" aria-hidden="true"></span>
+        <button class="tool" data-act="up" data-i18n-aria="up_aria" aria-label="تحريك لأعلى">⬆</button>
+        <button class="tool" data-act="dn" data-i18n-aria="dn_aria" aria-label="تحريك لأسفل">⬇</button>
+        <button class="tool" data-act="il" data-i18n-aria="il_aria" aria-label="تحريك للخلف">⬅</button>
+        <button class="tool" data-act="ir" data-i18n-aria="ir_aria" aria-label="تحريك للأمام">➡</button>
+        <span class="sep" aria-hidden="true"></span>
+        <button class="tool" data-act="lamp" data-i18n-aria="lamp_aria" aria-label="تحديد المصباح">🏮</button>
+        <button class="tool" data-act="del" data-i18n-aria="del_aria" aria-label="إزالة الظل">🗑</button>
+      </div>
+      <span id="kbdHint" style="font-size:11.5px; color:var(--muted)" data-i18n="kbdHint">Tab لاختيار ظل · الأسهم للحركة · Q/E تدوير · +/− حجم · Enter للمطابقة · Space للإيقاع</span>
+      <button id="modeBtn" class="btn" style="margin-inline-start:auto; font-size:13px; padding:7px 14px"></button>
+    </div>
+    <div id="tipLine"></div>
+  </section>
+</main>
+
+<!-- ONBOARDING -->
+<div id="ovOnb" class="overlay" role="dialog" aria-modal="true" aria-labelledby="onbT">
+  <div class="panel">
+    <h2 id="onbT" data-i18n="onb_title">أهلًا في خيال الظل</h2>
+    <p class="sub" data-i18n="onb_p1">اسحب المصباح ليتغير حجم الظلال وضبابيتها، ورتّب الظلال خلف الشاشة لتطابق المشهد المطلوب.</p>
+    <p class="sub" data-i18n="onb_p2">عند المطابقة يبدأ العرض الحيّ: اضغط على الإيقاع في وقته الصحيح لإبقاء جمهورك مسحورًا وترفع نتيجتك.</p>
+    <div class="diagram" aria-hidden="true">
+      <svg viewBox="0 0 340 130">
+        <rect x="0" y="0" width="340" height="130" rx="10" fill="#191327"/>
+        <circle cx="42" cy="65" r="26" fill="#f0a35e" opacity=".18"/>
+        <circle cx="42" cy="65" r="11" fill="#f0a35e"/>
+        <path d="M42 65 L242 8 L242 122 Z" fill="#f0a35e" opacity=".10"/>
+        <path d="M132 40 l14 -20 4 6 6 -4 -6 22 z" fill="#0c0814"/>
+        <ellipse cx="136" cy="66" rx="17" ry="11" fill="#0c0814"/>
+        <rect x="242" y="6" width="58" height="118" rx="6" fill="#f7e3b8"/>
+        <path d="M258 28 l12 -16 3 5 5 -3 -5 17 z" fill="#3a2412" opacity=".85"/>
+        <ellipse cx="262" cy="52" rx="13" ry="9" fill="#3a2412" opacity=".85"/>
+        <rect x="242" y="6" width="58" height="118" rx="6" fill="none" stroke="#f0a35e" stroke-width="2" opacity=".6"/>
+        <text x="42" y="108" fill="#b7abcf" font-size="11" text-anchor="middle">💡</text>
+      </svg>
+    </div>
+    <p class="sub" style="text-align:center; margin:0 0 12px" data-i18n="onb_cap">المصباح ← الظل ← الشاشة</p>
+    <div style="text-align:center"><button id="onbOk" class="btn primary" data-i18n="onb_ok">فهمت، لنبدأ</button></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="ovSet" class="overlay" role="dialog" aria-modal="true" aria-labelledby="setT">
+  <div class="panel">
+    <button class="icon-btn closeX" data-close data-i18n-aria="close_aria" aria-label="إغلاق">✕</button>
+    <h2 id="setT" data-i18n="set_title">الإعدادات</h2>
+    <p class="sub" data-i18n="set_sub">تُحفظ إعداداتك تلقائيًا على جهازك.</p>
+    <div class="setRow"><div class="lbl" data-i18n="set_sound">الصوت<small data-i18n="set_sound_s">نغمات وأصوات الطرب</small></div>
+      <button id="setSound" class="switch" role="switch" aria-checked="true" data-i18n-aria="set_sound" aria-label="الصوت"></button></div>
+    <div class="setRow"><div class="lbl" data-i18n="set_motion">الحركة<small data-i18n="set_motion_s">الجزيئات والتمايل</small></div>
+      <div class="seg" id="segMotion" role="group" data-i18n-aria="set_motion" aria-label="الحركة">
+        <button data-val="full" data-i18n="motion_full">كاملة</button>
+        <button data-val="reduced" data-i18n="motion_reduced">مخففة</button>
+      </div></div>
+    <div class="setRow"><div class="lbl" data-i18n="set_diff">صعوبة المطابقة<small data-i18n="set_diff_s">نسبة النجاح المطلوبة</small></div>
+      <div class="seg" id="segDiff" role="group" data-i18n-aria="set_diff" aria-label="الصعوبة">
+        <button data-val="generous" data-i18n="diff_g">متساهلة</button>
+        <button data-val="normal" data-i18n="diff_n">عادية</button>
+        <button data-val="strict" data-i18n="diff_s">صارمة</button>
+      </div></div>
+    <div class="setRow"><div class="lbl" data-i18n="set_soft">نعومة المصباح<small data-i18n="set_soft_s">ضبابية حافة الظل</small></div>
+      <input id="setSoft" type="range" min="0" max="100" step="5" value="60" data-i18n-aria="set_soft" aria-label="نعومة المصباح"></div>
+    <div class="setRow"><div class="lbl" data-i18n="set_theme">لوحة الألوان<small data-i18n="set_theme_s">زيت دافئ · ليل أزرق · مهرجان أحمر</small></div>
+      <div class="themeDots" id="themeDots" role="group" data-i18n-aria="set_theme" aria-label="لوحة الألوان">
+        <button data-val="oil" style="background:linear-gradient(135deg,#f0a35e,#221a38)" data-i18n-aria="theme_oil" aria-label="زيت دافئ"></button>
+        <button data-val="night" style="background:linear-gradient(135deg,#8fc1e8,#13223c)" data-i18n-aria="theme_night" aria-label="ليل أزرق"></button>
+        <button data-val="festival" style="background:linear-gradient(135deg,#ff8161,#331820)" data-i18n-aria="theme_festival" aria-label="مهرجان أحمر"></button>
+      </div></div>
+    <div class="setRow"><div class="lbl" data-i18n="set_touch">أزرار اللمس<small data-i18n="set_touch_s">أدوات الشاشة على الأجهزة اللمسية</small></div>
+      <div class="seg" id="segTouch" role="group" data-i18n-aria="set_touch" aria-label="أزرار اللمس">
+        <button data-val="auto" data-i18n="touch_auto">تلقائي</button>
+        <button data-val="on" data-i18n="touch_on">دائمًا</button>
+        <button data-val="off" data-i18n="touch_off">إيقاف</button>
+      </div></div>
+    <div class="setRow"><div class="lbl" data-i18n="set_reset">تصفير كل البيانات<small data-i18n="set_reset_s">النتائج والمعرض والإنجازات</small></div>
+      <button id="setReset" class="btn danger" data-i18n="set_reset_b">تصفير</button></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="ovAbout" class="overlay" role="dialog" aria-modal="true" aria-labelledby="abT">
+  <div class="panel">
+    <button class="icon-btn closeX" data-close data-i18n-aria="close_aria" aria-label="إغلاق">✕</button>
+    <h2 id="abT" data-i18n="about_title">عن خيال الظل</h2>
+    <p class="sub" data-i18n="about_pitch">كن سيّد مسرح الظل الرحّال:ركّب الظلال المتداخلة خلف الشاشة المضاءة بالمصباح لتطابق المشهد، ثم قدّم عرضًا حيًّا على إيقاع الطبل يُبقي جمهورك في حالة انسحار. مفهوم أصلي يعمل دون اتصال بالكامل.</p>
+    <h2 style="font-size:15px" data-i18n="about_ctrl">التحكم الكامل</h2>
+    <div id="ctrlList"></div>
+    <p class="sub" style="margin:14px 0 0">
+      <button id="onbReplay" class="btn" data-i18n="onb_again">إعادة جولة الشرح</button>
+    </p>
+    <p class="sub" style="margin:12px 0 0; color:var(--accent)" data-i18n="credit">جزء من مجموعة «الأصيلة العشرة» — تعمل دون اتصال بالكامل</p>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="ovStats" class="overlay" role="dialog" aria-modal="true" aria-labelledby="stT">
+  <div class="panel">
+    <button class="icon-btn closeX" data-close data-i18n-aria="close_aria" aria-label="إغلاق">✕</button>
+    <h2 id="stT" data-i18n="stats_title">سجلّ الحكواتي</h2>
+    <p class="sub"><span data-i18n="rep_label">السمعة</span>: <span id="repVal" style="color:var(--gold); font-weight:800">★ 0</span> — <span id="repNext"></span></p>
+    <div class="statGrid" id="statGrid"></div>
+    <h2 style="font-size:15px; margin-block-start:14px" data-i18n="ach_title">الإنجازات</h2>
+    <div class="achList" id="achList"></div>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<div id="ovGal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="gaT">
+  <div class="panel">
+    <button class="icon-btn closeX" data-close data-i18n-aria="close_aria" aria-label="إغلاق">✕</button>
+    <h2 id="gaT" data-i18n="gal_title">معرض التركيبات</h2>
+    <p class="sub" data-i18n="gal_sub">تُحفظ آخر 12 تركيبة مكتملة. يمكنك إعادة تحميل أي تركيبة على المسرح الحر.</p>
+    <div id="galEmpty" class="sub" data-i18n="gal_empty" style="text-align:center; padding:20px">لا توجد تركيبات بعد — أكمل مشهدًا أولًا!</div>
+    <div class="galGrid" id="galGrid"></div>
+  </div>
+</div>
+
+<!-- HELP / SHORTCUTS -->
+<div id="ovHelp" class="overlay" role="dialog" aria-modal="true" aria-labelledby="hpT">
+  <div class="panel">
+    <button class="icon-btn closeX" data-close data-i18n-aria="close_aria" aria-label="إغلاق">✕</button>
+    <h2 id="hpT" data-i18n="help_title">اختصارات لوحة المفاتيح</h2>
+    <p class="sub" data-i18n="help_sub">انقر على المسرح أولًا ثم استخدم الاختصارات.</p>
+    <div id="helpList"></div>
+  </div>
+</div>
+
+<!-- KEYMAP -->
+<div id="ovKbd" class="overlay" role="dialog" aria-modal="true" aria-labelledby="kbT">
+  <div class="panel">
+    <button class="icon-btn closeX" data-close data-i18n-aria="close_aria" aria-label="إغلاق">✕</button>
+    <h2 id="kbT" data-i18n="kbd_title">خريطة المفاتيح</h2>
+    <p class="sub" data-i18n="kbd_sub">انقر على المسرح أولًا لتعمل الاختصارات، ثم استخدم هذا الجدول مرجعًا سريعًا.</p>
+    <table class="kbdTab">
+      <thead><tr><th scope="col" data-i18n="kbd_col_key">المفتاح</th><th scope="col" data-i18n="kbd_col_act">الوظيفة</th></tr></thead>
+      <tbody id="kbdTable"></tbody>
+    </table>
+    <p class="sub" style="margin:14px 0 0"><button id="tipRestore" class="btn" data-i18n="tips_restore">إعادة إظهار شريط النصائح</button></p>
+  </div>
+</div>
+
+<!-- END SCREEN -->
+<div id="ovEnd" class="overlay" role="dialog" aria-modal="true" aria-labelledby="endT">
+  <div class="panel" id="endPanel">
+    <h2 id="endT">—</h2>
+    <div id="endStars" aria-hidden="true"></div>
+    <div id="newBestTag" data-i18n="new_best">رقم قياسي جديد!</div>
+    <div class="bigScore" id="endScore">0</div>
+    <div id="endBreak">
+      <div class="statCard"><b id="endMatch">0%</b><span data-i18n="end_match_l">نسبة المطابقة</span></div>
+      <div class="statCard"><b id="endMood">0%</b><span data-i18n="end_mood_l">حماس الجمهور</span></div>
+      <div class="statCard"><b id="endStreak">0</b><span data-i18n="end_streak_l">أطول تتابع</span></div>
+      <div class="statCard"><b id="endPerf">0</b><span data-i18n="end_perf_l">نقاط العرض</span></div>
+    </div>
+    <div id="endBtns">
+      <button id="endReplay" class="btn">⟳ <span data-i18n="end_replay">إعادة المشهد</span></button>
+      <button id="endNext" class="btn primary" data-i18n="end_next">المشهد التالي ›</button>
+      <button id="endGal" class="btn" data-i18n="end_gal">المعرض</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="ovCf" class="overlay" role="dialog" aria-modal="true" aria-labelledby="cfT">
+  <div class="panel" style="max-inline-size:400px; text-align:center">
+    <h2 id="cfT" data-i18n="cf_title">هل أنت متأكد؟</h2>
+    <p class="sub" id="cfBody" data-i18n="cf_body">سيُحذف كل شيء نهائيًا.</p>
+    <div style="display:flex; gap:10px; justify-content:center">
+      <button id="cfNo" class="btn" data-i18n="cf_no">إلغاء</button>
+      <button id="cfYes" class="btn danger" data-i18n="cf_yes">نعم، تابع</button>
+    </div>
+  </div>
+</div>
+
+<div id="tipStrip" role="status" data-i18n-aria="tips_aria" aria-label="نصائح الحكواتي" aria-hidden="true">
+  <span id="tipStripTxt"></span>
+  <span class="tipNav">
+    <button id="tipPrev" class="icon-btn" data-i18n-aria="tips_prev" aria-label="النصيحة السابقة">‹</button>
+    <button id="tipNext" class="icon-btn" data-i18n-aria="tips_next" aria-label="النصيحة التالية">›</button>
+  </span>
+  <button id="tipStripX" class="icon-btn" data-i18n-aria="tips_hide" aria-label="إخفاء النصائح">✕</button>
+</div>
+<div id="toasts" aria-live="polite"></div>
+<script>
+/* ===== SAFE STORAGE ===== */
+const store={mem:{},ok:false,init(){try{localStorage.setItem("_t1","1");localStorage.removeItem("_t1");this.ok=true}catch(e){this.ok=false}},get(k,d){try{if(this.ok){const v=localStorage.getItem(k);if(v!=null)return JSON.parse(v)}}catch(e){}return k in this.mem?this.mem[k]:d},set(k,v){try{if(this.ok){localStorage.setItem(k,JSON.stringify(v));return}}catch(e){}this.mem[k]=v}};store.init();
+
+/* ===== I18N ===== */
+const I18N={
+ar:{
+ doc_title:"خيال الظل — مسرح الظل التفاعلي", title:"خيال الظل", subtitle:"مسرح الظل التفاعلي",
+ back_aria:"رجوع إلى فهرس المجموعة", statsIco:"📊", galIco:"🖼️", helpIco:"❔", aboutIco:"ⓘ", setIco:"⚙️",
+ stats_aria:"سجلّ الحكواتي والإحصائيات", gal_aria:"معرض التركيبات", help_aria:"اختصارات لوحة المفاتيح",
+ about_aria:"حول التجربة", set_aria:"الإعدادات", prev_aria:"المشهد السابق", next_aria:"المشهد التالي",
+ stage_aria:"مسرح خيال الظل: اسحب المصباح والظلال خلف الشاشة لتطابق المشهد المطلوب",
+ mood:"الجمهور", beat:"إيقاع", beat_aria:"ضربة الإيقاع", judge:"طابق المشهد", savePiece:"احفظ التركيبة",
+ tray:"صندوق الظلال", tray_aria:"صندوق الظلال، اختر ظلًا لإضافته إلى المسرح", tray_add:"إضافة ظل «{t}»",
+ rotL_aria:"تدوير عكس عقارب الساعة", rotR_aria:"تدوير مع عقارب الساعة", sup_aria:"تكبير الظل", sdn_aria:"تصغير الظل",
+ up_aria:"إزاحة لأعلى", dn_aria:"إزاحة لأسفل", il_aria:"إزاحة نحو اليسار", ir_aria:"إزاحة نحو اليمين",
+ lamp_aria:"تحديد المصباح", del_aria:"إزالة الظل المحدد",
+ kbdHint:"Tab اختيار · الأسهم حركة · Q/E تدوير · +/− حجم · Enter مطابقة · Space إيقاع",
+ onb_title:"أهلًا في خيال الظل",
+ onb_p1:"اسحب المصباح فتتكبر الظلال وتنعم حوافّها كلما اقترب من الظل، ورتّب الظلال خلف الشاشة لتطابق الصورة الباهتة المرسومة عليها.",
+ onb_p2:"إذا بلغتَ نسبة المطابقة المطلوبة يبدأ «العرض الحيّ»: تتوالى نبضات الطبل فاضغط في اللحظة الصحيحة لملء مقياس حماس الجمهور ومضاعفة نتيجتك.",
+ onb_cap:"المصباح ← الظل ← الشاشة", onb_ok:"فهمت، لنبدأ", onb_again:"إعادة جولة الشرح",
+ set_title:"الإعدادات", set_sub:"تُحفظ اختياراتك تلقائيًا على هذا الجهاز.",
+ set_sound:"الصوت", set_sound_s:"نغمات الضربات والنجاح والتصفيق",
+ set_motion:"الحركة", set_motion_s:"غبار الضوء وتمايل الظلال",
+ motion_full:"كاملة", motion_reduced:"مخففة",
+ set_diff:"صعوبة المطابقة", set_diff_s:"نسبة النجاح المطلوبة ودقة التلميحات",
+ diff_g:"متساهلة", diff_n:"عادية", diff_s:"صارمة",
+ set_soft:"نعومة المصباح", set_soft_s:"ضبابية حافة الظل على الشاشة",
+ set_theme:"لوحة الألوان", set_theme_s:"ثلاث لوحات من رحاب الخيال",
+ theme_oil:"زيت دافئ", theme_night:"ليل أزرق", theme_festival:"مهرجان أحمر",
+ set_touch:"أزرار اللمس", set_touch_s:"أدوات على الشاشة لتحريك الظلال وتدويرها",
+ touch_auto:"تلقائي", touch_on:"دائمًا", touch_off:"إيقاف",
+ set_reset:"تصفير كل البيانات", set_reset_s:"النتائج والمعرض والإنجازات — لا رجعة فيها", set_reset_b:"تصفير",
+ about_title:"عن «خيال الظل»",
+ about_pitch:"كن سيّد مسرح الظل الرحّال: ركّب الظلال المتداخلة خلف الشاشة المضاءة بالمصباح لتطابق المشهد المطلوب، ثم قدّمه عرضًا حيًّا على إيقاع الطبل يُبقي جمهورك مسحورًا. مفهوم أصلي من الألف إلى الياء يعمل دون اتصال بالإنترنت.",
+ about_ctrl:"التحكم الكامل",
+ ctrl_drag:"اسحب المصباح أو أي ظل بالمؤشر", ctrl_cycle:"تنقّل بين المصباح والظلال الموضوعة",
+ ctrl_move:"تحريك المحدد (Shift = أسرع)", ctrl_rot:"تدوير الظل المحدد", ctrl_scale:"تكبير/تصغير الظل المحدد",
+ ctrl_del:"إزالة الظل المحدد", ctrl_judge:"الحكم على المطابقة", ctrl_beat:"ضربة الإيقاع أثناء العرض الحيّ",
+ ctrl_spawn:"إضافة ظل سريعًا من الصندوق", ctrl_esc:"إغلاق اللوحات / إلغاء تحديد العرض الحيّ",
+ credit:"جزء من مجموعة «الأصيلة العشرة» — تجارب أصلية تعمل دون اتصال بالكامل",
+ stats_title:"سجلّ الحكواتي", rep_label:"السمعة", rep_next:"تبقّى {n}★ لفتح {u}", rep_max:"فتحتَ كل المراحل!",
+ ach_title:"الإنجازات",
+ gal_title:"معرض التركيبات", gal_sub:"تُحفظ آخر 12 تركيبة مكتملة، ويمكن إعادة تحميل أيٍّ منها على المسرح الحر.",
+ gal_empty:"المعرض فارغ بعد — أكمل مشهدًا لتحفظ أول تركيبة.", gal_open:"تحميل", gal_rm:"حذف",
+ help_title:"اختصارات لوحة المفاتيح", help_sub:"انقر على المسرح أولًا ثم جرّب:",
+ kbdIco:"⌨", kbd_aria:"خريطة مفاتيح التحكم", kbd_title:"خريطة المفاتيح",
+ kbd_sub:"انقر على المسرح أولًا لتعمل الاختصارات، ثم استخدم هذا الجدول مرجعًا سريعًا.",
+ kbd_col_key:"المفتاح", kbd_col_act:"الوظيفة",
+ tips_aria:"شريط نصائح الحكواتي", tips_hide:"إخفاء شريط النصائح", tips_restore:"إعادة إظهار شريط النصائح",
+ tips_prev:"النصيحة السابقة", tips_next:"النصيحة التالية",
+ tk1:"ابدأ بالمصباح: كلما اقتربت منه كبَر الظلّ ولانَت حافّته.",
+ tk2:"Tab يقلّب الاختيار بين المصباح والظلال الموضوعة دون الحاجة إلى الفأرة.",
+ tk3:"الأسهم تُزيح المحدَّد خطوات دقيقة، ومع Shift تصير الخطوات أوسع.",
+ tk4:"Q وE يدوران الظلَّ المحدَّد، و＋ و− يكبّرانه أو يصغّره.",
+ tk5:"المفاتيح 1 إلى 4 تستدعي أول أربعة ظلال من الصندوق فورًا.",
+ tk6:"Delete يحذف الظلَّ الزائد ويعيد الاختيار إلى ما قبله.",
+ tk7:"Enter يحكم على المطابقة، ثم Space يضرب الطبل في العرض الحيّ.",
+ tk8:"في المشاهد الصارمة تختفي الصورة الباهتة، فاحفظ مواضع الظلال عن ظهر قلب.",
+ new_best:"رقم قياسي جديد!", end_match_l:"نسبة المطابقة", end_mood_l:"حماس الجمهور",
+ end_streak_l:"أطول تتابع", end_perf_l:"نقاط العرض", end_replay:"إعادة المشهد", end_next:"المشهد التالي ›",
+ end_gal:"المعرض", end_title:"انتهى عرض: {s}",
+ cf_title:"هل أنت متأكد؟", cf_body:"سيُمحى كل تقدّمك في «خيال الظل» نهائيًا.", cf_no:"إلغاء", cf_yes:"نعم، صفّر",
+ close_aria:"إغلاق", mode_to_free:"المسرح الحر", mode_to_scene:"مشاهد المطابقة",
+ free_name:"المسرح الحر", free_tier:"بلا هدف — عبّر بحرّية",
+ tier1:"المستوى الأول", tier2:"المستوى الثاني", tier3:"المستوى الثالث", pulses_u:"{n} نبضة",
+ tier_lock:"🔒 تحتاج {n}★", locked_toast:"هذه المرحلة مقفلة — اجمع {n}★ أولًا",
+ pass_msg:"مطابقة ناجحة! استعدّ للعرض الحيّ…", fail_msg:"لم تكتمل المطابقة بعد — اتبع التلميح",
+ hint_missing:"أضف ظل «{t}» إلى المسرح", hint_up:"ارفع «{t}» قليلًا", hint_down:"أنزل «{t}» قليلًا",
+ hint_right:"أزح «{t}» نحو الشاشة", hint_left:"أزح «{t}» بعيدًا عن الشاشة",
+ hint_rot:"دوّر «{t}» {dir}", hint_big:"كبّر «{t}» (قرّب المصباح أو زر ＋)", hint_small:"صغّر «{t}» (أبعد المصباح أو زر －)",
+ live_ready:"استعدّ…", live_go:"العرض بدأ!",
+ perf_perfect:"مثالي! +{n}", perf_good:"جيد +{n}", perf_miss:"فلاتني النبضة!", perf_stray:"انتظر النبضة داخل الحلقة",
+ tok_bird:"طائر", tok_rabbit:"أرنب", tok_wolf:"ذئب", tok_snake:"حيّة", tok_palm:"نخلة", tok_boat:"قارب",
+ tok_camel:"جمل", tok_cat:"قطة", tok_flower:"زهرة", tok_fish:"سمكة", tok_butterfly:"فراشة", tok_crescent:"هلال",
+ toast_max:"أربعة ظلال على المسرح كحد أقصى", toast_removed:"أُزيل الظل", toast_select:"اختر ظلًا من المسرح أولًا",
+ toast_lamp_fixed:"المصباح يُسحب ويُحرك فقط", saved_gal:"حُفظت تركيبتك في المعرض ✨",
+ gal_full:"المعرض ممتلئ — استُبدل الأقدم", gal_loaded:"حُمّلت التركيبة على المسرح الحر",
+ gal_deleted:"حُذفت التركيبة من المعرض", free_msg:"المسرح الحر: ركّب ما تشاء ثم احفظه",
+ reset_done:"عاد «خيال الظل» إلى بدايته", ach_new:"إنجاز جديد: {a}", unlock2:"المرحلة الثانية مفتوحة! (5★)",
+ unlock3:"المرحلة الثالثة مفتوحة! (12★)", next_locked:"المشهد التالي مقفل", no_next:"أنهيتَ كل المشاهد المتاحة!",
+ st_composed:"مشاهد مكتملة", st_perfs:"عروض حيّة", st_streak:"أطول تتابع", st_perfect:"ضربات مثالية",
+ st_score:"مجموع النقاط", st_gal:"قطع المعرض",
+ tip1:"قرّب المصباح من الظل فيكبر ظلّه على الشاشة وينعم حافّه.",
+ tip2:"الظل يتحرك في الاتجاه نفسه الذي تحرّكه، لكن بمقدار مضاعف — فالحركات الصغيرة تكفي.",
+ tip3:"الصورة الباهتة على الشاشة دليلك؛ في الوضع الصارم تختفي فاعتمد على ذاكرتك!",
+ tip4:"الضربة المثالية داخل النافذة الذهبية تُسعد الجمهور وتضاعف نقاطك.",
+ tip5:"حرّك المصباح لأعلى أو لأسفل لرفع مستوى الظل كلّه أو خفضه.",
+ tip6:"في المسرح الحر لا هدف ولا حُكم — جرّب سلوك الضوء ثم احفظ أعمالك.",
+ tip7:"احذف الظل الزائد بزر Del ليعود اختيارك إلى ما قبلها.",
+ tip8:"مقياس الجمهور يهبط باستمرار؛ كل ضربة في وقتها ترفعه من جديد.",
+ ach1_n:"أول ظل", ach1_d:"أكمل مطابقة مشهد لأول مرة",
+ ach2_n:"حكواتي الوعد", ach2_d:"اجمع 5★ من السمعة",
+ ach3_n:"سيّد الخيال", ach3_d:"اجمع 12★ من السمعة",
+ ach4_n:"قلب الطبل", ach4_d:"حقّق تتابعًا من 10 ضربات صحيحة",
+ ach5_n:"يد الصقر", ach5_d:"20 ضربة مثالية في مسيرتك",
+ ach6_n:"أمين المعرض", ach6_d:"اجمع 6 تركيبات في المعرض",
+ ach7_n:"روح حرّة", ach7_d:"احفظ تركيبة على المسرح الحر",
+ ach8_n:"نجم الشرق", ach8_d:"احصل على 3★ في مشهد واحد",
+ sc1:"الصقر فوق النخلة", sc2:"الأرنب والهلال", sc3:"السمكة تحت القارب", sc4:"الذئب يعوي على القمر",
+ sc5:"القطة على القارب", sc6:"الحيّة حول النخلة", sc7:"حديقة على البحر", sc8:"هجرة الليل",
+ sc9:"راحة القافلة", sc10:"تحت ضوء القمر", sc11:"الذئب والحيّة", sc12:"الميناء القديم"
+},
+en:{
+ doc_title:"Khayal: Shadow Play — Interactive Shadow Theatre", title:"Khayal", subtitle:"Interactive Shadow Play",
+ back_aria:"Back to collection index", statsIco:"📊", galIco:"🖼️", helpIco:"❔", aboutIco:"ⓘ", setIco:"⚙️",
+ stats_aria:"Storyteller record & statistics", gal_aria:"Composition gallery", help_aria:"Keyboard shortcuts",
+ about_aria:"About this experience", set_aria:"Settings", prev_aria:"Previous scene", next_aria:"Next scene",
+ stage_aria:"Khayal shadow stage: drag the lamp and the silhouettes to match the required scene",
+ mood:"Audience", beat:"Beat", beat_aria:"Beat hit", judge:"Match scene", savePiece:"Save composition",
+ tray:"Shadow tray", tray_aria:"Shadow tray, pick a silhouette to add to the stage", tray_add:"Add “{t}” shadow",
+ rotL_aria:"Rotate counter-clockwise", rotR_aria:"Rotate clockwise", sup_aria:"Grow shadow", sdn_aria:"Shrink shadow",
+ up_aria:"Nudge up", dn_aria:"Nudge down", il_aria:"Nudge left", ir_aria:"Nudge right",
+ lamp_aria:"Select the lamp", del_aria:"Remove selected shadow",
+ kbdHint:"Tab select · Arrows move · Q/E rotate · +/− scale · Enter match · Space beat",
+ onb_title:"Welcome to Khayal",
+ onb_p1:"Drag the lamp — shadows grow larger and softer as it nears them — and arrange silhouettes behind the screen to match the faint picture drawn on it.",
+ onb_p2:"Reach the required match and the LIVE SHOW begins: drum pulses roll in, hit them on time to keep the audience spellbound and multiply your score.",
+ onb_cap:"Lamp → Shadow → Screen", onb_ok:"Got it, let's start", onb_again:"Replay the intro tour",
+ set_title:"Settings", set_sub:"Your choices are saved automatically on this device.",
+ set_sound:"Sound", set_sound_s:"Beats, chimes and applause",
+ set_motion:"Motion", set_motion_s:"Light dust and silhouette sway",
+ motion_full:"Full", motion_reduced:"Reduced",
+ set_diff:"Match difficulty", set_diff_s:"Required pass rate and hint precision",
+ diff_g:"Generous", diff_n:"Normal", diff_s:"Strict",
+ set_soft:"Lamp softness", set_soft_s:"Edge blur of shadows on the screen",
+ set_theme:"Palette", set_theme_s:"Three palettes from the realm of Khayal",
+ theme_oil:"Warm oil", theme_night:"Night blue", theme_festival:"Festival red",
+ set_touch:"Touch controls", set_touch_s:"On-screen tools to move and rotate shadows",
+ touch_auto:"Auto", touch_on:"Always", touch_off:"Off",
+ set_reset:"Reset all data", set_reset_s:"Scores, gallery and achievements — cannot be undone", set_reset_b:"Reset",
+ about_title:"About “Khayal: Shadow Play”",
+ about_pitch:"Become a traveling shadow-play master: compose overlapping hand-shadow silhouettes behind the lamplit screen to match the scene, then perform it live to a drum beat that keeps your audience spellbound. An original concept, fully offline.",
+ about_ctrl:"Full controls",
+ ctrl_drag:"Drag the lamp or any silhouette with the pointer", ctrl_cycle:"Cycle between lamp and placed shadows",
+ ctrl_move:"Move selection (Shift = faster)", ctrl_rot:"Rotate selected shadow", ctrl_scale:"Scale selected shadow",
+ ctrl_del:"Remove selected shadow", ctrl_judge:"Judge the match", ctrl_beat:"Beat hit during the live show",
+ ctrl_spawn:"Quickly add a shadow from the tray", ctrl_esc:"Close panels / cancel live show",
+ credit:"Part of “10 Originals” — original experiences, fully offline",
+ stats_title:"Storyteller record", rep_label:"Reputation", rep_next:"{n}★ left to unlock {u}", rep_max:"Every tier unlocked!",
+ ach_title:"Achievements",
+ gal_title:"Composition gallery", gal_sub:"The last 12 completed compositions are kept; reload any of them onto the free stage.",
+ gal_empty:"The gallery is empty — complete a scene to save your first piece.", gal_open:"Load", gal_rm:"Delete",
+ help_title:"Keyboard shortcuts", help_sub:"Click the stage first, then try:",
+ kbdIco:"⌨", kbd_aria:"Control key map", kbd_title:"Key Map",
+ kbd_sub:"Click the stage first so shortcuts work, then keep this table as a quick reference.",
+ kbd_col_key:"Key", kbd_col_act:"Action",
+ tips_aria:"Storyteller tips strip", tips_hide:"Hide the tips strip", tips_restore:"Show the tips strip again",
+ tips_prev:"Previous tip", tips_next:"Next tip",
+ tk1:"Start with the lamp: every step closer enlarges the shadow and softens its edge.",
+ tk2:"Press Tab to cycle between the lamp and the placed shadows — no mouse needed.",
+ tk3:"Arrow keys nudge the selection in small steps; hold Shift for wider moves.",
+ tk4:"Q and E rotate the selected shadow, while ＋ and − scale it up or down.",
+ tk5:"Keys 1 to 4 summon the first four shadows from the tray instantly.",
+ tk6:"Delete trims an extra shadow and your selection falls back.",
+ tk7:"Confirm the match with Enter, then keep the drum pulses with Space.",
+ tk8:"In strict scenes the faint guide vanishes — memorise every silhouette position.",
+ new_best:"New personal best!", end_match_l:"Match rate", end_mood_l:"Audience mood",
+ end_streak_l:"Best streak", end_perf_l:"Performance points", end_replay:"Replay scene", end_next:"Next scene ›",
+ end_gal:"Gallery", end_title:"Show finished: {s}",
+ cf_title:"Are you sure?", cf_body:"All your Khayal progress will be erased permanently.", cf_no:"Cancel", cf_yes:"Yes, reset",
+ close_aria:"Close", mode_to_free:"Free stage", mode_to_scene:"Match scenes",
+ free_name:"Free stage", free_tier:"No target — express yourself",
+ tier1:"Tier I", tier2:"Tier II", tier3:"Tier III", pulses_u:"{n} pulses",
+ tier_lock:"🔒 needs {n}★", locked_toast:"This tier is locked — gather {n}★ first",
+ pass_msg:"Match complete! Get ready for the live show…", fail_msg:"The match isn't complete — follow the hint",
+ hint_missing:"Add a “{t}” shadow to the stage", hint_up:"Raise “{t}” a little", hint_down:"Lower “{t}” a little",
+ hint_right:"Move “{t}” toward the screen", hint_left:"Move “{t}” away from the screen",
+ hint_rot:"Rotate “{t}” {dir}", hint_big:"Enlarge “{t}” (bring the lamp closer or press ＋)", hint_small:"Shrink “{t}” (move the lamp away or press －)",
+ live_ready:"Get ready…", live_go:"The show begins!",
+ perf_perfect:"Perfect! +{n}", perf_good:"Good +{n}", perf_miss:"Missed the pulse!", perf_stray:"Wait for the pulse inside the ring",
+ tok_bird:"Bird", tok_rabbit:"Rabbit", tok_wolf:"Wolf", tok_snake:"Snake", tok_palm:"Palm", tok_boat:"Boat",
+ tok_camel:"Camel", tok_cat:"Cat", tok_flower:"Flower", tok_fish:"Fish", tok_butterfly:"Butterfly", tok_crescent:"Crescent",
+ toast_max:"Four shadows on stage at most", toast_removed:"Shadow removed", toast_select:"Select a shadow on the stage first",
+ toast_lamp_fixed:"The lamp can only be dragged and nudged", saved_gal:"Your composition was saved to the gallery ✨",
+ gal_full:"Gallery full — the oldest piece was replaced", gal_loaded:"Composition loaded onto the free stage",
+ gal_deleted:"Composition deleted from the gallery", free_msg:"Free stage: compose freely, then save",
+ reset_done:"Khayal is back to its very beginning", ach_new:"New achievement: {a}", unlock2:"Tier II unlocked! (5★)",
+ unlock3:"Tier III unlocked! (12★)", next_locked:"Next scene is locked", no_next:"You finished every available scene!",
+ st_composed:"Scenes composed", st_perfs:"Live shows", st_streak:"Best streak", st_perfect:"Perfect hits",
+ st_score:"Total score", st_gal:"Gallery pieces",
+ tip1:"Bring the lamp closer to a shadow and its projection grows while its edge softens.",
+ tip2:"Shadows move in the same direction you drag, only amplified — small gestures are enough.",
+ tip3:"The faint picture on the screen is your guide; in Strict mode it vanishes — trust your memory!",
+ tip4:"A perfect hit inside the golden window delights the crowd and multiplies your points.",
+ tip5:"Move the lamp up or down to raise or lower the whole row of shadows.",
+ tip6:"The free stage has no target and no judge — explore the light, then save your work.",
+ tip7:"Delete an extra shadow with Del and your selection falls back.",
+ tip8:"The audience meter keeps falling; every on-time beat lifts it again.",
+ ach1_n:"First Shadow", ach1_d:"Complete a scene match for the first time",
+ ach2_n:"Promising Storyteller", ach2_d:"Earn 5★ of reputation",
+ ach3_n:"Master of Khayal", ach3_d:"Earn 12★ of reputation",
+ ach4_n:"Heart of the Drum", ach4_d:"Hit a streak of 10 beats",
+ ach5_n:"Falcon's Hand", ach5_d:"20 perfect hits in your career",
+ ach6_n:"Gallery Curator", ach6_d:"Collect 6 compositions in the gallery",
+ ach7_n:"Free Spirit", ach7_d:"Save a composition on the free stage",
+ ach8_n:"Star of the East", ach8_d:"Earn 3★ on a single scene",
+ sc1:"Falcon above the palm", sc2:"The rabbit & the crescent", sc3:"Fish beneath the boat", sc4:"Wolf howling at the moon",
+ sc5:"Cat on the boat", sc6:"Snake around the palm", sc7:"Garden by the sea", sc8:"Night migration",
+ sc9:"Caravan rest", sc10:"Under the moonlight", sc11:"The wolf & the serpent", sc12:"The old harbor"
+}};
+let lang=store.get("khayal_lang","ar");
+const t=(k,vars)=>{let s=(I18N[lang]&&I18N[lang][k])!=null?I18N[lang][k]:I18N.ar[k];if(s==null)s=k;
+ if(vars)for(const p in vars)s=s.replaceAll("{"+p+"}",vars[p]);return s;};
+
+/* ===== AUDIO (Web Audio synthesis) ===== */
+const SFX={ac:null,master:null,noiseBuf:null,
+ ensure(){if(this.ac){if(this.ac.state==="suspended")this.ac.resume();return true}
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
+  this.ac=new AC();this.master=this.ac.createGain();this.master.gain.value=settings.sound?0.5:0;
+  this.master.connect(this.ac.destination);
+  const n=this.ac.sampleRate|0,b=this.ac.createBuffer(1,n,this.ac.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=Math.random()*2-1;this.noiseBuf=b;return true;},
+ setMuted(m){if(this.master)this.master.gain.setTargetAtTime(m?0:0.5,this.ac.currentTime,.02);},
+ tone(o){if(!this.ac)return;const t0=this.ac.currentTime+(o.delay||0),osc=this.ac.createOscillator(),g=this.ac.createGain();
+  osc.type=o.type||"sine";osc.frequency.setValueAtTime(o.f0,t0);
+  if(o.f1)osc.frequency.exponentialRampToValueAtTime(Math.max(1,o.f1),t0+(o.dur||.2));
+  g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(o.vol||.2,t0+(o.att||.008));
+  g.gain.exponentialRampToValueAtTime(.0001,t0+(o.dur||.2));
+  osc.connect(g);g.connect(this.master);osc.start(t0);osc.stop(t0+(o.dur||.2)+.06);},
+ noise(o){if(!this.ac)return;const t0=this.ac.currentTime+(o.delay||0),src=this.ac.createBufferSource();
+  src.buffer=this.noiseBuf;src.loop=true;
+  const f=this.ac.createBiquadFilter();f.type=o.ftype||"bandpass";f.frequency.value=o.freq||1500;f.Q.value=o.q||1;
+  const g=this.ac.createGain();g.gain.setValueAtTime(.0001,t0);
+  g.gain.exponentialRampToValueAtTime(o.vol||.2,t0+(o.att||.005));g.gain.exponentialRampToValueAtTime(.0001,t0+(o.dur||.15));
+  src.connect(f);f.connect(g);g.connect(this.master);src.start(t0);src.stop(t0+(o.dur||.15)+.06);},
+ press(){this.tone({f0:640,f1:500,dur:.07,type:"triangle",vol:.11});},
+ chime(){[523.25,659.25,783.99,1046.5].forEach((f,i)=>this.tone({f0:f,dur:.35,type:"sine",vol:.15,delay:i*.09}));},
+ thud(){this.tone({f0:150,f1:55,dur:.22,type:"sine",vol:.38});this.noise({freq:240,dur:.12,vol:.14,ftype:"lowpass"});},
+ drum(){this.tone({f0:175,f1:52,dur:.24,type:"sine",vol:.5});this.noise({freq:3200,dur:.05,vol:.1,q:.7});},
+ perfect(){this.drum();this.tone({f0:1318.5,dur:.18,type:"triangle",vol:.11,delay:.02});},
+ applause(){for(let i=0;i<16;i++)this.noise({freq:900+Math.random()*2300,dur:.05+Math.random()*.09,vol:.04+Math.random()*.07,delay:i*.07+Math.random()*.05,q:.8});
+  this.tone({f0:392,f1:523.25,dur:.5,type:"triangle",vol:.07,delay:.15});},
+ unlock(){[659.25,880,1174.66].forEach((f,i)=>this.tone({f0:f,dur:.3,type:"triangle",vol:.14,delay:i*.11}));}
+};
+
+/* ===== SETTINGS + PROGRESS STATE ===== */
+const DEF_SET={sound:true,motion:"full",difficulty:"normal",softness:60,theme:"oil",touch:"auto"};
+let settings=Object.assign({},DEF_SET,store.get("khayal_settings",{}));
+const saveSet=()=>store.set("khayal_settings",settings);
+const DEF_STATS={composed:0,perfs:0,bestStreak:0,perfect:0,hits:0,total:0,gallery:0,freeSaved:0};
+const DEF_PROG={rep:0,best:{},gallery:[],stats:DEF_STATS,ach:{}};
+let prog=Object.assign({},DEF_PROG,store.get("khayal_progress",{}));
+prog.stats=Object.assign({},DEF_STATS,prog.stats||{});
+const saveProg=()=>store.set("khayal_progress",prog);
+const mediaReduce=matchMedia("(prefers-reduced-motion: reduce)");
+const reducedMotion=()=>settings.motion==="reduced"||mediaReduce.matches;
+const DIFF={generous:{pass:70,pos:.16,rot:.5,scl:.24},normal:{pass:78,pos:.12,rot:.38,scl:.17},strict:{pass:85,pos:.09,rot:.26,scl:.12}};
+const diffCfg=()=>DIFF[settings.difficulty]||DIFF.normal;
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+/* ===== TOKEN SILHOUETTES (12 canvas builders) ===== */
+// كل شكل يُرسم داخل صندوق 100×100 حول نقطة الأصل باستخدام fillStyle الحالي
+const ell=(c,x,y,rx,ry,rot=0)=>{c.beginPath();c.ellipse(x,y,rx,ry,rot,0,Math.PI*2);c.fill();};
+const cir=(c,x,y,r)=>ell(c,x,y,r,r);
+const poly=(c,pts)=>{c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();c.fill();};
+const TOKENS={
+bird:{draw(c){ /* طائر محلق بجناحين مرفوعين */
+ poly(c,[[-4,-4],[-18,-38],[-34,-48],[-22,-16],[-12,0]]);
+ poly(c,[[6,-6],[14,-36],[30,-44],[20,-14],[10,0]]);
+ ell(c,0,8,17,11);
+ cir(c,17,-3,8);
+ poly(c,[[23,-8],[36,-2],[23,3]]);
+ poly(c,[[-12,6],[-40,0],[-38,12],[-14,12]]);
+}},
+rabbit:{draw(c){ /* أرنب جالس بأذنين طويلتين */
+ ell(c,6,18,25,23);
+ cir(c,-11,-9,11.5);
+ ell(c,-17,-33,5,17,-0.14);
+ ell(c,-5,-35,5,17,0.12);
+ cir(c,31,24,7.5);
+ ell(c,4,41,15,6.5);
+}},
+wolf:{draw(c){ /* ذئب واقف يرفع خطمه للعواء */
+ ell(c,-6,14,27,13);
+ c.beginPath();c.moveTo(6,8);c.quadraticCurveTo(20,-2,23,-14);c.lineTo(31,-12);c.quadraticCurveTo(28,2,20,10);c.closePath();c.fill();
+ cir(c,26,-17,9.5);
+ poly(c,[[28,-24],[46,-33],[31,-9]]);
+ poly(c,[[18,-24],[21,-34],[26,-25]]);
+ poly(c,[[27,-25],[32,-33],[34,-23]]);
+ [[-26,20],[-16,22],[4,22],[14,20]].forEach(p=>c.fillRect(p[0],p[1],5.5,28));
+ c.beginPath();c.moveTo(-30,10);c.quadraticCurveTo(-44,16,-47,30);c.lineWidth=8;c.lineCap="round";c.strokeStyle=c.fillStyle;c.stroke();
+}},
+snake:{draw(c){ /* حيّة ملتفّة برأس مرفوع ولسان */
+ c.beginPath();c.moveTo(-32,42);
+ c.bezierCurveTo(10,54,40,40,32,28);
+ c.bezierCurveTo(24,18,-16,22,-24,12);
+ c.bezierCurveTo(-32,2,24,4,32,-6);
+ c.quadraticCurveTo(36,-14,30,-24);
+ c.lineWidth=10;c.lineCap="round";c.lineJoin="round";c.strokeStyle=c.fillStyle;c.stroke();
+ ell(c,31,-29,9,6.5,0.45);
+ poly(c,[[38,-33],[48,-36],[40,-27]]);
+}},
+palm:{draw(c){ /* نخلة بجذع منحن وست سعف */
+ c.beginPath();c.moveTo(-7,50);c.quadraticCurveTo(-3,10,4,-8);c.lineTo(13,-6);c.quadraticCurveTo(8,14,11,50);c.closePath();c.fill();
+ [[-2.6,44],[-1.9,48],[-1.05,46],[-0.35,44],[0.4,42],[1.1,40]].forEach(f=>{
+  c.save();c.translate(8,-9);c.rotate(f[0]);
+  c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(f[1]*.55,-9,f[1],-2);c.quadraticCurveTo(f[1]*.55,6,0,6);c.closePath();c.fill();c.restore();});
+ cir(c,1,-5,4.5);cir(c,13,-1,4.5);
+}},
+boat:{draw(c){ /* قارب بشراع مثلث وراية */
+ c.beginPath();c.moveTo(-48,4);c.lineTo(38,4);c.quadraticCurveTo(22,30,-12,31);c.quadraticCurveTo(-38,29,-48,4);c.closePath();c.fill();
+ cir(c,-49,1,4.5);
+ c.fillRect(-1.5,-44,4,48);
+ c.beginPath();c.moveTo(6,-40);c.quadraticCurveTo(30,-26,38,-6);c.lineTo(6,-6);c.closePath();c.fill();
+ poly(c,[[2.5,-44],[-11,-40],[2.5,-35]]);
+}},
+camel:{draw(c){ /* جمل بسنام ورقبة طويلة */
+ c.beginPath();c.moveTo(-30,8);c.quadraticCurveTo(-20,-14,0,-13);c.quadraticCurveTo(8,-30,20,-15);c.quadraticCurveTo(34,-13,36,3);c.quadraticCurveTo(32,19,10,20);c.quadraticCurveTo(-16,21,-30,8);c.closePath();c.fill();
+ c.beginPath();c.moveTo(-24,4);c.quadraticCurveTo(-36,-6,-38,-26);c.lineTo(-29,-26);c.quadraticCurveTo(-27,-8,-16,6);c.closePath();c.fill();
+ ell(c,-36,-30,9.5,6.5,-0.45);
+ poly(c,[[-32,-36],[-30,-44],[-25,-36]]);
+ [[-25,14],[-15,16],[7,16],[18,14]].forEach(p=>c.fillRect(p[0],p[1],5.5,34));
+ c.beginPath();c.moveTo(36,0);c.quadraticCurveTo(44,12,41,26);c.lineWidth=4.5;c.lineCap="round";c.strokeStyle=c.fillStyle;c.stroke();
+}},
+cat:{draw(c){ /* قطة جالسة بذيل ملتف */
+ c.beginPath();c.moveTo(-17,46);c.quadraticCurveTo(-22,8,-7,-8);c.quadraticCurveTo(4,-15,10,-2);c.quadraticCurveTo(19,18,17,46);c.closePath();c.fill();
+ cir(c,-7,-23,12);
+ poly(c,[[-17,-29],[-14,-44],[-5,-32]]);
+ poly(c,[[-2,-33],[7,-45],[11,-30]]);
+ c.beginPath();c.moveTo(15,44);c.quadraticCurveTo(36,45,37,28);c.quadraticCurveTo(38,15,26,14);c.lineWidth=7.5;c.lineCap="round";c.strokeStyle=c.fillStyle;c.stroke();
+}},
+flower:{draw(c){ /* زهرة بساق وورقتين وست بتلات */
+ c.beginPath();c.moveTo(-2.5,48);c.quadraticCurveTo(-5,24,-1,4);c.lineTo(3.5,4);c.quadraticCurveTo(2,24,4.5,48);c.closePath();c.fill();
+ ell(c,-11,30,10.5,4.5,-0.5);
+ ell(c,11,24,10.5,4.5,0.5);
+ for(let i=0;i<6;i++){const a=i*Math.PI/3-Math.PI/2;cir(c,Math.cos(a)*11.5,-8+Math.sin(a)*11.5,8.5);}
+ cir(c,0,-8,6.5);
+}},
+fish:{draw(c){ /* سمكة بعين ثقب وزعنفتين */
+ c.beginPath();c.moveTo(-38,0);c.quadraticCurveTo(-18,-21,10,-12);c.quadraticCurveTo(25,-6,30,0);c.quadraticCurveTo(25,6,10,12);c.quadraticCurveTo(-18,21,-38,0);c.closePath();
+ c.moveTo(-19.8,-3);c.arc(-23,-3,3.2,0,Math.PI*2,true);
+ c.fill("evenodd");
+ c.beginPath();c.moveTo(30,0);c.lineTo(46,-16);c.quadraticCurveTo(40,0,46,16);c.closePath();c.fill();
+ c.beginPath();c.moveTo(-8,-12);c.quadraticCurveTo(1,-27,13,-11);c.closePath();c.fill();
+}},
+butterfly:{draw(c){ /* فراشة بأربع أجنحة وقرون استشعار */
+ [1,-1].forEach(m=>{
+  c.save();c.scale(m,1);
+  c.beginPath();c.moveTo(-3,-8);c.quadraticCurveTo(-34,-36,-43,-12);c.quadraticCurveTo(-32,4,-3,2);c.closePath();c.fill();
+  c.beginPath();c.moveTo(-3,4);c.quadraticCurveTo(-30,10,-27,30);c.quadraticCurveTo(-12,32,-3,14);c.closePath();c.fill();
+  c.restore();});
+ ell(c,0,4,4.5,15);
+ cir(c,0,-13,4.5);
+ c.strokeStyle=c.fillStyle;c.lineWidth=2;c.lineCap="round";
+ c.beginPath();c.moveTo(-2,-16);c.quadraticCurveTo(-8,-28,-14,-31);c.stroke();
+ c.beginPath();c.moveTo(2,-16);c.quadraticCurveTo(8,-28,14,-31);c.stroke();
+}},
+crescent:{draw(c){ /* هلال ونجمة صغيرة */
+ c.beginPath();c.arc(0,2,30,0,Math.PI*2);c.moveTo(37,-7);c.arc(13,-7,24,0,Math.PI*2,true);c.fill("evenodd");
+ c.beginPath();c.moveTo(27,-40);c.quadraticCurveTo(29,-31,37,-29);c.quadraticCurveTo(29,-27,27,-18);c.quadraticCurveTo(25,-27,17,-29);c.quadraticCurveTo(25,-31,27,-40);c.closePath();c.fill();
+}}
+};
+const TOKEN_KEYS=["bird","rabbit","wolf","snake","palm","boat","camel","cat","flower","fish","butterfly","crescent"];
+const tokName=k=>t("tok_"+k);
+const drawToken=(c,k)=>TOKENS[k].draw(c);
+
+/* ===== SCENES (12 targets across 3 tiers) ===== */
+const SCENES=[
+ {id:"sc1",tier:1,pulses:8, targets:[{t:"palm",u:.42,v:.66,s:.34,r:.03},{t:"bird",u:.60,v:.24,s:.22,r:-.12}]},
+ {id:"sc2",tier:1,pulses:8, targets:[{t:"crescent",u:.60,v:.24,s:.22,r:0},{t:"rabbit",u:.38,v:.66,s:.30,r:0}]},
+ {id:"sc3",tier:1,pulses:8, targets:[{t:"boat",u:.50,v:.30,s:.28,r:-.04},{t:"fish",u:.52,v:.72,s:.24,r:.06}]},
+ {id:"sc4",tier:2,pulses:12,targets:[{t:"crescent",u:.62,v:.24,s:.20,r:0},{t:"wolf",u:.38,v:.64,s:.34,r:-.18}]},
+ {id:"sc5",tier:2,pulses:12,targets:[{t:"boat",u:.48,v:.56,s:.32,r:-.03},{t:"cat",u:.47,v:.26,s:.24,r:0}]},
+ {id:"sc6",tier:2,pulses:12,targets:[{t:"palm",u:.50,v:.60,s:.36,r:0},{t:"snake",u:.52,v:.38,s:.26,r:.9}]},
+ {id:"sc7",tier:3,pulses:16,targets:[{t:"palm",u:.68,v:.55,s:.30,r:.05},{t:"flower",u:.36,v:.58,s:.22,r:0},{t:"fish",u:.50,v:.84,s:.20,r:-.05}]},
+ {id:"sc8",tier:3,pulses:16,targets:[{t:"bird",u:.34,v:.26,s:.18,r:-.1},{t:"bird",u:.56,v:.38,s:.16,r:.12},{t:"crescent",u:.74,v:.20,s:.18,r:0}]},
+ {id:"sc9",tier:3,pulses:16,targets:[{t:"camel",u:.34,v:.62,s:.30,r:0},{t:"boat",u:.64,v:.70,s:.24,r:-.06},{t:"palm",u:.78,v:.36,s:.26,r:.08}]},
+ {id:"sc10",tier:3,pulses:16,targets:[{t:"crescent",u:.55,v:.20,s:.20,r:0},{t:"cat",u:.36,v:.62,s:.26,r:0},{t:"rabbit",u:.66,v:.66,s:.26,r:0}]},
+ {id:"sc11",tier:3,pulses:16,targets:[{t:"wolf",u:.32,v:.60,s:.32,r:.1},{t:"snake",u:.60,v:.50,s:.28,r:-.5},{t:"crescent",u:.76,v:.22,s:.16,r:0}]},
+ {id:"sc12",tier:3,pulses:16,targets:[{t:"boat",u:.38,v:.58,s:.30,r:-.04},{t:"boat",u:.62,v:.66,s:.22,r:.05},{t:"bird",u:.52,v:.22,s:.16,r:-.15},{t:"fish",u:.50,v:.86,s:.16,r:.08}]}
+];
+const tierName=n=>t("tier"+n);
+const tierNeed=n=>n===2?5:12;
+const tierUnlocked=n=>n===1||(n===2&&prog.rep>=5)||(n===3&&prog.rep>=12);
+const sceneName=sc=>t(sc.id);
+
+/* ===== ACHIEVEMENTS / CONTROLS / TIPS ===== */
+const ACH=[
+ {id:"a1",ic:"🕯️",n:"ach1_n",d:"ach1_d",test:p=>p.stats.composed>=1},
+ {id:"a2",ic:"⭐",n:"ach2_n",d:"ach2_d",test:p=>p.rep>=5},
+ {id:"a3",ic:"🏆",n:"ach3_n",d:"ach3_d",test:p=>p.rep>=12},
+ {id:"a4",ic:"🥁",n:"ach4_n",d:"ach4_d",test:p=>p.stats.bestStreak>=10},
+ {id:"a5",ic:"🦅",n:"ach5_n",d:"ach5_d",test:p=>p.stats.perfect>=20},
+ {id:"a6",ic:"🖼️",n:"ach6_n",d:"ach6_d",test:p=>p.stats.gallery>=6},
+ {id:"a7",ic:"✨",n:"ach7_n",d:"ach7_d",test:p=>p.stats.freeSaved>=1},
+ {id:"a8",ic:"🌟",n:"ach8_n",d:"ach8_d",test:p=>Object.values(p.best).some(b=>b.stars>=3)}
+];
+const CONTROLS=[["🖱️","ctrl_drag"],["Tab","ctrl_cycle"],["↑ ↓ ← →","ctrl_move"],["Q / E","ctrl_rot"],
+ ["+ / −","ctrl_scale"],["Del","ctrl_del"],["Enter","ctrl_judge"],["Space","ctrl_beat"],["1…4","ctrl_spawn"],["Esc","ctrl_esc"]];
+const TIPS=[1,2,3,4,5,6,7,8].map(i=>"tip"+i);
+let tipIdx=Math.floor(Math.random()*TIPS.length);
+/* ===== DOM REFS ===== */
+const $=id=>document.getElementById(id);
+const stage=$("stage"),stageWrap=$("stageWrap"),ctx=stage.getContext("2d");
+const beatC=$("beatCanvas"),beatCtx=beatC.getContext("2d");
+const langBtn=$("langBtn"),modeBtn=$("modeBtn"),tipLine=$("tipLine"),hintLine=$("hintLine");
+const matchBar=$("matchBar"),matchPct=$("matchPct"),matchWrap=$("matchWrap");
+const moodWrap=$("moodWrap"),moodBar=$("moodBar"),multTag=$("multTag"),liveMsg=$("liveMsg");
+const judgeBtn=$("judgeBtn"),freeSaveBtn=$("freeSaveBtn"),beatPad=$("beatPad");
+const sceneNameEl=$("sceneName"),sceneTierEl=$("sceneTier"),repBadge=$("repBadge"),trayEl=$("tray");
+const touchTools=$("touchTools");
+
+/* ===== CANVAS PALETTES ===== */
+const PAL={
+ oil:{cone:"240,163,94",lamp:"#f0a35e",lampCore:"#fff3d9",cloth1:"#f7e3b8",cloth2:"#dfba7f",shadow:"rgba(40,22,8,.92)",
+  roomTop:"#181128",roomBot:"#0d0918",floor:"#221a38",motes:"255,214,150",token:"#0b0713",ghost:"#f0a35e",
+  accent:"#f0a35e",good:"#8fd694",bad:"#ef7d6d",gold:"#f5c84c",frame:"#4a3a22"},
+ night:{cone:"160,200,236",lamp:"#f4c98f",lampCore:"#fff8ea",cloth1:"#eef4f9",cloth2:"#c4d9ea",shadow:"rgba(13,28,48,.92)",
+  roomTop:"#0e1a30",roomBot:"#070e1c",floor:"#13223c",motes:"205,232,255",token:"#050b16",ghost:"#8fc1e8",
+  accent:"#8fc1e8",good:"#8fd6b0",bad:"#e88098",gold:"#f0d27a",frame:"#31465e"},
+ festival:{cone:"255,140,110",lamp:"#ffb08e",lampCore:"#fff0e2",cloth1:"#ffe6c9",cloth2:"#eec295",shadow:"rgba(52,16,10,.92)",
+  roomTop:"#2c131b",roomBot:"#190a0f",floor:"#3a1a22",motes:"255,196,166",token:"#130508",ghost:"#ff8161",
+  accent:"#ff8161",good:"#a5d68f",bad:"#ef6d6d",gold:"#ffd25e",frame:"#5e2c26"}
+};
+let pal=PAL[settings.theme]||PAL.oil;
+
+/* ===== STAGE GEOMETRY ===== */
+let W=0,H=0,dpr=1,dprS=1,cloth={x:0,y:0,w:0,h:0};
+let lampMinX=0,lampMaxX=0,lampMinY=0,lampMaxY=0,tokMinX=0,tokMaxX=0,tokMinY=0,tokMaxY=0;
+const lamp={x:0,y:0};
+const insts=[];let sel=-1,lampSel=false,drag=null;
+const S={mode:"scene",sceneIdx:0,live:null,match:0,lockMatch:0};
+const cur=()=>SCENES[S.sceneIdx];
+
+let roomC=null,clothC=null;
+function sizeStage(){
+ const r=stageWrap.getBoundingClientRect();W=Math.max(320,r.width);H=Math.max(260,r.height);
+ dpr=Math.min(window.devicePixelRatio||1,2);dprS=dpr;
+ stage.width=Math.round(W*dpr);stage.height=Math.round(H*dpr);
+ const narrow=W<640;
+ cloth={x:W*(narrow?.55:.585),y:H*.075,w:W*(narrow?.41:.335),h:H*.80};
+ lampMinX=W*.03;lampMaxX=W*.5;lampMinY=H*.12;lampMaxY=H*.85;
+ tokMinX=W*.05;tokMaxX=cloth.x-W*.015;tokMinY=H*.12;tokMaxY=H*.88;
+ lamp.x=clamp(lamp.x||W*.09,lampMinX,lampMaxX);lamp.y=clamp(lamp.y||H*.52,lampMinY,lampMaxY);
+ for(const o of insts){o.x=clamp(o.x,tokMinX,tokMaxX);o.y=clamp(o.y,tokMinY,tokMaxY);}
+ buildCaches();sizeBeat();matchDirty=true;
+}
+function buildCaches(){
+ roomC=document.createElement("canvas");roomC.width=Math.round(W*dpr);roomC.height=Math.round(H*dpr);
+ const rc=roomC.getContext("2d");rc.scale(dpr,dpr);
+ const bg=rc.createLinearGradient(0,0,0,H);bg.addColorStop(0,pal.roomTop);bg.addColorStop(1,pal.roomBot);
+ rc.fillStyle=bg;rc.fillRect(0,0,W,H);
+ rc.fillStyle=pal.floor;rc.globalAlpha=.65;rc.fillRect(0,H*.86,W,H*.14);rc.globalAlpha=1;
+ rc.strokeStyle=`rgba(${pal.cone},.10)`;rc.lineWidth=1.5;
+ rc.beginPath();rc.moveTo(0,H*.86);rc.lineTo(W,H*.86);rc.stroke();
+ const vg=rc.createRadialGradient(W*.42,H*.48,H*.2,W*.42,H*.48,Math.max(W,H)*.75);
+ vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,"rgba(0,0,0,.5)");
+ rc.fillStyle=vg;rc.fillRect(0,0,W,H);
+ clothC=document.createElement("canvas");clothC.width=Math.round(cloth.w*dpr);clothC.height=Math.round(cloth.h*dpr);
+ const cc=clothC.getContext("2d");cc.scale(dpr,dpr);
+ const cg=cc.createLinearGradient(0,0,0,cloth.h);cg.addColorStop(0,pal.cloth1);cg.addColorStop(1,pal.cloth2);
+ cc.fillStyle=cg;cc.fillRect(0,0,cloth.w,cloth.h);
+ cc.strokeStyle="rgba(60,40,10,.05)";cc.lineWidth=1;
+ for(let y=6;y<cloth.h;y+=7){cc.beginPath();cc.moveTo(0,y);cc.lineTo(cloth.w,y);cc.stroke();}
+ cc.fillStyle="rgba(255,255,255,.10)";cc.fillRect(0,0,cloth.w,cloth.h*.06);
+}
+function sizeBeat(){
+ const r=beatC.getBoundingClientRect();if(r.width<10)return;
+ beatC.width=Math.round(r.width*dpr);beatC.height=Math.round(r.height*dpr);
+}
+
+/* ===== PROJECTION (lamp → cloth) ===== */
+function project(inst){
+ const dx=inst.x-lamp.x,dy=inst.y-lamp.y,d=Math.max(38,Math.hypot(dx,dy));
+ const m=clamp(1.1+(W*.55)/d,1.2,3.4);
+ const x=clamp(lamp.x+dx*m,cloth.x+cloth.w*.05,cloth.x+cloth.w*.95);
+ const y=clamp(lamp.y+dy*m,cloth.y+cloth.h*.05,cloth.y+cloth.h*.95);
+ const k=inst.s*m*cloth.h*.0011,span=k*100;
+ const blur=(settings.softness/100)*15*(m/2.6)+span*.05;
+ return{x,y,k,m,span,blur};
+}
+const angDiff=(a,b)=>{let d=(a-b)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return d;};
+function shadowRec(inst){
+ const p=project(inst);
+ return{t:inst.t,u:(p.x-cloth.x)/cloth.w,v:(p.y-cloth.y)/cloth.h,s:p.span/cloth.h,r:inst.rot};
+}
+
+/* ===== MATCH EVALUATION ===== */
+function pairScore(inst,tg,cfg){
+ const p=project(inst),su=(p.x-cloth.x)/cloth.w,sv=(p.y-cloth.y)/cloth.h,sN=p.span/cloth.h;
+ const d=Math.hypot((su-tg.u)*cloth.w,(sv-tg.v)*cloth.h)/cloth.h;
+ const pos=Math.max(0,1-d/cfg.pos);
+ const dr=angDiff(inst.rot,tg.r),rot=Math.max(0,1-Math.abs(dr)/cfg.rot);
+ const rel=Math.abs(sN-tg.s)/Math.max(tg.s,.06),scl=Math.max(0,1-rel/cfg.scl);
+ return{s:(pos*.55+rot*.2+scl*.25)*100,pos,rot,scl,du:su-tg.u,dv:sv-tg.v,dr,sN,tg};
+}
+function evaluate(){
+ const cfg=diffCfg(),sc=cur(),used=new Set();let sum=0,worst=null,worstVal=1e9,missing=null;
+ for(const tg of sc.targets){
+  let best=null;
+  for(let i=0;i<insts.length;i++){
+   if(used.has(i)||insts[i].t!==tg.t)continue;
+   const r=pairScore(insts[i],tg,cfg);r.i=i;if(!best||r.s>best.s)best=r;}
+  if(!best){if(!missing)missing=tg.t;continue;}
+  used.add(best.i);sum+=best.s;
+  if(best.s<worstVal){worstVal=best.s;worst=best;}
+ }
+ let hint="";
+ if(missing)hint=t("hint_missing",{t:tokName(missing)});
+ else if(worst)hint=hintFor(worst);
+ return{match:sum/sc.targets.length,hint};
+}
+function hintFor(w){
+ const tg=w.tg,nm=tokName(tg.t);
+ const sub=Math.min(w.pos,w.rot,w.scl);
+ if(sub===w.rot)return t("hint_rot",{t:nm,dir:w.dr>0?"⟲":"⟳"});
+ if(sub===w.scl)return t(w.sN<tg.s?"hint_big":"hint_small",{t:nm});
+ if(w.dv<-.045)return t("hint_up",{t:nm});
+ if(w.dv>.045)return t("hint_down",{t:nm});
+ return t(w.du>0?"hint_left":"hint_right",{t:nm});
+}
+function matchUI(){
+ const pct=clamp(Math.round(S.match),0,100),cfg=diffCfg();
+ matchPct.textContent=pct+"%";matchBar.style.width=pct+"%";
+ matchBar.style.background=S.match>=cfg.pass?"var(--good)":S.match>=cfg.pass-12?"var(--gold)":"var(--bad)";
+}
+
+/* ===== DUST MOTES ===== */
+const motes=Array.from({length:42},()=>({s:Math.random(),u:.12+Math.random()*.72,sp:.006+Math.random()*.026,tw:Math.random()*7}));
+
+/* ===== RENDER ===== */
+let flick=0,strayCd=0,moodAcc=0,lastMult=0,matchDirty=true,lastMatchT=0;
+function swayOf(now){return reducedMotion()?0:Math.sin(now*26)*.05*flick;}
+function draw(now){
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ ctx.clearRect(0,0,W,H);
+ ctx.drawImage(roomC,0,0,W,H);
+ const jit=reducedMotion()?0:Math.sin(now*42)*.5*flick;
+ let g=ctx.createRadialGradient(lamp.x,lamp.y,4,lamp.x,lamp.y,130+flick*30);
+ g.addColorStop(0,`rgba(${pal.cone},${(.5+jit*.12).toFixed(3)})`);g.addColorStop(1,`rgba(${pal.cone},0)`);
+ ctx.fillStyle=g;ctx.fillRect(lamp.x-170,lamp.y-170,340,340);
+ ctx.beginPath();ctx.moveTo(lamp.x,lamp.y);
+ ctx.lineTo(cloth.x,cloth.y-16);ctx.lineTo(cloth.x+cloth.w,cloth.y-30);
+ ctx.lineTo(cloth.x+cloth.w,cloth.y+cloth.h+30);ctx.lineTo(cloth.x,cloth.y+cloth.h+16);ctx.closePath();
+ const cg=ctx.createLinearGradient(lamp.x,0,cloth.x+cloth.w,0);
+ cg.addColorStop(0,`rgba(${pal.cone},${(.15+jit*.05).toFixed(3)})`);cg.addColorStop(1,`rgba(${pal.cone},.02)`);
+ ctx.fillStyle=cg;ctx.fill();
+ drawMotes(now);
+ ctx.drawImage(clothC,cloth.x,cloth.y,cloth.w,cloth.h);
+ ctx.save();ctx.beginPath();ctx.rect(cloth.x,cloth.y,cloth.w,cloth.h);ctx.clip();
+ if(S.mode==="scene"&&!S.live&&settings.difficulty!=="strict")drawGhosts();
+ drawShadows(now);
+ ctx.restore();
+ ctx.strokeStyle=pal.frame;ctx.lineWidth=6;ctx.strokeRect(cloth.x-3,cloth.y-3,cloth.w+6,cloth.h+6);
+ ctx.strokeStyle=`rgba(${pal.cone},.45)`;ctx.lineWidth=1.5;ctx.strokeRect(cloth.x-7.5,cloth.y-7.5,cloth.w+15,cloth.h+15);
+ for(let i=0;i<insts.length;i++)drawStageToken(insts[i]);
+ drawLamp(now);
+ drawSelection();
+}
+function drawMotes(now){
+ if(reducedMotion())return;
+ for(const m of motes){
+  const x=lamp.x+(cloth.x-lamp.x)*m.s;
+  const yT=lamp.y+((cloth.y-16)-lamp.y)*m.s,yB=lamp.y+((cloth.y+cloth.h+16)-lamp.y)*m.s;
+  const y=yT+(yB-yT)*m.u+Math.sin(now*.7+m.tw)*7;
+  const a=.18+.3*(0.5+0.5*Math.sin(now*1.3+m.tw*3));
+  ctx.fillStyle=`rgba(${pal.motes},${a.toFixed(3)})`;
+  ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);ctx.fill();
+ }
+}
+function drawGhosts(){
+ for(const tg of cur().targets){
+  const k=tg.s*cloth.h/100,x=cloth.x+tg.u*cloth.w,y=cloth.y+tg.v*cloth.h;
+  ctx.save();ctx.translate(x,y);ctx.rotate(tg.r);ctx.scale(k,k);
+  ctx.globalAlpha=.14;ctx.fillStyle=pal.ghost;drawToken(ctx,tg.t);ctx.restore();
+  ctx.save();ctx.globalAlpha=.5;ctx.strokeStyle=pal.ghost;ctx.lineWidth=1.4;ctx.setLineDash([6,5]);
+  ctx.beginPath();ctx.ellipse(x,y,k*56,k*56,tg.r,0,Math.PI*2);ctx.stroke();ctx.restore();
+ }
+}
+function drawShadows(now){
+ const sw=swayOf(now);
+ for(const inst of insts){
+  const p=project(inst);
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(inst.rot+sw);ctx.scale(p.k,p.k);
+  ctx.globalAlpha=.88;ctx.fillStyle=pal.shadow;ctx.shadowColor=pal.shadow;ctx.shadowBlur=p.blur*dprS;
+  drawToken(ctx,inst.t);ctx.restore();
+ }
+}
+function drawStageToken(inst){
+ const p=project(inst),kr=p.span/260;
+ ctx.save();ctx.translate(inst.x,inst.y);
+ ctx.fillStyle=`rgba(${pal.cone},.10)`;
+ ctx.beginPath();ctx.ellipse(0,kr*56,kr*42,kr*8,0,0,Math.PI*2);ctx.fill();
+ ctx.rotate(inst.rot);ctx.scale(kr,kr);
+ ctx.fillStyle=pal.token;drawToken(ctx,inst.t);
+ ctx.restore();
+}
+function drawLamp(now){
+ const wob=reducedMotion()?0:Math.sin(now*13)*.5+.5;
+ ctx.save();ctx.translate(lamp.x,lamp.y);
+ ctx.strokeStyle=pal.lamp;ctx.lineWidth=2.5;
+ ctx.beginPath();ctx.arc(0,-20,7,0,Math.PI*2);ctx.stroke();
+ ctx.fillStyle=pal.lamp;ctx.fillRect(-8,-15,16,5);ctx.fillRect(-8,16,16,4);
+ ctx.fillStyle=`rgba(${pal.cone},${(.72+wob*.16+flick*.12).toFixed(3)})`;
+ ctx.beginPath();ctx.roundRect(-10,-10,20,26,5);ctx.fill();
+ ctx.fillStyle=pal.lampCore;ctx.beginPath();ctx.arc(0,3,4.5,0,Math.PI*2);ctx.fill();
+ ctx.restore();
+}
+function drawSelection(){
+ ctx.save();ctx.setLineDash([7,5]);ctx.lineWidth=1.8;ctx.strokeStyle=pal.accent;
+ if(lampSel){
+  ctx.beginPath();ctx.arc(lamp.x,lamp.y,32,0,Math.PI*2);ctx.stroke();
+ }else if(sel>=0&&insts[sel]){
+  const o=insts[sel],p=project(o);
+  ctx.globalAlpha=.35;
+  ctx.beginPath();ctx.moveTo(lamp.x,lamp.y);ctx.lineTo(o.x,o.y);ctx.lineTo(p.x,p.y);ctx.stroke();
+  ctx.globalAlpha=1;
+  ctx.beginPath();ctx.arc(o.x,o.y,Math.max(26,p.span*.42),0,Math.PI*2);ctx.stroke();
+ }
+ ctx.restore();
+}
+function drawBeat(){
+ const L=S.live;if(!L)return;
+ const r=beatC.getBoundingClientRect(),bw=r.width,bh=r.height;
+ beatCtx.setTransform(dpr,0,0,dpr,0,0);beatCtx.clearRect(0,0,bw,bh);
+ const hz=44,spd=.14;
+ beatCtx.fillStyle="rgba(245,200,76,.07)";beatCtx.fillRect(hz-36.4,8,72.8,bh-16);
+ beatCtx.fillStyle="rgba(245,200,76,.16)";beatCtx.fillRect(hz-16.8,8,33.6,bh-16);
+ beatCtx.strokeStyle=pal.accent;beatCtx.lineWidth=2.5;
+ beatCtx.beginPath();beatCtx.arc(hz,bh/2,13,0,Math.PI*2);beatCtx.stroke();
+ for(const p of L.pulses){
+  const x=hz+(p.t-L.clock)*spd;if(x<-24||x>bw+24)continue;
+  if(p.fx>0){
+   beatCtx.globalAlpha=p.fx;beatCtx.strokeStyle=pal.good;beatCtx.lineWidth=2;
+   beatCtx.beginPath();beatCtx.arc(hz,bh/2,13+(1-p.fx)*22,0,Math.PI*2);beatCtx.stroke();beatCtx.globalAlpha=1;
+  }
+  beatCtx.save();beatCtx.translate(x,bh/2);beatCtx.rotate(Math.PI/4);
+  if(p.state===1){beatCtx.fillStyle=p.grade==="perfect"?pal.good:pal.gold;beatCtx.fillRect(-7,-7,14,14);}
+  else if(p.state===2){beatCtx.globalAlpha=.3;beatCtx.fillStyle=pal.bad;beatCtx.fillRect(-6,-6,12,12);}
+  else{beatCtx.fillStyle=pal.accent;beatCtx.fillRect(-6,-6,12,12);}
+  beatCtx.restore();
+ }
+}
+
+/* ===== MAIN LOOP ===== */
+let lastT=performance.now(),running=true;
+function update(dt,now){
+ flick=Math.max(0,flick-dt*2.6);strayCd=Math.max(0,strayCd-dt);
+ if(!reducedMotion())for(const m of motes){m.s+=m.sp*dt;if(m.s>1)m.s=0;}
+ if(S.live)updateLive(dt);
+ if(matchDirty&&now-lastMatchT>.09){matchUI();matchDirty=false;lastMatchT=now;}
+}
+function frame(now){
+ if(!running)return;
+ const dt=Math.min(.05,(now-lastT)/1000);lastT=now;
+ update(dt,now/1000);draw(now/1000);
+ if(S.live)drawBeat();
+ requestAnimationFrame(frame);
+}
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden)running=false;
+ else{running=true;lastT=performance.now();requestAnimationFrame(frame);}
+});
+
+/* ===== LIVE PERFORMANCE ===== */
+const multOf=()=>1+Math.min(3,Math.floor((S.live?S.live.streak:0)/4))*.5;
+let msgTimer=null;
+function popMsg(txt,dur){
+ liveMsg.textContent=txt;liveMsg.classList.add("pop");
+ clearTimeout(msgTimer);msgTimer=setTimeout(()=>liveMsg.classList.remove("pop"),dur||900);
+}
+function startLive(){
+ S.live={clock:0,mood:70,streak:0,best:0,pts:0,perfect:0,hits:0,done:false,ready:false,
+  pulses:Array.from({length:cur().pulses},(_,i)=>({t:2400+i*850,state:0,grade:null,fx:0}))};
+ judgeBtn.style.display="none";moodWrap.style.display="flex";beatPad.style.display="grid";
+ beatC.style.display="block";sizeBeat();
+ moodBar.style.width="70%";multTag.textContent="×1";lastMult=1;
+ hideHint();popMsg(t("live_ready"),1500);
+}
+function cancelLive(){
+ if(!S.live)return;S.live=null;restoreComposeUI();
+}
+function restoreComposeUI(){
+ moodWrap.style.display="none";beatPad.style.display="none";beatC.style.display="none";
+ judgeBtn.style.display=S.mode==="scene"?"":"none";
+}
+function updateLive(dt){
+ const L=S.live;L.clock+=dt*1000;
+ L.mood=Math.max(0,L.mood-dt*5.5);
+ for(const p of L.pulses){
+  if(p.fx>0)p.fx=Math.max(0,p.fx-dt*2.2);
+  if(p.state===0&&L.clock>p.t+280){
+   p.state=2;L.streak=0;L.mood=Math.max(0,L.mood-12);
+   SFX.thud();popMsg(t("perf_miss"),800);
+  }
+ }
+ if(!L.ready&&L.clock>2200){L.ready=true;popMsg(t("live_go"),1200);}
+ moodAcc+=dt;
+ if(moodAcc>.12){
+  moodAcc=0;moodBar.style.width=L.mood.toFixed(0)+"%";
+  const m=multOf();if(m!==lastMult){lastMult=m;multTag.textContent="×"+m;}
+ }
+ const lp=L.pulses[L.pulses.length-1];
+ if(L.clock>lp.t+280+1500)finishPerformance();
+}
+function beatHit(){
+ const L=S.live;if(!L||L.done)return;
+ let bp=null,bd=1e9;
+ for(const p of L.pulses){if(p.state!==0)continue;const d=Math.abs(L.clock-p.t);if(d<bd){bd=d;bp=p;}}
+ if(!bp||bd>300){
+  if(strayCd<=0){strayCd=.5;L.mood=Math.max(0,L.mood-2);SFX.press();popMsg(t("perf_stray"),700);}
+  return;
+ }
+ const perfect=bd<=120;
+ bp.state=1;bp.grade=perfect?"perfect":"good";bp.fx=1;
+ L.streak++;L.best=Math.max(L.best,L.streak);L.hits++;
+ if(perfect)L.perfect++;
+ const gain=Math.round((perfect?100:50)*multOf());
+ L.pts+=gain;L.mood=clamp(L.mood+(perfect?14:9),0,100);
+ flick=1;beatPad.classList.add("hit");setTimeout(()=>beatPad.classList.remove("hit"),130);
+ perfect?SFX.perfect():SFX.drum();
+ popMsg(t(perfect?"perf_perfect":"perf_good",{n:gain}),700);
+}
+function finishPerformance(){
+ const L=S.live;if(!L||L.ended)return;L.ended=true;
+ const sc=cur(),st=prog.stats;
+ const score=Math.max(1,Math.round(S.lockMatch*10*(0.55+0.45*L.mood/100)*(1+Math.min(L.best,20)*.025)));
+ const stars=score>=1600?3:score>=1100?2:score>=600?1:0;
+ const prev=prog.best[sc.id];
+ const isBest=!prev||score>prev.score;
+ prog.best[sc.id]={
+  score:Math.max(score,prev?prev.score:0),
+  stars:Math.max(stars,prev?prev.stars:0),
+  match:Math.max(Math.round(S.lockMatch),prev?prev.match:0)};
+ const prevRep=prog.rep;
+ prog.rep=Object.values(prog.best).reduce((a,b)=>a+(b.stars||0),0);
+ st.perfs++;st.hits+=L.hits;st.perfect+=L.perfect;
+ st.bestStreak=Math.max(st.bestStreak,L.best);st.total+=score;
+ addGallery({free:false,sc:sc.id,shadows:insts.map(shadowRec),score,stars});
+ checkAch();
+ if(prevRep<5&&prog.rep>=5)queueToast(t("unlock2"));
+ if(prevRep<12&&prog.rep>=12)queueToast(t("unlock3"));
+ saveProg();updateRep();flushToasts();
+ const moodPct=Math.round(L.mood),bestStreak=L.best,perfPts=L.pts,lockMatch=S.lockMatch;
+ S.live=null;restoreComposeUI();
+ $("endT").textContent=t("end_title",{s:sceneName(sc)});
+ $("endStars").innerHTML=`<span>${"★".repeat(stars)}</span><span class="dim">${"★".repeat(3-stars)}</span>`;
+ $("endScore").textContent=score;
+ $("endMatch").textContent=Math.round(lockMatch)+"%";
+ $("endMood").textContent=moodPct+"%";
+ $("endStreak").textContent=bestStreak;
+ $("endPerf").textContent=perfPts;
+ $("newBestTag").style.display=isBest?"block":"none";
+ stars>0?SFX.applause():SFX.chime();
+ openPanel("ovEnd");
+}
+
+/* ===== JUDGE ===== */
+function showHint(txt){
+ if(!txt){hintLine.style.display="none";return;}
+ hintLine.textContent=txt;hintLine.style.display="block";
+}
+const hideHint=()=>showHint("");
+function judge(){
+ if(S.mode!=="scene"||S.live)return;
+ if(!insts.length){toast(t("hint_missing",{t:tokName(cur().targets[0].t)}));return;}
+ const res=evaluate();S.match=res.match;matchUI();
+ const cfg=diffCfg();
+ if(res.match>=cfg.pass){
+  SFX.chime();S.lockMatch=S.match;
+  prog.stats.composed++;saveProg();checkAch();flushToasts();
+  showHint(t("pass_msg"));setTimeout(startLive,750);
+ }else{
+  SFX.thud();showHint(t("fail_msg")+" — "+res.hint);
+ }
+}
+
+/* ===== GALLERY / META ===== */
+function addGallery(item){
+ item.gid=Date.now()+Math.floor(Math.random()*999);item.ts=Date.now();
+ prog.gallery.push(item);
+ if(prog.gallery.length>12){prog.gallery.shift();toast(t("gal_full"));}
+ prog.stats.gallery=prog.gallery.length;saveProg();
+}
+function saveFree(){
+ if(!insts.length){toast(t("toast_select"));return;}
+ addGallery({free:true,sc:null,shadows:insts.map(shadowRec),score:0,stars:0});
+ prog.stats.freeSaved++;saveProg();checkAch();flushToasts();
+ SFX.chime();toast(t("saved_gal"));
+}
+function renderGallery(){
+ const grid=$("galGrid");grid.innerHTML="";
+ $("galEmpty").style.display=prog.gallery.length?"none":"block";
+ for(const it of [...prog.gallery].reverse()){
+  const d=document.createElement("div");d.className="galItem";
+  const cv=document.createElement("canvas");cv.width=264;cv.height=198;cv.style.height="auto";
+  const c=cv.getContext("2d");c.scale(2,2);
+  const gw=132,gh=99,gd=c.createLinearGradient(0,0,0,gh);
+  gd.addColorStop(0,pal.cloth1);gd.addColorStop(1,pal.cloth2);
+  c.fillStyle=gd;c.fillRect(0,0,gw,gh);
+  c.fillStyle="rgba(40,22,8,.82)";
+  for(const sh of it.shadows){
+   c.save();c.translate(sh.u*gw,sh.v*gh);c.rotate(sh.r);
+   const k=sh.s*gh/100;c.scale(k,k);drawToken(c,sh.t);c.restore();
+  }
+  d.appendChild(cv);
+  const nm=document.createElement("div");nm.className="gname";
+  nm.textContent=(it.free?t("free_name"):t(it.sc))+" · "+("★".repeat(it.stars||0)||"·");
+  d.appendChild(nm);
+  const row=document.createElement("div");row.className="grow";
+  const bl=document.createElement("button");bl.textContent=t("gal_open");
+  bl.onclick=()=>{SFX.press();loadComposition(it);};
+  const bd=document.createElement("button");bd.textContent=t("gal_rm");
+  bd.onclick=()=>{SFX.press();prog.gallery=prog.gallery.filter(g=>g.gid!==it.gid);
+   prog.stats.gallery=prog.gallery.length;saveProg();renderGallery();toast(t("gal_deleted"));};
+  row.append(bl,bd);d.appendChild(row);grid.appendChild(d);
+ }
+}
+function loadComposition(it){
+ setMode("free");insts.length=0;sel=-1;lampSel=false;
+ lamp.x=clamp(W*.09,lampMinX,lampMaxX);lamp.y=clamp(H*.52,lampMinY,lampMaxY);
+ for(const sh of it.shadows){
+  const sx=cloth.x+sh.u*cloth.w,sy=cloth.y+sh.v*cloth.h;
+  let m=2.4,tx=0,ty=0;
+  for(let i=0;i<5;i++){
+   tx=lamp.x+(sx-lamp.x)/m;ty=lamp.y+(sy-lamp.y)/m;
+   const d=Math.max(38,Math.hypot(tx-lamp.x,ty-lamp.y));
+   m=clamp(1.1+(W*.55)/d,1.2,3.4);
+  }
+  insts.push({t:sh.t,x:clamp(tx,tokMinX,tokMaxX),y:clamp(ty,tokMinY,tokMaxY),rot:sh.r,s:clamp(sh.s/(.11*m),.5,1.7)});
+ }
+ closePanel();updateTrayCounts();matchDirty=true;toast(t("gal_loaded"));
+}
+
+/* ===== STATS + ACHIEVEMENTS ===== */
+function updateRep(){repBadge.textContent="★ "+prog.rep;}
+function renderStatsPanel(){
+ const st=prog.stats,g=$("statGrid");
+ g.innerHTML="";
+ [[st.composed,"st_composed"],[st.perfs,"st_perfs"],[st.bestStreak,"st_streak"],
+  [st.perfect,"st_perfect"],[st.total,"st_score"],[st.gallery,"st_gal"]].forEach(([v,k])=>{
+  const d=document.createElement("div");d.className="statCard";
+  const b=document.createElement("b");b.textContent=v;
+  const s=document.createElement("span");s.textContent=t(k);
+  d.append(b,s);g.appendChild(d);
+ });
+ $("repVal").textContent="★ "+prog.rep;
+ $("repNext").textContent=prog.rep<5?t("rep_next",{n:5-prog.rep,u:tierName(2)})
+  :prog.rep<12?t("rep_next",{n:12-prog.rep,u:tierName(3)}):t("rep_max");
+ const list=$("achList");list.innerHTML="";
+ for(const a of ACH){
+  const got=!!prog.ach[a.id];
+  const d=document.createElement("div");d.className="ach"+(got?" got":"");
+  const ic=document.createElement("span");ic.className="ic";ic.textContent=a.ic;
+  const tx=document.createElement("div");
+  const b=document.createElement("b");b.textContent=t(a.n);
+  const sm=document.createElement("small");sm.textContent=t(a.d);
+  tx.append(b,sm);d.append(ic,tx);list.appendChild(d);
+ }
+}
+function checkAch(){
+ let got=false;
+ for(const a of ACH){if(!prog.ach[a.id]&&a.test(prog)){prog.ach[a.id]=Date.now();queueToast(t("ach_new",{a:t(a.n)}));got=true;}}
+ if(got){SFX.unlock();saveProg();}
+}
+
+/* ===== TOASTS ===== */
+const toastHost=$("toasts");
+function toast(msg){
+ const d=document.createElement("div");d.className="toast";d.textContent=msg;
+ toastHost.appendChild(d);requestAnimationFrame(()=>d.classList.add("show"));
+ setTimeout(()=>{d.classList.remove("show");setTimeout(()=>d.remove(),320);},2600);
+ while(toastHost.children.length>3)toastHost.firstChild.remove();
+}
+const toastQ=[];
+function queueToast(m){toastQ.push(m);}
+function flushToasts(){if(!toastQ.length)return;toast(toastQ.shift());setTimeout(flushToasts,420);}
+
+/* ===== PANELS ===== */
+const PANELS=["ovOnb","ovSet","ovAbout","ovStats","ovGal","ovHelp","ovKbd","ovEnd","ovCf"];
+let openStack=[],lastFocus=null;
+function openPanel(id){
+ const el=$(id);if(el.classList.contains("open"))return;
+ while(openStack.length)closePanel();
+ lastFocus=document.activeElement;
+ el.classList.add("open");openStack.push(id);
+ const f=el.querySelector("button,input,[tabindex]");if(f)f.focus();
+ if(id==="ovStats")renderStatsPanel();
+ if(id==="ovGal")renderGallery();
+}
+function closePanel(){
+ const id=openStack.pop();if(!id)return;
+ $(id).classList.remove("open");
+ if(id==="ovOnb")store.set("khayal_seen",true);
+ if(lastFocus&&lastFocus.focus)lastFocus.focus();
+}
+const panelOpen=()=>openStack.length>0;
+
+/* ===== TRAY + TOOLS + MODES ===== */
+function buildTray(){
+ trayEl.innerHTML="";
+ for(const k of TOKEN_KEYS){
+  const b=document.createElement("button");b.className="trayTok";b.type="button";
+  b.setAttribute("role","option");b.dataset.k=k;
+  const cv=document.createElement("canvas");cv.width=92;cv.height=92;
+  const c=cv.getContext("2d");c.scale(.92,.92);
+  c.fillStyle=pal.accent;drawToken(c,k);
+  b.appendChild(cv);
+  const cnt=document.createElement("span");cnt.className="cnt";b.appendChild(cnt);
+  b.onclick=()=>{SFX.ensure();spawnToken(k);};
+  trayEl.appendChild(b);
+ }
+ updateTrayCounts();
+}
+function updateTrayCounts(){
+ for(const b of trayEl.children){
+  const n=insts.filter(i=>i.t===b.dataset.k).length;
+  const badge=b.querySelector(".cnt");
+  badge.textContent=n;badge.style.display=n?"block":"none";
+  b.setAttribute("aria-label",t("tray_add",{t:tokName(b.dataset.k)}));
+ }
+}
+function spawnToken(k){
+ if(insts.length>=4){toast(t("toast_max"));return;}
+ const n=insts.length;
+ insts.push({t:k,x:clamp(W*.30+((n%2)*100-50),tokMinX,tokMaxX),
+  y:clamp(H*.5+((n%3)*80-80),tokMinY,tokMaxY),rot:0,s:1});
+ sel=insts.length-1;lampSel=false;hideHint();
+ updateTrayCounts();matchDirty=true;SFX.press();
+}
+function removeSel(){
+ if(lampSel||sel<0||!insts[sel])return;
+ insts.splice(sel,1);sel=-1;updateTrayCounts();matchDirty=true;
+ toast(t("toast_removed"));SFX.press();
+}
+function cycleSel(){
+ const n=insts.length;
+ if(lampSel){lampSel=false;sel=-1;}
+ else if(sel>=n-1){lampSel=true;sel=-1;}
+ else if(n)sel++;
+ else lampSel=!lampSel;
+}
+function nudge(dx,dy){
+ if(lampSel){lamp.x=clamp(lamp.x+dx,lampMinX,lampMaxX);lamp.y=clamp(lamp.y+dy,lampMinY,lampMaxY);}
+ else if(sel>=0&&insts[sel]){const o=insts[sel];o.x=clamp(o.x+dx,tokMinX,tokMaxX);o.y=clamp(o.y+dy,tokMinY,tokMaxY);}
+ else{toast(t("toast_select"));return;}
+ matchDirty=true;
+}
+function toolAct(act){
+ if(act==="lamp"){lampSel=true;sel=-1;return;}
+ if(act==="del"){removeSel();return;}
+ if(act==="rotL"||act==="rotR"){
+  if(lampSel){toast(t("toast_lamp_fixed"));return;}
+  if(sel<0||!insts[sel]){toast(t("toast_select"));return;}
+  insts[sel].rot+=(act==="rotL"?-0.09:0.09);matchDirty=true;return;
+ }
+ if(act==="scaleUp"||act==="scaleDn"){
+  if(lampSel){toast(t("toast_lamp_fixed"));return;}
+  if(sel<0||!insts[sel]){toast(t("toast_select"));return;}
+  insts[sel].s=clamp(insts[sel].s+(act==="scaleUp"?0.08:-0.08),.5,1.7);matchDirty=true;return;
+ }
+ const step=16;
+ if(act==="up")nudge(0,-step);else if(act==="dn")nudge(0,step);
+ else if(act==="il")nudge(-step,0);else if(act==="ir")nudge(step,0);
+}
+function setMode(m){
+ if(S.live)cancelLive();
+ S.mode=m;
+ judgeBtn.style.display=m==="scene"?"":"none";
+ freeSaveBtn.style.display=m==="free"?"":"none";
+ matchWrap.style.display=m==="scene"?"flex":"none";
+ modeBtn.textContent=m==="scene"?t("mode_to_free"):t("mode_to_scene");
+ refreshSceneHud();matchDirty=true;
+ if(m==="free")toast(t("free_msg"));
+}
+function refreshSceneHud(){
+ if(S.mode==="free"){
+  sceneNameEl.textContent=t("free_name");sceneTierEl.textContent=t("free_tier");return;
+ }
+ const sc=cur();
+ sceneNameEl.textContent=sceneName(sc);
+ let tier=tierName(sc.tier)+" · "+t("pulses_u",{n:sc.pulses});
+ if(!tierUnlocked(sc.tier))tier+=" · "+t("tier_lock",{n:tierNeed(sc.tier)});
+ sceneTierEl.textContent=tier;
+}
+function loadScene(i){
+ if(!tierUnlocked(SCENES[i].tier)){toast(t("locked_toast",{n:tierNeed(SCENES[i].tier)}));SFX.thud();return;}
+ S.sceneIdx=i;insts.length=0;sel=-1;lampSel=false;S.match=0;S.lockMatch=0;
+ hideHint();refreshSceneHud();updateTrayCounts();matchDirty=true;SFX.press();
+}
+function nextUnlocked(from){
+ for(let s=from;s<SCENES.length;s++)if(tierUnlocked(SCENES[s].tier))return s;
+ return -1;
+}
+
+/* ===== INPUT: POINTER ===== */
+const evtPos=e=>{const r=stage.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};};
+stage.addEventListener("pointerdown",e=>{
+ SFX.ensure();
+ const pt=evtPos(e);let hitLamp=false,hitI=-1;
+ if(Math.hypot(pt.x-lamp.x,pt.y-lamp.y)<36)hitLamp=true;
+ else for(let i=insts.length-1;i>=0;i--){
+  const p=project(insts[i]);
+  if(Math.hypot(pt.x-insts[i].x,pt.y-insts[i].y)<Math.max(24,p.span*.42)){hitI=i;break;}
+ }
+ if(hitLamp){
+  SFX.press();lampSel=true;sel=-1;
+  drag={lamp:true,ox:lamp.x-pt.x,oy:lamp.y-pt.y};
+ }else if(hitI>=0){
+  SFX.press();lampSel=false;sel=hitI;
+  drag={i:hitI,ox:insts[hitI].x-pt.x,oy:insts[hitI].y-pt.y};
+ }else{sel=-1;lampSel=false;drag=null;}
+ if(drag){stage.setPointerCapture(e.pointerId);stage.classList.add("dragging");}
+ e.preventDefault();
+});
+stage.addEventListener("pointermove",e=>{
+ if(!drag)return;
+ const pt=evtPos(e);
+ if(drag.lamp){lamp.x=clamp(pt.x+drag.ox,lampMinX,lampMaxX);lamp.y=clamp(pt.y+drag.oy,lampMinY,lampMaxY);}
+ else{const o=insts[drag.i];if(!o)return;
+  o.x=clamp(pt.x+drag.ox,tokMinX,tokMaxX);o.y=clamp(pt.y+drag.oy,tokMinY,tokMaxY);}
+ matchDirty=true;hideHint();
+});
+const endDrag=e=>{if(drag&&stage.hasPointerCapture(e.pointerId))try{stage.releasePointerCapture(e.pointerId);}catch(_){}
+ drag=null;stage.classList.remove("dragging");};
+stage.addEventListener("pointerup",endDrag);
+stage.addEventListener("pointercancel",endDrag);
+
+/* ===== INPUT: KEYBOARD ===== */
+stage.addEventListener("keydown",e=>{
+ if(panelOpen())return;
+ const k=e.key,step=e.shiftKey?24:9;let used=true;
+ if(k==="ArrowUp")nudge(0,-step);
+ else if(k==="ArrowDown")nudge(0,step);
+ else if(k==="ArrowLeft")nudge(-step,0);
+ else if(k==="ArrowRight")nudge(step,0);
+ else if(k==="q"||k==="Q"){if(lampSel||sel<0)used=false;else{insts[sel].rot-=0.09;matchDirty=true;}}
+ else if(k==="e"||k==="E"){if(lampSel||sel<0)used=false;else{insts[sel].rot+=0.09;matchDirty=true;}}
+ else if(k==="+"||k==="="){if(lampSel||sel<0)used=false;else{insts[sel].s=clamp(insts[sel].s+.08,.5,1.7);matchDirty=true;}}
+ else if(k==="-"||k==="_"){if(lampSel||sel<0)used=false;else{insts[sel].s=clamp(insts[sel].s-.08,.5,1.7);matchDirty=true;}}
+ else if(k==="Delete"||k==="Backspace")removeSel();
+ else if(k==="Tab")cycleSel();
+ else if(k===" "){if(S.live)beatHit();else used=false;}
+ else if(k==="Enter"){if(S.mode==="scene"&&!S.live)judge();else used=false;}
+ else if(/^[1-4]$/.test(k))spawnToken(TOKEN_KEYS[+k-1]);
+ else used=false;
+ if(used)e.preventDefault();
+});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){
+  if(panelOpen()){closePanel();e.preventDefault();return;}
+  if(S.live){cancelLive();return;}
+  sel=-1;lampSel=false;return;
+ }
+ if(e.code==="Space"&&!panelOpen()&&S.live&&(e.target===document.body||e.target===stage)){
+  e.preventDefault();SFX.ensure();beatHit();
+ }
+});
+
+/* ===== INPUT: WIRING ===== */
+function wireEvents(){
+ langBtn.onclick=()=>{SFX.ensure();SFX.press();
+  lang=lang==="ar"?"en":"ar";store.set("khayal_lang",lang);applyLang();};
+ $("backLink").addEventListener("click",()=>SFX.press());
+ $("btnSettings").onclick=()=>{SFX.ensure();SFX.press();openPanel("ovSet");};
+ $("btnAbout").onclick=()=>{SFX.ensure();SFX.press();openPanel("ovAbout");};
+ $("btnStats").onclick=()=>{SFX.ensure();SFX.press();openPanel("ovStats");};
+ $("btnGallery").onclick=()=>{SFX.ensure();SFX.press();openPanel("ovGal");};
+ $("btnHelp").onclick=()=>{SFX.ensure();SFX.press();openPanel("ovHelp");};
+ $("onbOk").onclick=()=>{SFX.press();closePanel();};
+ $("onbReplay").onclick=()=>{SFX.press();openPanel("ovOnb");};
+ judgeBtn.onclick=()=>{SFX.ensure();judge();};
+ freeSaveBtn.onclick=()=>{SFX.ensure();saveFree();};
+ modeBtn.onclick=()=>{SFX.ensure();SFX.press();setMode(S.mode==="scene"?"free":"scene");};
+ $("prevScene").onclick=()=>{if(S.mode==="free"){toast(t("free_msg"));return;}
+  const i=(S.sceneIdx+SCENES.length-1)%SCENES.length;loadScene(i);};
+ $("nextScene").onclick=()=>{if(S.mode==="free"){toast(t("free_msg"));return;}
+  const i=(S.sceneIdx+1)%SCENES.length;loadScene(i);};
+ beatPad.addEventListener("pointerdown",e=>{e.preventDefault();SFX.ensure();beatHit();});
+ touchTools.addEventListener("click",e=>{
+  const b=e.target.closest("button[data-act]");if(!b)return;
+  SFX.ensure();SFX.press();toolAct(b.dataset.act);
+ });
+ $("endReplay").onclick=()=>{SFX.press();closePanel();loadScene(S.sceneIdx);};
+ $("endNext").onclick=()=>{SFX.press();closePanel();
+  const i=nextUnlocked(S.sceneIdx+1);
+  if(i<0)toast(t("no_next"));else loadScene(i);};
+ $("endGal").onclick=()=>{SFX.press();closePanel();openPanel("ovGal");};
+ $("setReset").onclick=()=>{SFX.press();openPanel("ovCf");};
+ $("cfNo").onclick=()=>{SFX.press();closePanel();};
+ $("cfYes").onclick=()=>{doReset();};
+ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>{SFX.press();closePanel();});
+ PANELS.forEach(id=>{
+  const ov=$(id);
+  ov.addEventListener("pointerdown",e=>{if(e.target===ov)closePanel();});
+ });
+ wireSettings();
+ window.addEventListener("resize",sizeStage);
+ mediaReduce.addEventListener?.("change",applyMotion);
+}
+function renderCtrlList(){
+ $("ctrlList").innerHTML=CONTROLS.map(([k,l])=>
+  `<div class="helpRow"><span class="kbd">${k}</span><span>${t(l)}</span></div>`).join("");
+ $("helpList").innerHTML=CONTROLS.map(([k,l])=>
+  `<div class="helpRow"><span>${t(l)}</span><span class="kbd">${k}</span></div>`).join("");
+}
+
+/* ===== SETTINGS WIRING ===== */
+function wireSeg(el,cb){
+ for(const b of el.children)b.onclick=()=>{
+  for(const x of el.children)x.setAttribute("aria-pressed","false");
+  b.setAttribute("aria-pressed","true");SFX.ensure();SFX.press();cb(b.dataset.val);
+ };
+}
+function initSettingsUI(){
+ $("setSound").setAttribute("aria-checked",String(!!settings.sound));
+ for(const b of $("segMotion").children)b.setAttribute("aria-pressed",String(b.dataset.val===settings.motion));
+ for(const b of $("segDiff").children)b.setAttribute("aria-pressed",String(b.dataset.val===settings.difficulty));
+ for(const b of $("segTouch").children)b.setAttribute("aria-pressed",String(b.dataset.val===settings.touch));
+ for(const b of $("themeDots").children)b.setAttribute("aria-pressed",String(b.dataset.val===settings.theme));
+ $("setSoft").value=settings.softness;
+}
+function applyTheme(){
+ document.documentElement.dataset.theme=settings.theme;pal=PAL[settings.theme]||PAL.oil;
+}
+function applyMotion(){document.body.classList.toggle("reduced",reducedMotion());}
+function applyTouch(){
+ const on=settings.touch==="on"||
+  (settings.touch==="auto"&&(matchMedia("(pointer: coarse)").matches||"ontouchstart" in window));
+ document.body.classList.toggle("touch-on",on);
+ document.body.classList.toggle("touch-off",!on);
+}
+function wireSettings(){
+ $("setSound").onclick=()=>{
+  SFX.ensure();settings.sound=!settings.sound;
+  $("setSound").setAttribute("aria-checked",String(settings.sound));
+  SFX.setMuted(!settings.sound);if(settings.sound)SFX.press();saveSet();
+ };
+ wireSeg($("segMotion"),v=>{settings.motion=v;saveSet();applyMotion();});
+ wireSeg($("segDiff"),v=>{settings.difficulty=v;saveSet();matchDirty=true;});
+ wireSeg($("segTouch"),v=>{settings.touch=v;saveSet();applyTouch();});
+ wireSeg($("themeDots"),v=>{settings.theme=v;saveSet();applyTheme();buildCaches();buildTray();});
+ $("setSoft").addEventListener("input",e=>{settings.softness=+e.target.value;saveSet();});
+}
+function doReset(){
+ settings=Object.assign({},DEF_SET);prog=Object.assign({},DEF_PROG,{stats:Object.assign({},DEF_STATS)});
+ saveSet();saveProg();
+ applyTheme();applyMotion();applyTouch();initSettingsUI();buildTray();
+ S.sceneIdx=0;setMode("scene");loadScene(0);updateRep();
+ closePanel();toast(t("reset_done"));SFX.chime();
+}
+
+/* ===== I18N APPLY ===== */
+function applyLang(){
+ document.documentElement.lang=lang;
+ document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+ document.title=t("doc_title");
+ document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.dataset.i18n);});
+ document.querySelectorAll("[data-i18n-aria]").forEach(el=>{el.setAttribute("aria-label",t(el.dataset.i18nAria));});
+ langBtn.textContent=lang==="ar"?"EN":"عربي";
+ modeBtn.textContent=S.mode==="scene"?t("mode_to_free"):t("mode_to_scene");
+ refreshSceneHud();renderCtrlList();renderStatsPanel();renderGallery();updateTrayCounts();
+ tipLine.textContent=t(TIPS[tipIdx]);
+}
+function rotateTip(){
+ if(document.hidden||panelOpen())return;
+ tipLine.style.opacity=0;
+ setTimeout(()=>{tipIdx=(tipIdx+1)%TIPS.length;tipLine.textContent=t(TIPS[tipIdx]);tipLine.style.opacity=1;},420);
+}
+
+/* ===== KEYMAP + TIPS STRIP ===== */
+const KBD_ROWS=[
+ {k:"Tab",d:"ctrl_cycle"},{k:"↑ ↓ ← →",d:"ctrl_move"},{k:"Q / E",d:"ctrl_rot"},
+ {k:"＋ / −",d:"ctrl_scale"},{k:"1 – 4",d:"ctrl_spawn"},{k:"Del / Backspace",d:"ctrl_del"},
+ {k:"Enter",d:"ctrl_judge"},{k:"Space",d:"ctrl_beat"},{k:"Esc",d:"ctrl_esc"},{k:"Drag",d:"ctrl_drag"}
+];
+const KTIPS=["tk1","tk2","tk3","tk4","tk5","tk6","tk7","tk8"];
+const TIP_CYCLE_MS=12000,TIP_DWELL_MS=9000,TIP_RETRY_MS=2500;
+const tipStripEl=$("tipStrip"),tipStripTxt=$("tipStripTxt");
+let kTipIdx=0,kTipTimer=null,kTipDwell=null,kTipsOff=false;
+function buildKbdTable(){
+ const tb=$("kbdTable").tBodies[0];tb.innerHTML="";
+ for(const r of KBD_ROWS){
+  const tr=document.createElement("tr");
+  const th=document.createElement("th");th.scope="row";th.textContent=r.k;
+  const td=document.createElement("td");td.dataset.i18n=r.d;td.textContent=t(r.d);
+  tr.append(th,td);tb.appendChild(tr);
+ }
+}
+function kTipsAllowed(){return S.mode==="scene"&&!S.live&&!panelOpen()&&!kTipsOff;}
+function kTipRender(){
+ tipStripTxt.textContent=t(KTIPS[kTipIdx]);
+ tipStripEl.classList.add("show");
+ tipStripEl.setAttribute("aria-hidden","false");
+}
+function kTipHide(){
+ tipStripEl.classList.remove("show");
+ tipStripEl.setAttribute("aria-hidden","true");
+}
+function kTipStopDwell(){if(kTipDwell){clearTimeout(kTipDwell);kTipDwell=null;}}
+function kTipTick(){
+ if(!kTipsAllowed()){kTipTimer=setTimeout(kTipTick,TIP_RETRY_MS);return;}
+ kTipRender();
+ kTipIdx=(kTipIdx+1)%KTIPS.length;
+ kTipDwell=setTimeout(kTipHide,TIP_DWELL_MS);
+ kTipTimer=setTimeout(kTipTick,TIP_CYCLE_MS);
+}
+function kTipStep(dir){
+ if(!kTipsAllowed())return;
+ kTipStopDwell();
+ kTipIdx=(kTipIdx+dir+KTIPS.length)%KTIPS.length;
+ kTipRender();
+ kTipDwell=setTimeout(kTipHide,TIP_DWELL_MS);
+}
+function kTipsRestart(){
+ kTipsOff=false;store.set("khayal_tips",true);
+ if(!kTipTimer)kTipTimer=setTimeout(kTipTick,TIP_RETRY_MS);
+}
+function initKbdExtras(){
+ buildKbdTable();
+ $("btnKbd").addEventListener("click",()=>{SFX.ensure();SFX.press();openPanel("ovKbd");});
+ $("tipPrev").addEventListener("click",()=>{SFX.press();kTipStep(-1);});
+ $("tipNext").addEventListener("click",()=>{SFX.press();kTipStep(1);});
+ $("tipRestore").addEventListener("click",()=>{SFX.press();kTipsRestart();kTipStep(0);});
+ $("tipStripX").addEventListener("click",()=>{
+  kTipsOff=true;store.set("khayal_tips",false);
+  clearTimeout(kTipTimer);kTipTimer=null;kTipStopDwell();kTipHide();SFX.press();
+ });
+ kTipsOff=!store.get("khayal_tips",true);
+ if(!kTipsOff)kTipTimer=setTimeout(kTipTick,TIP_CYCLE_MS);
+}
+
+/* ===== INIT ===== */
+function init(){
+ touchTools.removeAttribute("style");
+ applyTheme();applyMotion();applyTouch();buildTray();initSettingsUI();
+ applyLang();sizeStage();updateRep();wireEvents();initKbdExtras();
+ loadScene(nextUnlocked(0)>=0?nextUnlocked(0):0);
+ setMode("scene");
+ if(!store.get("khayal_seen",false))openPanel("ovOnb");
+ setInterval(rotateTip,9000);
+ requestAnimationFrame(now=>{lastT=now;requestAnimationFrame(frame);});
+}
+init();
+</script>
+</body>
+</html>

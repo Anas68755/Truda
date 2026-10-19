@@ -1,0 +1,1906 @@
+<!-- 10 Originals — Mirrorseal — original concept, 100% offline -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="parchment">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الخَتم المعكوس — Mirrorseal</title>
+<style>
+/* ============================================================
+   MIRRORSEAL — palette: wax crimson on parchment over dark walnut
+   ============================================================ */
+:root{
+  --walnut-0:#191009; --walnut-1:#241710; --walnut-2:#342216; --walnut-3:#4a3120;
+  --parch:#f2e6cd; --parch-2:#e7d6b2; --parch-3:#dcc79d;
+  --ink:#241812; --ink-soft:#5b4634;
+  --wax:#c9584f; --wax-deep:#8e3a33; --wax-lite:#e08a7d; --wax-shadow:#5e241f;
+  --forest:#2e5a3a; --midnight:#2b3450; --gold-wax:#c9a227;
+  --gold:#c9a227; --brass:#8a6d3b; --gold-soft:#a8863d;
+  --panel:#f4e9d2; --panel-2:#ecdcb9; --panel-3:#e2cda1;
+  --line:#c8b28a; --line-2:#b49a6c;
+  --text:#2c1e14; --text-2:#6b543c;
+  --face-bg:#f2e6cd; --face-rim:#3c281a;
+  --ok:#3f7d4e; --danger:#a03d2e;
+  --shadow:0 12px 32px rgba(18,9,3,.38);
+  --shadow-sm:0 4px 12px rgba(18,9,3,.28);
+  --r:14px; --r-sm:9px;
+  --tr:.22s cubic-bezier(.4,.8,.3,1);
+}
+[data-theme="night"]{
+  --walnut-0:#0d0906; --walnut-1:#140e09; --walnut-2:#1f150d; --walnut-3:#2c1e12;
+  --panel:#251a12; --panel-2:#1c130c; --panel-3:#33241706;
+  --line:#4a3826; --line-2:#5d472e;
+  --text:#f0e2c4; --text-2:#bda57e;
+  --face-bg:#eadcbd; --face-rim:#0c0805;
+  --gold:#d8b23c; --shadow:0 12px 32px rgba(0,0,0,.6); --shadow-sm:0 4px 12px rgba(0,0,0,.5);
+}
+[data-theme="sepia"]{
+  --walnut-0:#241b0f; --walnut-1:#2e2314; --walnut-2:#3c2e1a; --walnut-3:#54401f;
+  --panel:#e9dab6; --panel-2:#dfcb9e; --panel-3:#d2ba85;
+  --line:#b3975f; --line-2:#9c8149;
+  --text:#332611; --text-2:#6d5836;
+  --face-bg:#efe0c0; --face-rim:#332611;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{
+  margin:0; min-height:100%;
+  font:16px/1.55 "Segoe UI",Tahoma,system-ui,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1100px 700px at 50% -8%, rgba(201,88,79,.10), transparent 60%),
+    radial-gradient(900px 900px at 88% 110%, rgba(201,162,39,.07), transparent 55%),
+    linear-gradient(180deg, var(--walnut-2), var(--walnut-1) 55%, var(--walnut-0));
+  background-attachment:fixed;
+}
+:focus-visible{outline:3px solid var(--gold); outline-offset:2px; border-radius:8px}
+::selection{background:var(--wax); color:#fff6e8}
+button{font:inherit; color:inherit; cursor:pointer}
+input,textarea,select{font:inherit; color:var(--text)}
+h1,h2,h3{margin:0; line-height:1.3}
+p{margin:.35em 0}
+canvas{display:block}
+
+/* ---------- app frame ---------- */
+#app{max-width:1460px; margin-inline:auto; padding:14px 16px 26px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:10px 14px; margin-bottom:16px;
+  background:linear-gradient(180deg, var(--panel), var(--panel-2));
+  border:1px solid var(--line); border-radius:var(--r);
+  box-shadow:var(--shadow);
+}
+.back{
+  display:grid; place-items:center; width:42px; height:42px; flex:none;
+  font-size:22px; text-decoration:none; color:var(--text);
+  background:var(--panel-2); border:1px solid var(--line); border-radius:50%;
+  transition:transform var(--tr), background var(--tr);
+}
+.back:hover{transform:scale(1.08); background:var(--gold); color:#241812}
+.brand{flex:1; min-width:200px}
+.brand h1{font-size:1.45rem; letter-spacing:.5px; color:var(--text)}
+.brand h1 .waxdot{color:var(--wax)}
+.brand .tag{margin:0; font-size:.85rem; color:var(--text-2)}
+.top-actions{display:flex; gap:8px; align-items:center}
+.icon-btn{
+  width:42px; height:42px; display:grid; place-items:center; font-size:20px;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:50%;
+  transition:background var(--tr), transform var(--tr);
+}
+.icon-btn:hover{background:var(--gold); transform:translateY(-2px)}
+.lang{
+  min-width:64px; height:42px; padding-inline:12px; font-weight:700;
+  background:var(--wax); color:#fff4e6; border:none; border-radius:21px;
+  box-shadow:var(--shadow-sm); transition:transform var(--tr), filter var(--tr);
+}
+.lang:hover{transform:translateY(-2px); filter:brightness(1.08)}
+
+/* ---------- layout ---------- */
+.layout{display:grid; grid-template-columns:minmax(320px,1.12fr) minmax(300px,.86fr) minmax(330px,1fr); gap:16px; align-items:start}
+@media (max-width:1180px){ .layout{grid-template-columns:1fr 1fr} .waxp{grid-column:1/-1} }
+@media (max-width:780px){ .layout{grid-template-columns:1fr} }
+
+/* ---------- panels ---------- */
+.panel{
+  background:linear-gradient(180deg, var(--panel), var(--panel-2));
+  border:1px solid var(--line); border-radius:var(--r);
+  box-shadow:var(--shadow); padding:14px;
+}
+.p-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap}
+.p-head h2{font-size:1.06rem; color:var(--text); display:flex; gap:8px; align-items:center}
+.p-head h2 .ic{color:var(--wax)}
+
+/* ---------- stage: seal face ---------- */
+.face-wrap{
+  position:relative; width:100%; max-width:560px; aspect-ratio:1;
+  margin-inline:auto; border-radius:50%;
+  outline-offset:6px;
+}
+.face-wrap canvas{width:100%; height:100%; touch-action:none; border-radius:50%}
+.stage-badge{
+  position:absolute; top:6px; inset-inline-start:50%; transform:translateX(-50%);
+  padding:2px 12px; font-size:.78rem; font-weight:700; border-radius:12px;
+  background:var(--gold); color:#241812; pointer-events:none;
+}
+.chips{display:flex; gap:6px; flex-wrap:wrap}
+.chip{
+  padding:5px 12px; font-size:.82rem; border-radius:16px; font-weight:600;
+  background:var(--panel-2); border:1px solid var(--line); color:var(--text-2);
+  transition:background var(--tr), color var(--tr), transform var(--tr);
+}
+.chip:hover{transform:translateY(-1px)}
+.chip.on{background:var(--wax); border-color:var(--wax-deep); color:#fff4e6}
+.sel-bar{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center;
+  margin-top:12px; padding:8px 10px;
+  background:var(--panel-2); border:1px dashed var(--line-2); border-radius:var(--r-sm);
+}
+.sel-bar .sel-name{font-weight:700; font-size:.9rem; color:var(--text); min-width:70px}
+.sel-btns{display:flex; gap:5px; flex-wrap:wrap}
+.sel-btns button{
+  width:36px; height:34px; display:grid; place-items:center; font-size:15px;
+  background:var(--panel); border:1px solid var(--line); border-radius:8px;
+  transition:background var(--tr), transform var(--tr);
+}
+.sel-btns button:hover{background:var(--gold); transform:translateY(-1px)}
+.sel-btns button.warn:hover{background:var(--danger); color:#fff2e2}
+
+/* ---------- accordions & fields ---------- */
+.acc{border:1px solid var(--line); border-radius:var(--r-sm); margin-bottom:10px; background:var(--panel-2); overflow:hidden}
+.acc summary{
+  padding:9px 12px; font-weight:700; cursor:pointer; user-select:none; list-style:none;
+  display:flex; align-items:center; gap:8px; color:var(--text);
+}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::after{content:"▾"; margin-inline-start:auto; transition:transform var(--tr); color:var(--text-2)}
+.acc[open] summary::after{transform:rotate(180deg)}
+.acc-body{padding:4px 12px 12px; display:flex; flex-direction:column; gap:10px}
+.fld{display:flex; flex-direction:column; gap:5px; font-size:.88rem; color:var(--text-2); font-weight:600}
+.fld input[type="text"], .fld input[type="number"]{
+  padding:9px 11px; border:1px solid var(--line); border-radius:8px;
+  background:var(--panel); font-size:1rem; font-weight:400; color:var(--text);
+}
+.fld input[type="range"]{width:100%; accent-color:var(--wax); height:26px}
+.hint{font-size:.78rem; color:var(--text-2); margin:2px 0 0}
+
+/* ---------- buttons ---------- */
+.btn{
+  padding:10px 14px; border:none; border-radius:10px; font-weight:700; font-size:.92rem;
+  background:var(--panel-3); color:var(--text); border:1px solid var(--line-2);
+  transition:transform var(--tr), filter var(--tr), background var(--tr);
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+}
+.btn:hover{transform:translateY(-2px); filter:brightness(1.05)}
+.btn:active{transform:translateY(0)}
+.btn.wax-btn{background:var(--wax); color:#fff4e6; border-color:var(--wax-deep); box-shadow:var(--shadow-sm)}
+.btn.gold-btn{background:var(--gold); color:#241812; border-color:var(--gold-soft)}
+.btn.ghost{background:transparent}
+.btn.tiny{padding:6px 10px; font-size:.8rem; border-radius:8px}
+.btn.press{
+  width:100%; padding:15px; font-size:1.08rem; letter-spacing:.5px;
+  background:linear-gradient(180deg, var(--wax), var(--wax-deep));
+  color:#fff4e6; border:none; border-radius:12px; box-shadow:0 6px 0 var(--wax-shadow), var(--shadow-sm);
+  transition:transform .12s, box-shadow .12s;
+}
+.btn.press:active{transform:translateY(5px); box-shadow:0 1px 0 var(--wax-shadow), var(--shadow-sm)}
+.exp-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px}
+
+/* ---------- letters tool ---------- */
+.style-row{display:grid; grid-template-columns:repeat(3,1fr); gap:6px}
+.style-btn{
+  padding:8px 4px; text-align:center; font-size:1.05rem; line-height:1.15;
+  background:var(--panel); border:1px solid var(--line); border-radius:8px;
+  transition:background var(--tr), border-color var(--tr), transform var(--tr);
+}
+.style-btn small{display:block; font-size:.64rem; color:var(--text-2); font-family:inherit}
+.style-btn.on{border-color:var(--wax); box-shadow:inset 0 0 0 2px var(--wax); transform:scale(1.04)}
+.mini-lays{display:flex; gap:6px; flex-wrap:wrap}
+.mini-lays .btn{flex:1}
+
+/* ---------- symbol library ---------- */
+.sym-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:6px}
+.sym-btn{
+  aspect-ratio:1; padding:4px; display:grid; place-items:center;
+  background:var(--panel); border:1px solid var(--line); border-radius:8px;
+  color:var(--ink); transition:background var(--tr), transform var(--tr), border-color var(--tr);
+}
+.sym-btn svg{width:100%; height:100%}
+.sym-btn:hover{background:var(--gold); transform:scale(1.1); border-color:var(--gold-soft)}
+
+/* ---------- borders ---------- */
+.bord-row{display:grid; grid-template-columns:repeat(4,1fr); gap:6px}
+.bord-btn{
+  padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:4px;
+  background:var(--panel); border:1px solid var(--line); border-radius:8px; font-size:.68rem; font-weight:700;
+  transition:background var(--tr), transform var(--tr);
+}
+.bord-btn svg{width:44px; height:44px}
+.bord-btn:hover{transform:translateY(-2px); background:var(--gold)}
+.stepper{display:flex; align-items:center; gap:8px; justify-content:space-between}
+.stepper .st-lab{font-size:.85rem; font-weight:700; color:var(--text-2)}
+.stepper .st-ctl{display:flex; align-items:center; gap:6px}
+.stepper button{
+  width:30px; height:30px; border-radius:8px; border:1px solid var(--line);
+  background:var(--panel); font-weight:800; font-size:1rem; line-height:1;
+}
+.stepper button:hover{background:var(--gold)}
+.stepper output{min-width:34px; text-align:center; font-weight:800; font-variant-numeric:tabular-nums}
+
+/* ---------- symmetry ---------- */
+.fold-row{display:flex; gap:6px; flex-wrap:wrap}
+.switch{display:flex; align-items:center; gap:10px; cursor:pointer; padding:4px 0; font-weight:600; font-size:.9rem}
+.switch input{position:absolute; opacity:0; width:1px; height:1px}
+.switch .sl{
+  width:44px; height:24px; flex:none; border-radius:12px; background:var(--panel-3);
+  border:1px solid var(--line-2); position:relative; transition:background var(--tr);
+}
+.switch .sl::after{
+  content:""; position:absolute; top:2px; inset-inline-start:2px; width:18px; height:18px;
+  border-radius:50%; background:var(--text-2); transition:transform var(--tr), background var(--tr);
+}
+.switch input:checked + .sl{background:var(--wax); border-color:var(--wax-deep)}
+.switch input:checked + .sl::after{transform:translateX(-20px); background:#fff4e6}
+[dir="ltr"] .switch input:checked + .sl::after{transform:translateX(20px)}
+.switch input:focus-visible + .sl{outline:3px solid var(--gold); outline-offset:2px}
+
+/* ---------- layers ---------- */
+.layer-list{display:flex; flex-direction:column; gap:5px; max-height:210px; overflow:auto}
+.layer-item{
+  display:flex; align-items:center; gap:8px; padding:6px 9px;
+  background:var(--panel); border:1px solid var(--line); border-radius:8px; font-size:.85rem;
+}
+.layer-item.on{border-color:var(--wax); box-shadow:inset 0 0 0 2px var(--wax)}
+.layer-item .l-ic{width:24px; text-align:center; flex:none}
+.layer-item .l-name{flex:1; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.layer-item .l-z{font-size:.7rem; color:var(--text-2)}
+.layer-item button{
+  width:26px; height:26px; border:1px solid var(--line); background:var(--panel-2);
+  border-radius:6px; font-size:.8rem; display:grid; place-items:center;
+}
+.layer-item button:hover{background:var(--gold)}
+.layer-empty{font-size:.82rem; color:var(--text-2); text-align:center; padding:10px}
+
+/* ---------- wax panel ---------- */
+.prev-box{
+  display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:var(--r-sm); padding:10px;
+}
+.prev-lab{font-size:.78rem; font-weight:700; color:var(--text-2); writing-mode:vertical-rl; text-orientation:mixed; letter-spacing:1px}
+[dir="ltr"] .prev-lab{writing-mode:vertical-lr}
+.prev-wrap{position:relative; width:132px; aspect-ratio:1}
+.prev-wrap canvas{width:100%; height:100%; border-radius:50%; box-shadow:var(--shadow-sm)}
+.flip-mini{
+  position:absolute; bottom:-6px; inset-inline-end:-6px; width:34px; height:34px;
+  border-radius:50%; border:1px solid var(--line-2); background:var(--panel); font-size:15px;
+  display:grid; place-items:center; box-shadow:var(--shadow-sm);
+}
+.flip-mini:hover{background:var(--gold)}
+.swatches{display:flex; gap:9px}
+.swatch{
+  width:38px; height:38px; border-radius:50%; border:3px solid transparent;
+  box-shadow:var(--shadow-sm); transition:transform var(--tr), border-color var(--tr);
+  position:relative;
+}
+.swatch:hover{transform:scale(1.12)}
+.swatch.on{border-color:var(--gold); transform:scale(1.12)}
+.swatch span{
+  position:absolute; inset-inline-start:50%; top:calc(100% + 3px); transform:translateX(-50%);
+  font-size:.6rem; white-space:nowrap; color:var(--text-2); font-weight:700;
+}
+.range-row{display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center}
+.range-row output{font-weight:800; min-width:44px; text-align:center; font-variant-numeric:tabular-nums}
+.range-row .rl{font-size:.8rem; color:var(--text-2); font-weight:700}
+
+/* ---------- impression card ---------- */
+.imp-card{
+  margin-top:12px; padding:12px; text-align:center;
+  background:
+    radial-gradient(140% 110% at 50% 0%, rgba(255,250,235,.5), transparent 55%),
+    linear-gradient(180deg, var(--panel), var(--panel-3));
+  border:1px solid var(--line-2); border-radius:var(--r);
+  box-shadow:var(--shadow-sm), inset 0 0 0 4px rgba(255,250,235,.25), inset 0 0 0 5px var(--line-2);
+}
+.imp-card canvas{width:min(300px,86%); margin-inline:auto; border-radius:6px}
+.imp-meta{margin-top:8px}
+.imp-meta .nm{font-size:1.12rem; font-weight:800; letter-spacing:.4px}
+.imp-meta .dt{font-size:.82rem; color:var(--text-2); font-variant-numeric:tabular-nums}
+.imp-meta .in{font-size:.74rem; color:var(--text-2)}
+.imp-empty{font-size:.85rem; color:var(--text-2); padding:26px 8px}
+
+/* ---------- cabinet ---------- */
+.cab-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(86px,1fr)); gap:8px}
+.cab-item{
+  border:1px solid var(--line); border-radius:10px; background:var(--panel);
+  padding:6px; display:flex; flex-direction:column; gap:4px; align-items:center;
+}
+.cab-item canvas{width:68px; height:68px; border-radius:50%}
+.cab-item .cn{font-size:.7rem; font-weight:700; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.cab-item .cr{display:flex; gap:4px}
+.cab-item .cr button{width:26px; height:24px; font-size:.72rem; border:1px solid var(--line); border-radius:6px; background:var(--panel-2)}
+.cab-item .cr button:hover{background:var(--gold)}
+.cab-item .cr button.del:hover{background:var(--danger); color:#fff2e2}
+.cab-empty{font-size:.8rem; color:var(--text-2); text-align:center; padding:8px}
+.tpl-row{display:flex; gap:6px; flex-wrap:wrap}
+.tpl-row .btn{flex:1; min-width:100px}
+
+/* ---------- footer ---------- */
+.foot{
+  margin-top:16px; padding:10px 16px; display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+  background:linear-gradient(180deg, var(--panel), var(--panel-2));
+  border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow-sm);
+}
+.stats{display:flex; gap:8px; flex-wrap:wrap}
+.stat{
+  font-size:.75rem; font-weight:700; padding:4px 10px; border-radius:12px;
+  background:var(--panel-2); border:1px solid var(--line); color:var(--text-2);
+  font-variant-numeric:tabular-nums;
+}
+.stat b{color:var(--wax)}
+.tip-row{flex:1; min-width:220px; display:flex; gap:8px; align-items:center; font-size:.82rem; color:var(--text-2)}
+.tip-row .ti{flex:none}
+.linkish{background:none; border:none; color:var(--wax); font-weight:700; text-decoration:underline; padding:4px}
+
+/* ---------- overlays & modals ---------- */
+.overlay{
+  position:fixed; inset:0; z-index:60; display:grid; place-items:center;
+  background:rgba(15,8,4,.62); backdrop-filter:blur(3px); padding:16px;
+}
+.overlay[hidden]{display:none}
+.modal{
+  width:min(94vw,600px); max-height:88vh; overflow:auto; padding:0;
+  background:linear-gradient(180deg, var(--panel), var(--panel-2));
+  border:1px solid var(--line-2); border-radius:var(--r); box-shadow:var(--shadow);
+}
+.m-head{display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--panel); z-index:1}
+.m-head h3{flex:1; font-size:1.1rem}
+.m-close{
+  width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
+  background:var(--panel-2); font-size:15px; flex:none;
+}
+.m-close:hover{background:var(--danger); color:#fff2e2}
+.m-body{padding:16px 18px 20px; display:flex; flex-direction:column; gap:12px}
+.m-body .row{display:flex; gap:8px; flex-wrap:wrap}
+.m-body .row .btn{flex:1}
+.ob-diagram{display:grid; place-items:center; background:var(--panel); border:1px dashed var(--line-2); border-radius:var(--r-sm); padding:10px}
+.ob-diagram svg{width:min(320px,100%); height:auto}
+.set-grid{display:flex; flex-direction:column; gap:12px}
+.set-opt{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px 12px; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--r-sm);
+}
+.set-opt .so-lab{font-weight:700; font-size:.92rem}
+.set-opt .so-sub{font-size:.74rem; color:var(--text-2); font-weight:400}
+.theme-row{display:flex; gap:6px}
+.kbd-table{width:100%; border-collapse:collapse; font-size:.86rem}
+.kbd-table td{padding:6px 8px; border-bottom:1px dashed var(--line)}
+.kbd-table td:first-child{width:130px}
+.kbd{display:inline-block; padding:2px 8px; background:var(--panel); border:1px solid var(--line-2); border-bottom-width:3px; border-radius:6px; font-weight:800; font-size:.78rem; font-family:inherit}
+.svg-ta{width:100%; height:190px; resize:vertical; direction:ltr; text-align:left; font-family:Consolas,Menlo,monospace; font-size:.78rem; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px}
+.tl-list{display:flex; flex-direction:column; gap:0}
+.tl-item{display:flex; gap:12px; align-items:center; padding:10px 4px; border-bottom:1px dashed var(--line)}
+.tl-item .tl-ic{width:38px; height:38px; flex:none; display:grid; place-items:center; border-radius:50%; background:var(--panel-2); border:1px solid var(--line); font-size:17px}
+.tl-item .tl-body{flex:1}
+.tl-item .tl-t{font-weight:700; font-size:.9rem}
+.tl-item .tl-d{font-size:.74rem; color:var(--text-2); font-variant-numeric:tabular-nums}
+.tl-empty{text-align:center; color:var(--text-2); padding:18px}
+
+/* ---------- toasts ---------- */
+.toasts{position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:80; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none}
+.toast{
+  padding:10px 20px; border-radius:24px; font-weight:700; font-size:.9rem; color:#fff4e6;
+  background:var(--wax-deep); box-shadow:var(--shadow);
+  animation:toastIn .3s cubic-bezier(.3,1.4,.5,1), toastOut .3s ease-in 2.3s forwards;
+  max-width:88vw; text-align:center;
+}
+.toast.ok{background:var(--ok)}
+.toast.gold{background:var(--gold); color:#241812}
+@keyframes toastIn{from{opacity:0; transform:translateY(16px) scale(.9)}}
+@keyframes toastOut{to{opacity:0; transform:translateY(10px)}}
+
+/* ---------- export flash ---------- */
+.flash{animation:flashA .9s ease-out}
+@keyframes flashA{0%{box-shadow:0 0 0 0 rgba(201,162,39,.95)} 100%{box-shadow:0 0 0 34px rgba(201,162,39,0)}}
+
+/* ---------- motion preferences ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s !important; transition-duration:.001s !important}
+}
+html[data-motion="off"] *,html[data-motion="off"] *::before,html[data-motion="off"] *::after{
+  animation-duration:.001s !important; transition-duration:.001s !important;
+}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff}
+  #app, .topbar, .foot, .exp-grid, .prev-box, .toasts{display:none !important}
+  .print-zone{display:block !important; position:fixed; inset:0; background:#fff; padding:20px; box-shadow:none; border:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  html[data-motion="off"] .btn.press:active{transform:translateY(5px)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ======= top bar ======= -->
+  <header class="topbar">
+    <a class="back" href="../index.html" title="…" data-i18n-title="back" data-i18n-aria="back" aria-label="رجوع">↩</a>
+    <div class="brand">
+      <h1><span class="waxdot">✦</span> <span data-i18n="title">الخَتم المعكوس</span></h1>
+      <p class="tag" data-i18n="tag">انقش عكس الحقيقة… ليقرأ الشمع صدقها</p>
+    </div>
+    <div class="top-actions">
+      <button id="langBtn" class="lang" aria-label="English / عربي">EN</button>
+      <button id="setBtn" class="icon-btn" title="…" data-i18n-title="settings" data-i18n-aria="settings" aria-label="الإعدادات">⚙</button>
+      <button id="aboutBtn" class="icon-btn" title="…" data-i18n-title="about" data-i18n-aria="about" aria-label="حول">ⓘ</button>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- ======= stage: seal face editor ======= -->
+    <section class="panel stage" aria-labelledby="faceTtl">
+      <div class="p-head">
+        <h2 id="faceTtl"><span class="ic">✏</span> <span data-i18n="faceT">وجه الختم — الطرْح المعكوس</span></h2>
+        <div class="chips">
+          <button id="snapChip" class="chip on" data-i18n="snapChip">محاذاة للشبكة</button>
+          <button id="flipChip" class="chip" data-i18n="flipChip">عرض موجب</button>
+        </div>
+      </div>
+      <div class="face-wrap" id="faceWrap" tabindex="0" aria-describedby="faceHint">
+        <canvas id="face" width="512" height="512" role="img" aria-label="وجه الختم"></canvas>
+        <div class="stage-badge" id="viewBadge" hidden data-i18n="positiveView">عرض موجب</div>
+      </div>
+      <p class="hint" id="faceHint" data-i18n="faceHint" style="text-align:center"></p>
+      <div class="sel-bar" id="selBar" hidden>
+        <span class="sel-name" id="selName">—</span>
+        <div class="sel-btns" role="toolbar" data-i18n-aria="selTools" aria-label="أدوات العنصر">
+          <button data-act="rotL" title="…" data-i18n-title="rotL" aria-label="تدوير يسارًا">↺</button>
+          <button data-act="rotR" title="…" data-i18n-title="rotR" aria-label="تدوير يمينًا">↻</button>
+          <button data-act="sclUp" title="…" data-i18n-title="sclUp" aria-label="تكبير">＋</button>
+          <button data-act="sclDn" title="…" data-i18n-title="sclDn" aria-label="تصغير">－</button>
+          <button data-act="top" title="…" data-i18n-title="zTop" aria-label="إلى الأمام">⏫</button>
+          <button data-act="up" title="…" data-i18n-title="zUp" aria-label="طبقة للأمام">▲</button>
+          <button data-act="dn" title="…" data-i18n-title="zDn" aria-label="طبقة للخلف">▼</button>
+          <button data-act="bot" title="…" data-i18n-title="zBot" aria-label="إلى الخلف">⏬</button>
+          <button data-act="dup" title="…" data-i18n-title="dup" aria-label="تكرار">⧉</button>
+          <button data-act="del" class="warn" title="…" data-i18n-title="del" aria-label="حذف">🗑</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= tools panel ======= -->
+    <aside class="panel tools" aria-labelledby="toolsTtl">
+      <div class="p-head"><h2 id="toolsTtl"><span class="ic">🛠</span> <span data-i18n="toolsT">أدوات النقش</span></h2></div>
+
+      <details class="acc" open>
+        <summary>🔤 <span data-i18n="lettersT">الحروف المعكوسة</span></summary>
+        <div class="acc-body">
+          <label class="fld">
+            <span data-i18n="initials">الأحرف الأولى (حتى 3)</span>
+            <input id="initials" type="text" maxlength="3" autocomplete="off" data-i18n-ph="initialsPh" placeholder="مثال: س لم">
+          </label>
+          <div class="fld">
+            <span data-i18n="letterStyle">نمط الحرف</span>
+            <div class="style-row" id="styleRow"></div>
+          </div>
+          <button id="addLetters" class="btn wax-btn" data-i18n="addInitials">＋ أضف الحروف</button>
+          <div class="mini-lays" id="layRow"></div>
+          <p class="hint" data-i18n="lettersHint"></p>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary>❖ <span data-i18n="symbolsT">مكتبة الرموز</span></summary>
+        <div class="acc-body">
+          <div class="sym-grid" id="symGrid"></div>
+          <p class="hint" data-i18n="symHint"></p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>◌ <span data-i18n="bordersT">أطواق الحدود</span></summary>
+        <div class="acc-body">
+          <div class="bord-row" id="bordRow"></div>
+          <div class="stepper">
+            <span class="st-lab" data-i18n="count">العدد</span>
+            <div class="st-ctl">
+              <button id="cntDn" aria-label="−">−</button><output id="cntVal">18</output><button id="cntUp" aria-label="＋">＋</button>
+            </div>
+          </div>
+          <div class="stepper">
+            <span class="st-lab" data-i18n="width">السماكة</span>
+            <div class="st-ctl">
+              <button id="widDn" aria-label="−">−</button><output id="widVal">10</output><button id="widUp" aria-label="＋">＋</button>
+            </div>
+          </div>
+          <button id="addBorder" class="btn wax-btn" data-i18n="addBorder">＋ أضف الطوق</button>
+          <p class="hint" data-i18n="borderHint"></p>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>✳ <span data-i18n="symmetryT">التجويد الشعاعي</span></summary>
+        <div class="acc-body">
+          <div class="fld">
+            <span data-i18n="folds">محاور التناظر</span>
+            <div class="fold-row" id="foldRow"></div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="autoMir">
+            <span class="sl"></span>
+            <span data-i18n="autoMirror">انعكاس تلقائي (يُضاعف كل عنصر معكوسًا)</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="hatchTg">
+            <span class="sl"></span>
+            <span data-i18n="hatch">تظليل الحفر ( hatch )</span>
+          </label>
+          <p class="hint" data-i18n="symHint2"></p>
+        </div>
+      </details>
+
+      <details class="acc" open>
+        <summary>≡ <span data-i18n="layersT">الطبقات</span></summary>
+        <div class="acc-body">
+          <div class="layer-list" id="layerList"></div>
+        </div>
+      </details>
+    </aside>
+
+    <!-- ======= wax panel ======= -->
+    <aside class="panel waxp" aria-labelledby="waxTtl">
+      <div class="p-head"><h2 id="waxTtl"><span class="ic">🕯</span> <span data-i18n="waxT">ختم الشمع</span></h2></div>
+
+      <div class="prev-box">
+        <div class="prev-lab" data-i18n="livePrev">معاينة حيّة — الأثر الموجب</div>
+        <div class="prev-wrap">
+          <canvas id="prev" width="264" height="264" role="img" aria-label="معاينة الأثر الموجب"></canvas>
+          <button id="flipBtn" class="flip-mini" title="…" data-i18n-title="flipView" aria-label="قلب العرض">⇄</button>
+        </div>
+      </div>
+
+      <label class="fld" style="margin-top:12px">
+        <span data-i18n="holder">اسم صاحب الختم</span>
+        <input id="holder" type="text" maxlength="34" autocomplete="off" data-i18n-ph="holderPh" placeholder="الاسم يظهر على البطاقة">
+      </label>
+
+      <div class="fld">
+        <span data-i18n="waxColor">لون الشمع</span>
+        <div class="swatches" id="waxRow"></div>
+      </div>
+
+      <div class="fld">
+        <span data-i18n="temperature">حرارة الشمع</span>
+        <div class="range-row">
+          <span class="rl" data-i18n="cold">بارد</span>
+          <input type="range" id="tempR" min="0" max="100" value="45" data-i18n-aria="temperature" aria-label="حرارة الشمع">
+          <output id="tempVal">45</output>
+        </div>
+      </div>
+
+      <div class="fld">
+        <span data-i18n="tilt">ميل الضغطة ±8°</span>
+        <div class="range-row">
+          <span class="rl">-8°</span>
+          <input type="range" id="tiltR" min="-8" max="8" value="0" data-i18n-aria="tilt" aria-label="ميل الضغطة">
+          <output id="tiltVal">0°</output>
+        </div>
+      </div>
+
+      <button id="pressBtn" class="btn press" style="margin-top:10px">⤓ <span data-i18n="press">اضغط الختم في الشمع</span></button>
+
+      <div class="imp-card print-zone" id="impCard" aria-live="polite">
+        <canvas id="impCv" width="512" height="512" role="img" aria-label="بطاقة الأثر" hidden></canvas>
+        <div class="imp-empty" id="impEmpty" data-i18n="impEmpty">لم تُضغط الطبعة بعد — اختر اللون والحرارة ثم اضغط</div>
+        <div class="imp-meta" id="impMeta" hidden>
+          <div class="nm" id="impName">—</div>
+          <div class="dt" id="impDate"></div>
+          <div class="in" id="impInfo"></div>
+        </div>
+      </div>
+
+      <div class="exp-grid">
+        <button id="expStamp" class="btn">🪙 <span data-i18n="expStamp">وجه الختم PNG</span></button>
+        <button id="expCard" class="btn">🃏 <span data-i18n="expCard">بطاقة الأثر PNG</span></button>
+        <button id="expSvg" class="btn">⧉ <span data-i18n="expSvg">نسخ حزمة SVG</span></button>
+        <button id="expCert" class="btn">📜 <span data-i18n="expCert">شهادة PNG</span></button>
+        <button id="printBtn" class="btn ghost" style="grid-column:1/-1">🖨 <span data-i18n="printBtn">طباعة البطاقة</span></button>
+      </div>
+
+      <details class="acc" open style="margin-top:12px">
+        <summary>🗄 <span data-i18n="cabinetT">خزانة الأختام</span></summary>
+        <div class="acc-body">
+          <div class="row" style="display:flex;gap:8px">
+            <input id="sealName" type="text" maxlength="26" style="flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--panel)" data-i18n-ph="sealNamePh" placeholder="اسم الختم">
+            <button id="saveSeal" class="btn gold-btn" data-i18n="saveSeal">حفظ</button>
+          </div>
+          <div class="cab-grid" id="cabGrid"></div>
+          <div class="fld">
+            <span data-i18n="templates">قوالب البداية</span>
+            <div class="tpl-row" id="tplRow"></div>
+          </div>
+          <button id="tlBtn" class="btn ghost tiny" data-i18n="timelineBtn">🕘 الخط الزمني لأختامي</button>
+        </div>
+      </details>
+    </aside>
+
+  </main>
+
+  <footer class="foot">
+    <div class="stats">
+      <span class="stat" id="stEls"></span>
+      <span class="stat" id="stPresses"></span>
+      <span class="stat" id="stExports"></span>
+      <span class="stat" id="stSaves"></span>
+    </div>
+    <div class="tip-row"><span class="ti">💡</span><span id="tipTxt"></span></div>
+    <button id="keysBtn" class="linkish" data-i18n="shortcuts">اختصارات لوحة المفاتيح</button>
+  </footer>
+</div>
+
+<!-- ======= onboarding overlay ======= -->
+<div class="overlay" id="onbOv" hidden role="dialog" aria-modal="true" aria-labelledby="onbT">
+  <div class="modal" style="width:min(94vw,540px)">
+    <div class="m-head"><h3 id="onbT" data-i18n="onbT">مرحبًا بك في الخَتم المعكوس</h3></div>
+    <div class="m-body">
+      <div class="ob-diagram">
+        <svg viewBox="0 0 340 132" aria-hidden="true">
+          <circle cx="72" cy="66" r="47" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="7 5" opacity=".7"/>
+          <text x="72" y="89" text-anchor="middle" font-size="62" font-family="Georgia,serif" font-weight="700" fill="currentColor" transform="translate(144 0) scale(-1 1)">R</text>
+          <path d="M134 66 L198 66" stroke="currentColor" stroke-width="4"/>
+          <path d="M189 57 L201 66 L189 75" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="264" cy="66" r="49" fill="#c9584f"/>
+          <circle cx="264" cy="66" r="49" fill="none" stroke="#8e3a33" stroke-width="5"/>
+          <text x="264" y="89" text-anchor="middle" font-size="62" font-family="Georgia,serif" font-weight="700" fill="#fff2e2">R</text>
+        </svg>
+      </div>
+      <p data-i18n="onbP1"></p>
+      <p data-i18n="onbP2"></p>
+      <button id="onbOk" class="btn wax-btn" data-i18n="gotIt">فهمت، لنبدأ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= settings ======= -->
+<div class="overlay" id="setOv" hidden role="dialog" aria-modal="true" aria-labelledby="setT">
+  <div class="modal">
+    <div class="m-head"><h3 id="setT" data-i18n="setTitle">الإعدادات</h3><button class="m-close" data-close="setOv" aria-label="إغلاق">✕</button></div>
+    <div class="m-body set-grid">
+      <div class="set-opt">
+        <div><div class="so-lab" data-i18n="sSound">الصوت</div><div class="so-sub" data-i18n="sSoundSub">نغمات نقش وضغط مولّدة محليًا</div></div>
+        <label class="switch"><input type="checkbox" id="optSound"><span class="sl"></span></label>
+      </div>
+      <div class="set-opt">
+        <div><div class="so-lab" data-i18n="sMotion">الحركة</div><div class="so-sub" data-i18n="sMotionSub">إيقافها يجعل ضغطة الشمع فورية بلا تحريك</div></div>
+        <label class="switch"><input type="checkbox" id="optMotion"><span class="sl"></span></label>
+      </div>
+      <div class="set-opt">
+        <div><div class="so-lab" data-i18n="sWax">لون الشمع الافتراضي</div><div class="so-sub" data-i18n="sWaxSub">يُعتمد عند كل ضغطة جديدة</div></div>
+        <div class="swatches" id="setWaxRow"></div>
+      </div>
+      <div class="set-opt">
+        <div><div class="so-lab" data-i18n="sTemp">الحرارة الافتراضية</div><div class="so-sub" data-i18n="sTempSub">البارد حوافّ حادة، الساخن حلقات فيض</div></div>
+        <div style="min-width:170px"><input type="range" id="optTemp" min="0" max="100" style="width:100%"></div>
+      </div>
+      <div class="set-opt">
+        <div><div class="so-lab" data-i18n="sSnap">محاذاة الشبكة</div><div class="so-sub" data-i18n="sSnapSub">تقفيل السحب على تقسيمات شبكة 64px</div></div>
+        <label class="switch"><input type="checkbox" id="optSnap"><span class="sl"></span></label>
+      </div>
+      <div class="set-opt">
+        <div><div class="so-lab" data-i18n="sTheme">المظهر</div></div>
+        <div class="theme-row" id="themeRow"></div>
+      </div>
+      <button id="resetBtn" class="btn" style="border-color:var(--danger);color:var(--danger)">⚠ <span data-i18n="sReset">مسح كل البيانات</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= about ======= -->
+<div class="overlay" id="aboutOv" hidden role="dialog" aria-modal="true" aria-labelledby="abT">
+  <div class="modal">
+    <div class="m-head"><h3 id="abT" data-i18n="aboutTitle">حول الخَتم المعكوس</h3><button class="m-close" data-close="aboutOv" aria-label="إغلاق">✕</button></div>
+    <div class="m-body">
+      <p data-i18n="aboutPitch"></p>
+      <ul class="about-ctl" id="aboutCtl"></ul>
+      <p class="hint" data-i18n="aboutCredit"></p>
+      <button id="onbReplay" class="btn ghost tiny" data-i18n="replayOnb">إعادة عرض شرح البداية</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= confirm ======= -->
+<div class="overlay" id="confirmOv" hidden role="dialog" aria-modal="true" aria-labelledby="cfT">
+  <div class="modal" style="width:min(94vw,430px)">
+    <div class="m-head"><h3 id="cfT" data-i18n="confirmT">تأكيد</h3><button class="m-close" data-close="confirmOv" aria-label="إغلاق">✕</button></div>
+    <div class="m-body">
+      <p id="cfMsg" style="font-weight:600"></p>
+      <div class="row">
+        <button id="cfYes" class="btn wax-btn" data-i18n="yes">نعم</button>
+        <button id="cfNo" class="btn ghost" data-i18n="cancel">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= svg payload fallback ======= -->
+<div class="overlay" id="svgOv" hidden role="dialog" aria-modal="true" aria-labelledby="svgT">
+  <div class="modal">
+    <div class="m-head"><h3 id="svgT" data-i18n="svgT">حزمة SVG</h3><button class="m-close" data-close="svgOv" aria-label="إغلاق">✕</button></div>
+    <div class="m-body">
+      <p class="hint" data-i18n="svgHint"></p>
+      <textarea id="svgTa" class="svg-ta" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ======= shortcuts ======= -->
+<div class="overlay" id="keysOv" hidden role="dialog" aria-modal="true" aria-labelledby="keysT">
+  <div class="modal" style="width:min(94vw,480px)">
+    <div class="m-head"><h3 id="keysT" data-i18n="keysT">اختصارات لوحة المفاتيح</h3><button class="m-close" data-close="keysOv" aria-label="إغلاق">✕</button></div>
+    <div class="m-body"><table class="kbd-table" id="keysTable"></table></div>
+  </div>
+</div>
+
+<!-- ======= timeline ======= -->
+<div class="overlay" id="tlOv" hidden role="dialog" aria-modal="true" aria-labelledby="tlT">
+  <div class="modal">
+    <div class="m-head"><h3 id="tlT" data-i18n="tlT">الخط الزمني لأختامي</h3><button class="m-close" data-close="tlOv" aria-label="إغلاق">✕</button></div>
+    <div class="m-body"><div class="tl-list" id="tlList"></div></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   §1 SAFE STORAGE
+   ============================================================ */
+const store={mem:{},ok:false,init(){try{localStorage.setItem("_t1","1");localStorage.removeItem("_t1");this.ok=true}catch(e){this.ok=false}},get(k,d){try{if(this.ok){const v=localStorage.getItem(k);if(v!=null)return JSON.parse(v)}}catch(e){}return k in this.mem?this.mem[k]:d},set(k,v){try{if(this.ok){localStorage.setItem(k,JSON.stringify(v));return}}catch(e){}this.mem[k]=v}};store.init();
+
+/* ============================================================
+   §2 I18N — every user-visible string, ar (default) + en
+   ============================================================ */
+const I18N={
+ar:{
+  title:"الخَتم المعكوس", tag:"انقش عكس الحقيقة… ليقرأ الشمع صدقها", back:"رجوع إلى المجموعة",
+  settings:"الإعدادات", about:"حول", expPng:"تم تصدير الصورة PNG ✓", faceT:"وجه الختم — الطرح المعكوس",
+  snapChip:"محاذاة للشبكة", flipChip:"عرض موجب", positiveView:"عرض موجب (ما سيُقرأ)",
+  faceHint:"اسحب العناصر لتحريكها، ومقبض التدوير ↻ أو مقبض الحجم ⇲ للتحكم الدقيق. Tab للتنقّل بين العناصر.",
+  selTools:"أدوات العنصر", rotL:"تدوير يسارًا", rotR:"تدوير يمينًا", sclUp:"تكبير", sclDn:"تصغير",
+  zTop:"إلى أقصى الأمام", zUp:"طبقة للأمام", zDn:"طبقة للخلف", zBot:"إلى أقصى الخلف", dup:"تكرار", del:"حذف",
+  toolsT:"أدوات النقش", lettersT:"الحروف المعكوسة",
+  initials:"الأحرف الأولى (حتى 3)", initialsPh:"مثال: سلم", letterStyle:"نمط الحرف",
+  addInitials:"＋ أضف الحروف", lettersHint:"كل حرف يُنقش معكوسًا ويصبح عنصرًا مستقلًا قابلًا للسحب والتدوير.",
+  styles:["مذيّل","محزّز","دائري","مضغوط","مفرّغ","قوالبية"],
+  symbolsT:"مكتبة الرموز", symHint:"اضغط رمزًا لإضافته إلى وجه الختم ثم حوّله واسحبه.",
+  syms:["هلال","نجمة ثمانية","نجمة خماسية","صقر","أرز","موجة","شمس مشعّة","مفتاح","جمل","نخلة","عين","وردة","عقدة","جبل","هلال وقمر","قارب","ريشة","تاج","سنابل","قطرة","كفّ فا","طائر","لهب","ماسة"],
+  bordersT:"أطواق الحدود", count:"العدد", width:"السماكة", addBorder:"＋ أضف الطوق",
+  borderHint:"يطبّق العدد والسماكة على الطوق المحدَّد، أو على الطوق الجديد عند الإضافة.",
+  borders:["ضفيرة حبل","غار","شرفات","خرزات"],
+  symmetryT:"التجويد الشعاعي", folds:"محاور التناظر",
+  foldNames:["بدون","ثنائي","رباعي","ثماني"],
+  autoMirror:"انعكاس تلقائي — كل عنصر يُضاعَف معكوسًا عبر المحاور", hatch:"تظليل الحفر (تشطيب محوري)",
+  symHint2:"فعّل التناظر ثم ارسم؛ يعيد المِرآة توزيع كل عنصر شعاعيًا ف يقرأ الختم من كل الجهات.",
+  layersT:"الطبقات", layerEmpty:"لا عناصر بعد — أضف حرفًا أو رمزًا أو طوقًا",
+  waxT:"ختم الشمع", livePrev:"معاينة حيّة — الأثر الموجب", flipView:"قلب العرض بين المعكوس والموجب",
+  holder:"اسم صاحب الختم", holderPh:"الاسم يظهر على البطاقة", waxColor:"لون الشمع",
+  waxes:["قرمزي","زمرّدي","ليلي","ذهبي"], temperature:"حرارة الشمع", cold:"بارد", hot:"ساخن",
+  tilt:"ميل الضغطة ±8°", press:"اضغط الختم في الشمع",
+  impEmpty:"لم تُضغط الطبعة بعد — اختر اللون والحرارة ثم اضغط",
+  impTemp:"الحرارة", impTilt:"الميل", impWax:"الشمع",
+  expStamp:"وجه الختم PNG", expCard:"بطاقة الأثر PNG", expSvg:"نسخ حزمة SVG", expCert:"شهادة PNG",
+  printBtn:"طباعة البطاقة",
+  cabinetT:"خزانة الأختام", sealNamePh:"اسم الختم", saveSeal:"حفظ",
+  templates:"قوالب البداية", tplNames:["حرفية كلاسيكية","نجمة ثمانية","هلال وأرز"],
+  timelineBtn:"🕘 الخط الزمني لأختامي",
+  statEls:"عناصر: {n}", statPresses:"ضغطات: {n}", statExports:"تصديرات: {n}", statSaves:"محفوظات: {n}",
+  shortcuts:"اختصارات لوحة المفاتيح",
+  onbT:"مرحبًا بك في الخَتم المعكوس",
+  onbP1:"كل ما تنقشه على وجه الختم يُرسم معكوسًا أفقيًا — تمامًا كما يُحفر المعدن الحقيقي — ومعاينة الشمع المجاورة تُريك الأثر الموجب الذي سيقرأه الناس.",
+  onbP2:"اكتب أحرفًا، أضف رموزًا وأطواقًا، وفعّل التناظر الشعاعي، ثم اضغط الختم في الشمع الساخن وصدّر بصمتك.", 
+  gotIt:"فهمت، لنبدأ", replayOnb:"إعادة عرض شرح البداية",
+  setTitle:"الإعدادات", sSound:"الصوت", sSoundSub:"نغمات نقش وضغط مولّدة محليًا",
+  sMotion:"الحركة", sMotionSub:"إيقافها يجعل ضغطة الشمع فورية بلا تحريك",
+  sWax:"لون الشمع الافتراضي", sWaxSub:"يُعتمد عند كل ضغطة جديدة", sTemp:"الحرارة الافتراضية",
+  sTempSub:"البارد حوافّ حادة، الساخن حلقات فيض", sSnap:"محاذاة الشبكة", sSnapSub:"تقفيل السحب على تقسيمات شبكة 64px",
+  sTheme:"المظهر", thParchment:"رقّي", thNight:"ليلي", thSepia:"بني دافئ",
+  sReset:"مسح كل البيانات", resetMsg:"سيُمحى كل شيء: الأختام المحفوظة والإعدادات والخط الزمني. هل أنت متأكد؟",
+  aboutTitle:"حول الخَتم المعكوس",
+  aboutPitch:"الخَتم المعكوس: صمّم خاتمًا يجب أن يُقرأ بالعكس ليقرأ صحيحًا. انقش فنًّا معكوسًا، اضغطه في شمع ساخن، وصدّر ختمًا يمكنك صنعه فعلًا — قيد المرآة هو التجربة نفسها.",
+  aboutCtlT:"التحكم:", aboutCtl:["السحب: تحريك العنصر — المقبض ↻ تدوير والمقبض ⇲ تحجيم","Tab: تداول العناصر — الأسهم: نحرّك 4px (مع Shift: 16px)","R: تدوير 15° — ＋/−: تحجيم — Delete: حذف","Enter: ضغطة شمع — Esc: إغلاق/إلغاء تحديد"],
+  aboutCredit:"جزء من مجموعة «الأصيلة العشرة» — تعمل دون اتصال بالكامل.",
+  confirmT:"تأكيد", yes:"نعم", cancel:"إلغاء",
+  cfDelSeal:"حذف الختم «{n}» نهائيًا من الخزانة؟", cfTpl:"استبدال الختم الحالي بالقالب «{n}»؟", cfReset:"سيُمحى كل شيء: الأختام المحفوظة والإعدادات والخط الزمني. هل أنت متأكد؟",
+  svgT:"حزمة SVG", svgHint:"النسخ التلقائي غير متاح هنا — الحزمة أدناه محددة بالكامل: اضغط Ctrl+C (أو ⌘C) لنسخها. العناصر كمسارات وتحويلات، والوجه معكوس 1:1.",
+  keysT:"اختصارات لوحة المفاتيح",
+  keys:[["Tab / ⇧Tab","تداول العناصر المحددة"],["الأسهم","نحرّك العنصر 4px (⇧: 16px)"],["R / ⇧R","تدوير 15° يمينًا / يسارًا"],["＋ و −","تحجيم العنصر"],["Delete","حذف العنصر المحدد"],["Enter","ضغطة شمع فورية"],["Esc","إغلاق النافذة / إلغاء التحديد"]],
+  tlT:"الخط الزمني لأختامي", tlEmpty:"لا أحداث بعد — احفظ ختمًا أو اضغط طبعة", tlSaved:"ختم محفوظ", tlPress:"ضغطة شمع",
+  tSaved:"حُفظ الختم في الخزانة ✓", tLoaded:"حُمّل الختم", tTpl:"نُفّذ القالب «{n}»", tDeleted:"حُذف الختم",
+  tExported:"صُدِّر الملف ✓", tSvgOk:"نُسخت حزمة SVG ✓", tSvgFail:"تعذّر النسخ التلقائي — الحزمة محددة في النافذة",
+  tReset:"مُسحت جميع البيانات", tPressed:"طُبع الأثر في الشمع ✓", tNoName:"اكتب اسمًا للختم أولًا",
+  tips:["فعّل «العرض الموجب» لترى ما سيقرأه الناس — ثم عُد للنقش المعكوس.","الشمع البارد يعطي حوافّ حادة، والساخن يضيف حلقات فيض حول الطبعة.","ميل ±8° يمنح الطبعة واقعية الضغطة اليدوية.","جرّب التناظر الثماني مع الانعكاس التلقائي لختم شمسي كامل.","احفظ أختامك في الخزانة — تُعاد رسمها مصغّرة من عناصرها نفسها.","حزمة SVG تحمل عناصر ختمك كمسارات وتحويلات قابلة للإعادة استخدام."],
+  ariaFace:"وجه الختم — لوحة النقش المعكوس", ariaPrev:"معاينة حيّة للأثر الموجب", ariaImp:"بصمة الشمع الناتجة",
+  mmLabel:"⌀ {n} mm", cardT:"بصمة خاتم — Mirrorseal", certT:"شهادة ختم أصيل", certName:"صاحب الختم", certDate:"التاريخ",
+  certCredit:"مجموعة «الأصيلة العشرة» — عمل دون اتصال", layerIc:{letter:"🔤",symbol:"❖",border:"◌"},
+  selNameL:{letter:"حرف «{n}»",symbol:"رمز: {n}",border:"طوق: {n}"},
+  impInfoTpl:"{w} • الحرارة {t} • الميل {d}°", layoutNames:["صف","قوس","عمود","مثلث"], layoutTitle:"توزيع الأحرف",
+  badgeFlipped:"تعرض الآن الموجب", 
+},
+en:{
+  title:"Mirrorseal", tag:"Engrave the mirror… so the wax reads true", back:"Back to the collection",
+  settings:"Settings", about:"About", expPng:"PNG exported ✓", faceT:"Seal Face — Mirrored Engraving",
+  snapChip:"Grid snap", flipChip:"Positive view", positiveView:"Positive view (what will read)",
+  faceHint:"Drag elements to move; ↻ rotate handle or ⇲ scale handle for fine control. Tab cycles elements.",
+  selTools:"Element tools", rotL:"Rotate left", rotR:"Rotate right", sclUp:"Scale up", sclDn:"Scale down",
+  zTop:"Bring to front", zUp:"Layer forward", zDn:"Layer backward", zBot:"Send to back", dup:"Duplicate", del:"Delete",
+  toolsT:"Engraving tools", lettersT:"Mirror letters",
+  initials:"Initials (up to 3)", initialsPh:"e.g. ALM", letterStyle:"Letter style",
+  addInitials:"＋ Add letters", lettersHint:"Each letter is engraved mirrored and becomes its own draggable, rotatable element.",
+  styles:["Serif","Bold slab","Round","Condensed","Outline","Stencil"],
+  symbolsT:"Symbol library", symHint:"Click a symbol to add it to the seal face, then drag, rotate and scale it.",
+  syms:["Crescent","8-star","5-star","Falcon","Cedar","Wave","Sun rays","Key","Camel","Palm","Eye","Rose","Knot","Mountain","Moon","Boat","Feather","Crown","Wheat","Drop","Hamsa","Bird","Flame","Diamond"],
+  bordersT:"Border devices", count:"Count", width:"Width", addBorder:"＋ Add ring",
+  borderHint:"Count & width apply to the selected ring, or to the next ring you add.",
+  borders:["Rope braid","Laurel","Crenellation","Beads"],
+  symmetryT:"Radial symmetry", folds:"Symmetry axes",
+  foldNames:["Off","2-fold","4-fold","8-fold"],
+  autoMirror:"Auto-mirror — every element is duplicated mirrored across the axes", hatch:"Depth hatch (engraved shading)",
+  symHint2:"Turn symmetry on and keep drawing; the mirror redistributes each element radially so the seal reads from every side.",
+  layersT:"Layers", layerEmpty:"No elements yet — add a letter, symbol or ring",
+  waxT:"Wax press", livePrev:"Live — the positive impression", flipView:"Flip view between mirrored and positive",
+  holder:"Seal holder name", holderPh:"Shown on the card", waxColor:"Wax color",
+  waxes:["Crimson","Forest","Midnight","Golden"], temperature:"Wax temperature", cold:"Cold", hot:"Hot",
+  tilt:"Press tilt ±8°", press:"Press the seal into wax",
+  impEmpty:"No impression yet — pick a color and temperature, then press",
+  impTemp:"Temp", impTilt:"Tilt", impWax:"Wax",
+  expStamp:"Stamp face PNG", expCard:"Impression card PNG", expSvg:"Copy SVG payload", expCert:"Certificate PNG",
+  printBtn:"Print the card",
+  cabinetT:"Seal cabinet", sealNamePh:"Seal name", saveSeal:"Save",
+  templates:"Starter templates", tplNames:["Classic monogram","Eight-fold star","Crescent & cedar"],
+  timelineBtn:"🕘 My seal timeline",
+  statEls:"Elements: {n}", statPresses:"Presses: {n}", statExports:"Exports: {n}", statSaves:"Saved: {n}",
+  shortcuts:"Keyboard shortcuts",
+  onbT:"Welcome to Mirrorseal",
+  onbP1:"Everything you engrave on the seal face is drawn horizontally mirrored — exactly like a real metal die — while the wax preview beside it shows the positive impression people will read.",
+  onbP2:"Type initials, add symbols and border rings, switch on radial symmetry, then press the seal into hot wax and export with your mark.",
+  gotIt:"Got it, start", replayOnb:"Replay the onboarding",
+  setTitle:"Settings", sSound:"Sound", sSoundSub:"Locally synthesized engraving & press cues",
+  sMotion:"Motion", sMotionSub:"Turning it off makes the wax press an instant cut",
+  sWax:"Default wax color", sWaxSub:"Used for each new press", sTemp:"Default temperature",
+  sTempSub:"Cold = crisp edges, hot = overflow rings", sSnap:"Grid snap", sSnapSub:"Drag locks to the 64px grid divisions",
+  sTheme:"Theme", thParchment:"Parchment", thNight:"Night", thSepia:"Sepia",
+  sReset:"Reset all data", resetMsg:"Everything will be erased: saved seals, settings and the timeline. Are you sure?",
+  aboutTitle:"About Mirrorseal",
+  aboutPitch:"Mirrorseal: design a signet that must read backwards to read true. Engrave mirrored art, press it into hot wax, and export a stamp you can actually make — the mirror constraint IS the experience.",
+  aboutCtlT:"Controls:", aboutCtl:["Drag: move element — ↻ handle rotates, ⇲ handle scales","Tab: cycle elements — Arrows: nudge 4px (⇧: 16px)","R: rotate 15° — ＋/−: scale — Delete: remove","Enter: press wax — Esc: close / deselect"],
+  aboutCredit:"Part of '10 Originals' — fully offline.",
+  confirmT:"Confirm", yes:"Yes", cancel:"Cancel",
+  cfDelSeal:"Delete the seal “{n}” from the cabinet permanently?", cfTpl:"Replace the current seal with the “{n}” template?", cfReset:"Everything will be erased: saved seals, settings and the timeline. Are you sure?",
+  svgT:"SVG payload", svgHint:"Automatic copy is unavailable here — the payload below is fully selected: press Ctrl+C (or ⌘C) to copy. Elements as path strings + transforms, face mirrored 1:1.",
+  keysT:"Keyboard shortcuts",
+  keys:[["Tab / ⇧Tab","Cycle selected elements"],["Arrows","Nudge element 4px (⇧: 16px)"],["R / ⇧R","Rotate 15° right / left"],["＋ and −","Scale element"],["Delete","Remove selected element"],["Enter","Instant wax press"],["Esc","Close dialog / deselect"]],
+  tlT:"My seal timeline", tlEmpty:"No events yet — save a seal or press an impression", tlSaved:"Seal saved", tlPress:"Wax press",
+  tSaved:"Seal saved to the cabinet ✓", tLoaded:"Seal loaded", tTpl:"Template “{n}” applied", tDeleted:"Seal deleted",
+  tExported:"File exported ✓", tSvgOk:"SVG payload copied ✓", tSvgFail:"Auto-copy blocked — payload selected in the dialog",
+  tReset:"All data cleared", tPressed:"Impression pressed into wax ✓", tNoName:"Give the seal a name first",
+  tips:["Switch on “Positive view” to see what people will read — then go back and engrave mirrored.","Cold wax gives crisp edges; hot wax adds overflow rings around the impression.","A ±8° tilt gives the impression the honesty of a hand press.","Try 8-fold symmetry with auto-mirror for a full solar seal.","Save your seals in the cabinet — thumbnails are re-rendered from their own elements.","The SVG payload carries your elements as reusable path strings and transforms."],
+  ariaFace:"Seal face — mirrored engraving canvas", ariaPrev:"Live preview of the positive impression", ariaImp:"Resulting wax impression",
+  mmLabel:"⌀ {n} mm", cardT:"Signet impression — Mirrorseal", certT:"Authentic Seal Certificate", certName:"Seal holder", certDate:"Date",
+  certCredit:"'10 Originals' collection — fully offline", layerIc:{letter:"🔤",symbol:"❖",border:"◌"},
+  selNameL:{letter:"Letter “{n}”",symbol:"Symbol: {n}",border:"Ring: {n}"},
+  impInfoTpl:"{w} • temp {t} • tilt {d}°", layoutNames:["Row","Arc","Column","Triangle"], layoutTitle:"Letter layout",
+  badgeFlipped:"Now showing the positive",
+}};
+let lang=store.get('seal_lang','ar');
+if(lang!=='ar'&&lang!=='en')lang='ar';
+const t=k=>{const d=I18N[lang];return (d&&d[k]!==undefined)?d[k]:(I18N.ar[k]!==undefined?I18N.ar[k]:k)};
+const fmt=(k,n)=>String(t(k)).replace('{n}',n);
+const tA=k=>{const d=I18N[lang];return (d&&d[k])||I18N.ar[k]||[]};
+
+/* ============================================================
+   §3 CONTENT DATA — 24 symbols, 6 letter styles, 4 border
+   devices, 4 waxes, 3 starter templates, hatch tile
+   ============================================================ */
+const SYMS=[
+ {d:"M50 6 A44 44 0 1 0 50 94 A46 46 0 0 1 50 6 Z"},
+ {d:"M98 50 L74 60 L83.9 83.9 L60 74 L50 98 L40 74 L16.1 83.9 L26 60 L2 50 L26 40 L16.1 16.1 L40 26 L50 2 L60 26 L83.9 16.1 L74 40 Z"},
+ {d:"M50 2 L61.8 33.8 L95.7 35.2 L69 56.2 L78.2 88.8 L50 70 L21.8 88.8 L31 56.2 L4.3 35.2 L38.2 33.8 Z"},
+ {d:"M50 26 C44 12 30 6 14 10 C22 14 26 20 27 27 C18 26 10 29 4 36 C13 34 21 36 26 41 C20 46 17 53 18 61 C24 52 32 48 40 49 C38 58 40 67 46 74 L50 68 L54 74 C60 67 62 58 60 49 C68 48 76 52 82 61 C83 53 80 46 74 41 C79 36 87 34 96 36 C90 29 82 26 73 27 C74 20 78 14 86 10 C70 6 56 12 50 26 Z"},
+ {d:"M50 6 L64 24 L58 24 L72 42 L64 42 L78 60 L54 60 L54 90 L46 90 L46 60 L22 60 L36 42 L28 42 L42 24 L36 24 Z"},
+ {d:"M4 58 C16 42 32 40 44 52 C54 62 70 62 82 50 C88 44 93 41 96 41 L96 68 C84 80 66 82 52 70 C40 60 28 60 16 70 C10 75 6 76 4 74 Z"},
+ {d:"M50 2 L57 20 L43 20 Z M50 98 L43 80 L57 80 Z M98 50 L80 43 L80 57 Z M2 50 L20 57 L20 43 Z M83.9 16.1 L65.7 26.8 L73.2 34.4 Z M83.9 83.9 L73.2 65.7 L65.7 73.2 Z M16.1 83.9 L34.4 65.7 L26.8 73.2 Z M16.1 16.1 L26.8 26.8 L34.4 34.4 Z M50 30 A20 20 0 1 0 50.1 30 Z"},
+ {d:"M72 10 A26 26 0 1 0 72.1 10 Z M72 20 A16 16 0 1 1 71.9 20 Z M56 50 L18 88 L26 96 L34 88 L28 82 L36 74 L42 80 L58 64 C54 60 54 54 56 50 Z",eo:true},
+ {d:"M12 88 L12 56 C6 48 6 38 12 32 C18 26 28 28 32 36 C36 24 46 20 52 30 C55 22 62 16 70 16 C79 16 86 23 86 32 L86 34 L94 36 L86 41 L86 44 C86 51 81 56 74 57 L74 64 L77 88 L70 88 L68 64 L59 64 L59 88 L52 88 L52 64 L43 64 L43 88 L36 88 L36 64 L30 64 L30 88 Z"},
+ {d:"M48 94 C48 76 49 60 51 46 L56 46 C57 60 57 76 56 94 Z M51 46 C40 44 30 34 28 22 C40 28 50 35 54 41 Z M52 44 C46 34 44 21 46 9 C52 20 55 31 55 41 Z M55 41 C58 29 64 19 74 13 C68 26 62 36 57 44 Z M57 46 C66 39 78 37 88 41 C78 46 66 48 58 47 Z"},
+ {d:"M4 50 C20 26 80 26 96 50 C80 74 20 74 4 50 Z M10 50 C24 33 76 33 90 50 C76 67 24 67 10 50 Z M50 36 A14 14 0 1 0 50.1 36 Z M50 42 A8 8 0 1 1 49.9 42 Z",eo:true},
+ {d:"M50 88 C30 84 16 68 16 50 C16 30 32 14 52 14 C70 14 84 28 84 46 C84 62 72 74 57 74 C44 74 34 64 34 52 C34 42 42 34 51 34 C59 34 65 40 65 47 C65 53 61 57 56 57 M50 46 A5 5 0 1 0 50.1 46 Z",stroke:true},
+ {d:"M30 30 L70 30 L70 70 L30 70 Z M30 30 L70 70 M70 30 L30 70 M50 38 L62 50 L50 62 L38 50 Z",stroke:true},
+ {d:"M4 80 L30 32 L44 54 L58 20 L96 80 Z"},
+ {d:"M62 8 A44 44 0 1 1 62 92 A46 46 0 0 0 62 8 Z M34 32 L38 44 L50 48 L38 52 L34 64 L30 52 L18 48 L30 44 Z"},
+ {d:"M52 6 L52 62 L18 62 C28 52 42 34 52 6 Z M58 12 L58 62 L88 62 C81 46 70 26 58 12 Z M10 68 L90 68 L78 86 L22 86 Z"},
+ {d:"M74 6 C52 12 32 34 26 62 L22 88 M26 62 C36 58 46 50 52 40 M30 50 C40 46 48 38 54 28 M36 38 C44 34 52 26 56 18 M44 26 C50 22 56 16 60 10 M22 88 L34 84",stroke:true},
+ {d:"M12 68 L12 36 L30 52 L50 18 L70 52 L88 36 L88 68 Z M12 76 L88 76 L88 86 L12 86 Z"},
+ {d:"M48 94 L52 94 L53 24 L51 24 Z M50 6 C55 12 55 20 50 26 C45 20 45 12 50 6 Z M36 30 C42 34 44 41 41 48 C35 44 33 37 36 30 Z M64 30 C58 34 56 41 59 48 C65 44 67 37 64 30 Z M32 50 C38 54 40 61 37 68 C31 64 29 57 32 50 Z M68 50 C62 54 60 61 63 68 C69 64 71 57 68 50 Z M36 70 C42 74 44 81 41 88 C35 84 33 77 36 70 Z M64 70 C58 74 56 81 59 88 C65 84 67 77 64 70 Z"},
+ {d:"M50 6 C50 6 74 40 74 60 A24 24 0 1 1 26 60 C26 40 50 6 50 6 Z"},
+ {d:"M50 8 C54 8 56 12 56 18 L56 38 L60 38 L60 22 C60 16 68 16 68 22 L68 42 L72 42 L72 28 C72 22 80 22 80 28 L80 54 C80 74 68 86 50 86 C32 86 20 74 20 54 L20 28 C20 22 28 22 28 28 L28 42 L32 42 L32 22 C32 16 40 16 40 22 L40 38 L44 38 L44 18 C44 12 46 8 50 8 Z M50 48 A8 8 0 1 0 50.1 48 Z",eo:true},
+ {d:"M8 42 C20 30 34 28 44 34 C46 24 54 16 66 14 C60 22 58 30 60 36 C72 30 86 32 94 42 C82 40 72 44 66 52 C58 62 44 64 34 58 C24 52 14 48 8 42 Z"},
+ {d:"M50 6 C58 22 74 30 74 52 C74 70 64 84 50 92 C36 84 26 70 26 52 C26 40 32 34 36 26 C38 36 42 40 46 42 C44 30 44 16 50 6 Z M50 44 C56 54 62 58 62 68 C62 78 56 86 50 88 C44 86 38 78 38 68 C38 58 44 54 50 44 Z",eo:true},
+ {d:"M50 8 L88 40 L50 92 L12 40 Z M26 40 L74 40 L50 72 Z",eo:true},
+];
+const SYM_PATHS=SYMS.map(s=>new Path2D(s.d));
+
+const STYLES=[
+ {fam:'Georgia, "Times New Roman", serif', wt:400},
+ {fam:'Tahoma, Verdana, sans-serif', wt:900},
+ {fam:'"Trebuchet MS", "Segoe UI", sans-serif', wt:700},
+ {fam:'"Arial Narrow", Arial, sans-serif', wt:700, sq:.74},
+ {fam:'Georgia, "Times New Roman", serif', wt:600, outline:true},
+ {fam:'"Courier New", monospace', wt:900, stencil:true},
+];
+const styleFont=(i,s)=>`${STYLES[i].wt} ${s}px ${STYLES[i].fam}`;
+
+const TAU=Math.PI*2, RB=170;
+function pt(a,r){return [r*Math.cos(a), r*Math.sin(a)]}
+const DEVICES=[
+ { /* rope braid */
+  draw(ctx,n,w){
+    n=Math.max(6,Math.min(48,n));
+    ctx.lineWidth=w; ctx.lineCap='round';
+    const seg=TAU/n;
+    for(let pass=0;pass<2;pass++){
+      for(let i=0;i<n;i++){
+        const a0=i*seg+pass*seg/2, a1=a0+seg*0.62;
+        const rr=RB+(((i+pass)%2)?-1:1)*w*0.30;
+        ctx.beginPath(); ctx.arc(0,0,rr,a0,a1); ctx.stroke();
+      }
+    }
+  },
+  stroke:true,
+  svg(n,w){
+    n=Math.max(6,Math.min(48,n)); const seg=TAU/n; let d='';
+    for(let pass=0;pass<2;pass++)for(let i=0;i<n;i++){
+      const a0=i*seg+pass*seg/2, a1=a0+seg*0.62;
+      const rr=RB+(((i+pass)%2)?-1:1)*w*0.30;
+      const [x0,y0]=pt(a0,rr),[x1,y1]=pt(a1,rr);
+      const large=(a1-a0)>Math.PI?1:0;
+      d+=`M${x0.toFixed(1)} ${y0.toFixed(1)} A${rr.toFixed(1)} ${rr.toFixed(1)} 0 ${large} 1 ${x1.toFixed(1)} ${y1.toFixed(1)} `;
+    }
+    return `<path d="${d}" fill="none" stroke="#2a1a12" stroke-width="${w}" stroke-linecap="round"/>`;
+  }
+ },
+ { /* laurel */
+  draw(ctx,n,w){
+    n=Math.max(8,Math.min(40,n));
+    ctx.lineWidth=w*0.45; ctx.strokeStyle=ctx.fillStyle;
+    ctx.beginPath(); ctx.arc(0,0,RB,0,TAU); ctx.stroke();
+    const seg=TAU/n;
+    for(let i=0;i<n;i++){
+      const a=i*seg;
+      ctx.save(); ctx.translate(...pt(a,RB)); ctx.rotate(a+Math.PI/2+(i%2?0.22:-0.22));
+      ctx.beginPath();
+      ctx.moveTo(0,-w*1.25); ctx.quadraticCurveTo(w*0.62,-w*0.2,0,w*1.25);
+      ctx.quadraticCurveTo(-w*0.62,-w*0.2,0,-w*1.25); ctx.fill(); ctx.restore();
+    }
+  },
+  svg(n,w){
+    n=Math.max(8,Math.min(40,n)); const seg=TAU/n; let d='';
+    for(let i=0;i<n;i++){
+      const a=i*seg, [cx,cy]=pt(a,RB);
+      const rot=a+Math.PI/2+(i%2?0.22:-0.22), c=Math.cos(rot), s=Math.sin(rot);
+      const lp=(x,y)=>[(cx+x*c-y*s).toFixed(1),(cy+x*s+y*c).toFixed(1)];
+      const [tx,ty]=lp(0,-w*1.25),[bx,by]=lp(0,w*1.25),[c1x,c1y]=lp(w*0.62,-w*0.2),[c2x,c2y]=lp(-w*0.62,-w*0.2);
+      d+=`M${tx} ${ty} Q${c1x} ${c1y} ${bx} ${by} Q${c2x} ${c2y} ${tx} ${ty} `;
+    }
+    const [sx0,sy0]=pt(0,RB),[sx1,sy1]=pt(Math.PI,RB);
+    return `<circle cx="0" cy="0" r="${RB}" fill="none" stroke="#2a1a12" stroke-width="${(w*0.45).toFixed(1)}"/><path d="${d}" fill="#2a1a12"/>`;
+  }
+ },
+ { /* crenellation */
+  draw(ctx,n,w){
+    n=Math.max(8,Math.min(48,n));
+    const seg=TAU/n, r0=RB-w/2, r1=RB+w/2;
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const a0=i*seg, a1=a0+seg*0.55;
+      const [ax,ay]=pt(a0,r1),[bx,by]=pt(a1,r1),[cx2,cy2]=pt(a1,r0),[dx,dy]=pt(a0,r0);
+      ctx.moveTo(ax,ay); ctx.arc(0,0,r1,a0,a1); ctx.lineTo(cx2,cy2);
+      ctx.arc(0,0,r0,a1,a0,true); ctx.closePath();
+    }
+    ctx.fill();
+  },
+  svg(n,w){
+    n=Math.max(8,Math.min(48,n)); const seg=TAU/n, r0=RB-w/2, r1=RB+w/2; let d='';
+    for(let i=0;i<n;i++){
+      const a0=i*seg, a1=a0+seg*0.55;
+      const [ax,ay]=pt(a0,r1),[bx,by]=pt(a1,r1),[cx2,cy2]=pt(a1,r0),[dx,dy]=pt(a0,r0);
+      d+=`M${ax.toFixed(1)} ${ay.toFixed(1)} A${r1.toFixed(1)} ${r1.toFixed(1)} 0 0 1 ${bx.toFixed(1)} ${by.toFixed(1)} L${cx2.toFixed(1)} ${cy2.toFixed(1)} A${r0.toFixed(1)} ${r0.toFixed(1)} 0 0 0 ${dx.toFixed(1)} ${dy.toFixed(1)} Z `;
+    }
+    return `<path d="${d}" fill="#2a1a12"/>`;
+  }
+ },
+ { /* beads */
+  draw(ctx,n,w){
+    n=Math.max(8,Math.min(48,n));
+    const seg=TAU/n, r=w*0.62;
+    for(let i=0;i<n;i++){
+      const [x,y]=pt(i*seg,RB);
+      ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
+    }
+  },
+  svg(n,w){
+    n=Math.max(8,Math.min(48,n)); const seg=TAU/n, r=w*0.62; let d='';
+    for(let i=0;i<n;i++){
+      const [x,y]=pt(i*seg,RB);
+      d+=`M${(x+r).toFixed(1)} ${y.toFixed(1)} A${r.toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(x-r).toFixed(1)} ${y.toFixed(1)} A${r.toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(x+r).toFixed(1)} ${y.toFixed(1)} Z `;
+    }
+    return `<path d="${d}" fill="#2a1a12"/>`;
+  }
+ },
+];
+const WAXES=[
+ {bg:'#c9584f',deep:'#8e3a33',lite:'#e08a7c',edge:'#5e241f'},
+ {bg:'#2e5a3a',deep:'#1d3f27',lite:'#4f7d5c',edge:'#0f2417'},
+ {bg:'#2b3450',deep:'#1a223d',lite:'#4d5a80',edge:'#0d1226'},
+ {bg:'#c9a227',deep:'#8f7117',lite:'#e0c257',edge:'#5c480d'},
+];
+const uid=()=>'e'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const L=(ch,style,x,y,rot=0,sc=1)=>({id:uid(),kind:'letter',ch,style,x,y,rot,scale:sc});
+const S=(sym,x,y,rot=0,sc=1)=>({id:uid(),kind:'symbol',sym,x,y,rot,scale:sc});
+const B=(dev,count,w,x=0,y=0,rot=0,sc=1)=>({id:uid(),kind:'border',dev,count,width:w,x,y,rot,scale:sc});
+const TEMPLATES=[
+ {els:()=>[B(3,24,9),L('س',2,-58,42),L('ل',2,0,-52),L('م',2,58,42)],sym:0,am:false},
+ {els:()=>[B(2,32,12),S(1,0,0,0,1.35),S(19,0,-152,0,0.55)],sym:8,am:false},
+ {els:()=>[B(0,26,10),S(0,0,-42,0,1.2),S(4,0,66,0,0.85)],sym:0,am:false},
+];
+let hatchTile=null;
+function getHatchTile(){
+  if(hatchTile)return hatchTile;
+  const c=document.createElement('canvas'); c.width=c.height=10;
+  const g=c.getContext('2d'); g.strokeStyle='#241812'; g.lineWidth=2.4; g.lineCap='square';
+  g.beginPath(); g.moveTo(0,10); g.lineTo(10,0); g.moveTo(-2,2); g.lineTo(2,-2); g.moveTo(8,12); g.lineTo(12,8); g.stroke();
+  hatchTile=c; return c;
+}
+
+/* ============================================================
+   §4 AUDIO — Web Audio synth cues, lazy context, master gain
+   ============================================================ */
+const AudioEngine={
+  ctx:null, master:null, noise:null,
+  ensure(){
+    if(this.ctx)return true;
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      this.ctx=new AC();
+      this.master=this.ctx.createGain();
+      this.master.gain.value=set.sound?0.5:0;
+      this.master.connect(this.ctx.destination);
+    }catch(e){return false}
+    return true;
+  },
+  vol(){ if(this.master)this.master.gain.value=set.sound?0.5:0; },
+  env(g,t0,a,d,peak){
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(peak,t0+a);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+a+d);
+  },
+  getNoise(){
+    if(this.noise)return this.noise;
+    const len=this.ctx.sampleRate*0.6, buf=this.ctx.createBuffer(1,len,this.ctx.sampleRate);
+    const ch=buf.getChannelData(0);
+    for(let i=0;i<len;i++)ch[i]=Math.random()*2-1;
+    this.noise=buf; return buf;
+  },
+  tick(){ /* engrave tick: short bright square blip */
+    if(!set.sound||!this.ctx)return;
+    const t0=this.ctx.currentTime, o=this.ctx.createOscillator(), g=this.ctx.createGain();
+    o.type='square'; o.frequency.setValueAtTime(1750,t0); o.frequency.exponentialRampToValueAtTime(1150,t0+0.045);
+    this.env(g,t0,0.004,0.05,0.16); o.connect(g); g.connect(this.master); o.start(t0); o.stop(t0+0.08);
+  },
+  click(){ /* soft selection click */
+    if(!set.sound||!this.ctx)return;
+    const t0=this.ctx.currentTime, o=this.ctx.createOscillator(), g=this.ctx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(880,t0);
+    this.env(g,t0,0.003,0.035,0.09); o.connect(g); g.connect(this.master); o.start(t0); o.stop(t0+0.06);
+  },
+  whoosh(){ /* mirror flip: filtered noise sweep */
+    if(!set.sound||!this.ctx)return;
+    const t0=this.ctx.currentTime, src=this.ctx.createBufferSource(), f=this.ctx.createBiquadFilter(), g=this.ctx.createGain();
+    src.buffer=this.getNoise(); f.type='bandpass'; f.Q.value=1.4;
+    f.frequency.setValueAtTime(420,t0); f.frequency.exponentialRampToValueAtTime(2400,t0+0.16);
+    f.frequency.exponentialRampToValueAtTime(500,t0+0.3);
+    g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(0.22,t0+0.07);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+0.32);
+    src.connect(f); f.connect(g); g.connect(this.master); src.start(t0); src.stop(t0+0.34);
+  },
+  squish(){ /* wax press: noise burst through lowpass, pitch drop */
+    if(!set.sound||!this.ctx)return;
+    const t0=this.ctx.currentTime, src=this.ctx.createBufferSource(), f=this.ctx.createBiquadFilter(), g=this.ctx.createGain();
+    src.buffer=this.getNoise(); f.type='lowpass'; f.Q.value=2;
+    f.frequency.setValueAtTime(950,t0); f.frequency.exponentialRampToValueAtTime(170,t0+0.22);
+    g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(0.5,t0+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+0.26);
+    src.connect(f); f.connect(g); g.connect(this.master); src.start(t0); src.stop(t0+0.3);
+    const o=this.ctx.createOscillator(), g2=this.ctx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(240,t0); o.frequency.exponentialRampToValueAtTime(70,t0+0.2);
+    this.env(g2,t0,0.01,0.2,0.3); o.connect(g2); g2.connect(this.master); o.start(t0); o.stop(t0+0.26);
+  },
+  chime(){ /* success: three staggered sines */
+    if(!set.sound||!this.ctx)return;
+    const t0=this.ctx.currentTime;
+    [660,880,1320].forEach((f,i)=>{
+      const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+      o.type='sine'; o.frequency.value=f;
+      this.env(g,t0+i*0.09,0.012,0.34,0.14);
+      o.connect(g); g.connect(this.master); o.start(t0+i*0.09); o.stop(t0+i*0.09+0.4);
+    });
+  },
+};
+document.addEventListener('pointerdown',()=>AudioEngine.ensure(),{once:true,capture:true});
+document.addEventListener('keydown',()=>AudioEngine.ensure(),{once:true,capture:true});
+
+/* ============================================================
+   §5 STATE + SHELL — settings, i18n, modals, toasts, tips, stats
+   ============================================================ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const SET_DEF={sound:true,motion:true,wax:0,temp:45,snap:true,theme:'parchment'};
+let set=Object.assign({},SET_DEF,store.get('seal_set',{}));
+if(!(set.wax>=0&&set.wax<4))set.wax=0;
+if(!['parchment','night','sepia'].includes(set.theme))set.theme='parchment';
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const motionOn=()=>set.motion&&!REDUCED;
+const saveSet=()=>store.set('seal_set',set);
+let els=[], selId=null, symFold=0, autoMirror=false, hatchOn=false, flipped=false;
+let impState=null, curName='';
+const stats=Object.assign({p:0,e:0,s:0},store.get('seal_stats',{}));
+const saveStats=()=>store.set('seal_stats',stats);
+const COL={};
+function refreshColors(){
+  const cs=getComputedStyle(document.documentElement);
+  for(const k of ['face-bg','face-rim','ink','ink-soft','gold','line','parch']) COL[k]=cs.getPropertyValue('--'+k).trim()||'#241812';
+}
+function applyTheme(){
+  document.documentElement.dataset.theme=set.theme;
+  document.documentElement.dataset.motion=set.motion&&!REDUCED?'on':'off';
+  refreshColors(); requestRender();
+}
+const COL_INK='#241812', COL_LITE='rgba(255,246,224,0.62)';
+
+function toast(msg,cls){
+  const box=$('#toasts'), d=document.createElement('div');
+  d.className='toast'+(cls?' '+cls:''); d.textContent=msg;
+  box.appendChild(d);
+  setTimeout(()=>d.remove(),2700);
+}
+let openId=null;
+function openModal(id){
+  const ov=document.getElementById(id);
+  if(!ov)return; ov.hidden=false; openId=id;
+  const f=ov.querySelector('button,input,textarea,select'); if(f)setTimeout(()=>f.focus(),30);
+}
+function closeModal(id){
+  const ov=document.getElementById(id); if(!ov)return;
+  ov.hidden=true; if(openId===id)openId=null;
+  if(id==='confirmOv'&&confirmCb){confirmCb=null;}
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-close]'); if(c)closeModal(c.dataset.close);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(openId){closeModal(openId); e.preventDefault(); return;}
+  if(selId){selId=null; syncSelUI(); requestRender(); e.preventDefault();}
+});
+let confirmCb=null;
+function confirmDlg(msg,cb){
+  $('#cfMsg').textContent=msg; confirmCb=cb; openModal('confirmOv');
+  $('#cfYes').focus();
+}
+$('#cfYes').addEventListener('click',()=>{const cb=confirmCb;confirmCb=null;closeModal('confirmOv');if(cb)cb();});
+$('#cfNo').addEventListener('click',()=>{confirmCb=null;closeModal('confirmOv');});
+
+function applyLang(){
+  lang=store.get('seal_lang','ar');
+  document.documentElement.lang=lang;
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  $('#langBtn').textContent=lang==='ar'?'EN':'عربي';
+  $$('[data-i18n]').forEach(n=>{n.textContent=t(n.dataset.i18n)});
+  $$('[data-i18n-ph]').forEach(n=>{n.placeholder=t(n.dataset.i18nPh)});
+  $$('[data-i18n-title]').forEach(n=>{n.title=t(n.dataset.i18nTitle)});
+  $$('[data-i18n-aria]').forEach(n=>{n.setAttribute('aria-label',t(n.dataset.i18nAria))});
+  buildStyleRow(); buildSymGrid(); buildBordRow(); buildFoldRow(); buildWaxRows();
+  buildLayRow(); buildTplRow(); buildKeys(); buildAbout(); rebuildLayers();
+  syncSelUI(); syncImpMeta(); rebuildCab(); updateStats(); nextTip(true);
+  $('#face').setAttribute('aria-label',t('ariaFace')+(els.length?` — ${els.length}`:''));
+  $('#prev').setAttribute('aria-label',t('ariaPrev'));
+  $('#impCv').setAttribute('aria-label',t('ariaImp'));
+  requestRender();
+}
+$('#langBtn').addEventListener('click',()=>{
+  lang=lang==='ar'?'en':'ar'; store.set('seal_lang',lang);
+  AudioEngine.click(); applyLang();
+});
+
+/* ----- stats & tips ----- */
+function updateStats(){
+  $('#stEls').innerHTML=fmt('statEls',els.length).replace(/(\d+)/,'<b>$1</b>');
+  $('#stPresses').innerHTML=fmt('statPresses',stats.p).replace(/(\d+)/,'<b>$1</b>');
+  $('#stExports').innerHTML=fmt('statExports',stats.e).replace(/(\d+)/,'<b>$1</b>');
+  $('#stSaves').innerHTML=fmt('statSaves',stats.s).replace(/(\d+)/,'<b>$1</b>');
+}
+let tipIdx=store.get('seal_tip',0)%6;
+function nextTip(reset){
+  if(reset)tipIdx=store.get('seal_tip',0)%6; else {tipIdx=(tipIdx+1)%6; store.set('seal_tip',tipIdx);}
+  const tips=tA('tips'); $('#tipTxt').textContent=tips[tipIdx]||'';
+}
+setInterval(()=>nextTip(false),9000);
+
+/* ----- builders (dynamic UI, rebuilt on language / state change) ----- */
+function buildStyleRow(){
+  const row=$('#styleRow'); row.innerHTML='';
+  STYLES.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='style-btn'+(i===newStyle?' on':'');
+    b.style.fontFamily=s.fam; b.style.fontWeight=s.wt;
+    b.textContent='آ';
+    const sm=document.createElement('small'); sm.textContent=tA('styles')[i]||''; b.appendChild(sm);
+    b.setAttribute('aria-label',tA('styles')[i]||'');
+    b.addEventListener('click',()=>{newStyle=i; AudioEngine.click(); buildStyleRow();});
+    row.appendChild(b);
+  });
+}
+function buildSymGrid(){
+  const grid=$('#symGrid'); grid.innerHTML='';
+  const names=tA('syms');
+  SYMS.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='sym-btn'; b.title=names[i]||''; b.setAttribute('aria-label',names[i]||'');
+    b.innerHTML=`<svg viewBox="0 0 100 100" aria-hidden="true"><path d="${s.d}"${
+      s.stroke?' fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round"':''
+    }${s.eo?' fill-rule="evenodd"':''}/></svg>`;
+    b.addEventListener('click',()=>addSymbol(i));
+    grid.appendChild(b);
+  });
+}
+function buildBordRow(){
+  const row=$('#bordRow'); row.innerHTML='';
+  const names=tA('borders');
+  DEVICES.forEach((dv,i)=>{
+    const b=document.createElement('button');
+    b.className='bord-btn'; b.title=names[i]||''; b.setAttribute('aria-label',names[i]||'');
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','-220 -220 440 440');
+    svg.innerHTML=dv.svg(16,14);
+    b.appendChild(svg);
+    const sp=document.createElement('span'); sp.textContent=names[i]||''; b.appendChild(sp);
+    b.addEventListener('click',()=>{bordDev=i; AudioEngine.click(); buildBordRow();});
+    row.appendChild(b);
+  });
+}
+function buildFoldRow(){
+  const row=$('#foldRow'); row.innerHTML='';
+  const names=tA('foldNames');
+  [0,2,4,8].forEach((v,i)=>{
+    const b=document.createElement('button');
+    b.className='chip'+(symFold===v?' on':''); b.textContent=names[i]||String(v);
+    b.setAttribute('aria-label',names[i]||'');
+    b.addEventListener('click',()=>{
+      symFold=v; AudioEngine.whoosh(); scheduleSave();
+      buildFoldRow(); requestRender();
+      $('#autoMir').closest('.acc').open=true;
+    });
+    row.appendChild(b);
+  });
+}
+function waxSwatchRow(row,sel,onPick){
+  row.innerHTML='';
+  const names=tA('waxes');
+  WAXES.forEach((wx,i)=>{
+    const b=document.createElement('button');
+    b.className='swatch'+(i===sel?' on':'');
+    b.style.background=`radial-gradient(circle at 34% 30%, ${wx.lite}, ${wx.bg} 62%, ${wx.deep})`;
+    b.setAttribute('aria-label',names[i]||''); b.title=names[i]||'';
+    const sp=document.createElement('span'); sp.textContent=names[i]||''; b.appendChild(sp);
+    b.addEventListener('click',()=>onPick(i));
+    row.appendChild(b);
+  });
+}
+function buildWaxRows(){
+  waxSwatchRow($('#waxRow'),curWax,i=>{curWax=i; buildWaxRows(); requestRender(); if(impState)drawImpression();});
+  waxSwatchRow($('#setWaxRow'),set.wax,i=>{set.wax=i; saveSet(); buildWaxRows();});
+}
+function buildLayRow(){
+  const row=$('#layRow'); row.innerHTML='';
+  const lab=document.createElement('span');
+  lab.className='hint'; lab.style.alignSelf='center'; lab.textContent=t('layoutTitle');
+  row.appendChild(lab);
+  const names=tA('layoutNames');
+  names.forEach((nm,i)=>{
+    const b=document.createElement('button'); b.className='btn tiny'; b.textContent=nm;
+    b.setAttribute('aria-label',t('layoutTitle')+' — '+nm);
+    b.addEventListener('click',()=>applyLetterLayout(i));
+    row.appendChild(b);
+  });
+}
+function buildTplRow(){
+  const row=$('#tplRow'); row.innerHTML='';
+  const names=tA('tplNames');
+  TEMPLATES.forEach((tp,i)=>{
+    const b=document.createElement('button'); b.className='btn tiny'; b.textContent='✦ '+names[i];
+    b.setAttribute('aria-label',names[i]||'');
+    b.addEventListener('click',()=>{
+      if(els.length) confirmDlg(fmt('cfTpl',names[i]||''),()=>loadTemplate(i));
+      else loadTemplate(i);
+    });
+    row.appendChild(b);
+  });
+}
+function buildKeys(){
+  const tb=$('#keysTable'); tb.innerHTML='';
+  tA('keys').forEach(([k,d])=>{
+    const tr=document.createElement('tr');
+    const td1=document.createElement('td'), td2=document.createElement('td');
+    td1.innerHTML=`<span class="kbd">${k}</span>`; td2.textContent=d;
+    tr.appendChild(td1); tr.appendChild(td2); tb.appendChild(tr);
+  });
+}
+function buildAbout(){
+  const ul=$('#aboutCtl'); ul.innerHTML='';
+  const h=document.createElement('li'); h.textContent=t('aboutCtlT'); h.style.fontWeight='800'; h.style.listStyle='none';
+  ul.appendChild(h);
+  tA('aboutCtl').forEach(s=>{const li=document.createElement('li'); li.textContent=s; ul.appendChild(li);});
+}
+
+/* ----- modal & onboarding wiring ----- */
+$('#setBtn').addEventListener('click',()=>{syncSettingsUI(); openModal('setOv');});
+$('#aboutBtn').addEventListener('click',()=>openModal('aboutOv'));
+$('#keysBtn').addEventListener('click',()=>openModal('keysOv'));
+$('#tlBtn').addEventListener('click',()=>{buildTimeline(); openModal('tlOv');});
+$('#onbOk').addEventListener('click',()=>{store.set('seal_seen',1); closeModal('onbOv'); AudioEngine.chime();});
+$('#onbReplay').addEventListener('click',()=>{closeModal('aboutOv'); openModal('onbOv');});
+function syncSettingsUI(){
+  $('#optSound').checked=set.sound; $('#optMotion').checked=set.motion;
+  $('#optSnap').checked=set.snap; $('#optTemp').value=set.temp;
+  buildWaxRows();
+}
+$('#optSound').addEventListener('change',e=>{set.sound=e.target.checked; saveSet(); AudioEngine.vol();});
+$('#optMotion').addEventListener('change',e=>{set.motion=e.target.checked; saveSet(); applyTheme();});
+$('#optSnap').addEventListener('change',e=>{set.snap=e.target.checked; saveSet(); syncChips();});
+$('#optTemp').addEventListener('input',e=>{set.temp=+e.target.value; saveSet();});
+$('#resetBtn').addEventListener('click',()=>{
+  confirmDlg(t('cfReset'),()=>{
+    ['seal_set','seal_cur','seal_cab','seal_seen','seal_holder','seal_stats','seal_tip','seal_lang','seal_imps'].forEach(k=>store.set(k,undefined));
+    try{localStorage.removeItem('seal_set');localStorage.removeItem('seal_cur');localStorage.removeItem('seal_cab');
+        localStorage.removeItem('seal_seen');localStorage.removeItem('seal_holder');localStorage.removeItem('seal_stats');
+        localStorage.removeItem('seal_tip');localStorage.removeItem('seal_imps');}catch(e){}
+    set=Object.assign({},SET_DEF); stats.p=0;stats.e=0;stats.s=0; saveStats();
+    els=[]; selId=null; symFold=0; autoMirror=false; hatchOn=false; impState=null; curName='';
+    store.set('seal_lang','ar'); lang='ar';
+    syncAllUI(); applyTheme(); applyLang(); drawImpression();
+    closeModal('setOv'); toast(t('tReset'),'ok');
+  });
+});
+
+/* ============================================================
+   §6 RENDERING ENGINE — sprites, platter, elements, handles
+   ============================================================ */
+const faceCv=$('#face'), faceCx=faceCv.getContext('2d');
+const prevCv=$('#prev'), prevCx=prevCv.getContext('2d');
+const impCv=$('#impCv'), impCx=impCv.getContext('2d');
+const faceWrap=$('#faceWrap');
+const DPR=Math.min(window.devicePixelRatio||1,2);
+
+const spriteCache=new Map();
+function sprite(ch,style,color,hatch){
+  const key=ch+'|'+style+'|'+color+'|'+(hatch?1:0);
+  if(spriteCache.has(key))return spriteCache.get(key);
+  const SS=2, fs=120, pad=36;
+  const mc=document.createElement('canvas').getContext('2d');
+  mc.font=styleFont(style,fs);
+  const tw=Math.max(30,Math.ceil(mc.measureText(ch).width));
+  const w=tw+pad*2, h=Math.ceil(fs*1.75);
+  const cv=document.createElement('canvas'); cv.width=w*SS; cv.height=h*SS;
+  const g=cv.getContext('2d'); g.scale(SS,SS);
+  g.font=styleFont(style,fs); g.textAlign='center'; g.textBaseline='middle';
+  g.translate(w/2,h/2);
+  const st=STYLES[style];
+  if(st.sq)g.scale(st.sq,1);
+  g.fillStyle=color; g.strokeStyle=color; g.lineJoin='round';
+  if(st.outline){ g.lineWidth=7; g.strokeText(ch,0,0); }
+  else{
+    g.fillText(ch,0,0);
+    if(hatch){
+      g.globalCompositeOperation='source-in';
+      g.fillStyle=g.createPattern(getHatchTile(),'repeat');
+      g.fillRect(-w/2,-h/2,w,h);
+      g.globalCompositeOperation='source-over';
+    }
+  }
+  if(st.stencil){
+    g.globalCompositeOperation='destination-out'; g.fillStyle='#000';
+    g.fillRect(-w,-fs*0.20,w*2,fs*0.085);
+    g.fillRect(-w, fs*0.10,w*2,fs*0.085);
+    g.globalCompositeOperation='source-over';
+  }
+  const sp={cv,w,h};
+  spriteCache.set(key,sp); return sp;
+}
+
+function instancesOf(el,fold,am){
+  fold=(fold===undefined)?symFold:fold; am=(am===undefined)?autoMirror:am;
+  const out=[{th:0,mir:false}];
+  if(fold>0){
+    for(let k=1;k<fold;k++)out.push({th:k*TAU/fold,mir:false});
+    if(am)for(let k=0;k<fold;k++)out.push({th:k*TAU/fold,mir:true});
+  }else if(am)out.push({th:0,mir:true});
+  return out;
+}
+function drawElement(ctx,el,inst,o){
+  ctx.save();
+  ctx.rotate(inst.th);
+  if(inst.mir)ctx.scale(-1,1);
+  ctx.translate(el.x,el.y);
+  ctx.rotate((el.rot||0)*Math.PI/180);
+  ctx.scale(el.scale||1,el.scale||1);
+  if(el.kind==='letter'){
+    const sp=sprite(el.ch,el.style,o.color,o.hatch);
+    ctx.drawImage(sp.cv,-sp.w/2,-sp.h/2,sp.w,sp.h);
+  }else if(el.kind==='symbol'){
+    const p=SYM_PATHS[el.sym], def=SYMS[el.sym];
+    ctx.scale(1.3,1.3); ctx.translate(-50,-50);
+    if(def.stroke){
+      ctx.lineWidth=6.5; ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.strokeStyle=o.color; ctx.stroke(p);
+    }else{
+      const rule=def.eo?'evenodd':'nonzero';
+      ctx.fillStyle=o.color; ctx.fill(p,rule);
+      if(o.hatch){ ctx.fillStyle=ctx.createPattern(getHatchTile(),'repeat'); ctx.fill(p,rule); }
+    }
+  }else if(el.kind==='border'){
+    ctx.fillStyle=o.color; ctx.strokeStyle=o.color;
+    DEVICES[el.dev].draw(ctx,el.count,el.width);
+  }
+  ctx.restore();
+}
+function drawAxes(ctx,fold){
+  ctx.save(); ctx.strokeStyle='rgba(201,162,39,0.4)'; ctx.lineWidth=2; ctx.setLineDash([10,9]);
+  for(let i=0;i<fold;i++){
+    const a=i*Math.PI/fold, ca=Math.cos(a)*252, sa=Math.sin(a)*252;
+    ctx.beginPath(); ctx.moveTo(-ca,-sa); ctx.lineTo(ca,sa); ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawElementsInto(ctx,S,o){
+  const list=o.list||els;
+  const fold=(o.fold===undefined)?symFold:o.fold;
+  const am=(o.am===undefined)?autoMirror:o.am;
+  ctx.save();
+  ctx.translate(S/2,S/2);
+  const k=S/512; ctx.scale(k,k);
+  if(o.ox||o.oy)ctx.translate(o.ox||0,o.oy||0);
+  if(o.platter){
+    ctx.beginPath(); ctx.arc(0,0,250,0,TAU);
+    const grd=ctx.createRadialGradient(-40,-70,30,0,0,255);
+    grd.addColorStop(0,'#faf1dc'); grd.addColorStop(1,o.faceBg||COL['face-bg']||'#f2e6cd');
+    ctx.fillStyle=grd; ctx.fill();
+    ctx.lineWidth=11; ctx.strokeStyle=o.faceRim||COL['face-rim']||'#3c281a';
+    ctx.beginPath(); ctx.arc(0,0,244,0,TAU); ctx.stroke();
+    ctx.globalAlpha=0.35; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(0,0,222,0,TAU); ctx.stroke(); ctx.globalAlpha=1;
+    if(o.grid){
+      ctx.save();
+      ctx.beginPath(); ctx.arc(0,0,243,0,TAU); ctx.clip();
+      ctx.strokeStyle='rgba(36,24,18,0.09)'; ctx.lineWidth=1;
+      for(let v=-256;v<=256;v+=64){
+        ctx.beginPath(); ctx.moveTo(v,-256); ctx.lineTo(v,256); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-256,v); ctx.lineTo(256,v); ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+  if(o.mirror)ctx.scale(-1,1);
+  for(const el of list){ if(el)for(const inst of instancesOf(el,fold,am)) drawElement(ctx,el,inst,o); }
+  if(o.axes&&fold>0)drawAxes(ctx,fold);
+  ctx.restore();
+}
+function drawSealContent(ctx,S,o){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,S,S);
+  drawElementsInto(ctx,S,o);
+  if(o.handles&&selId){
+    const el=elById(selId);
+    if(el){
+      ctx.save(); ctx.translate(S/2,S/2); ctx.scale(S/512,S/512);
+      if(o.mirror)ctx.scale(-1,1);
+      drawHandles(ctx,el); ctx.restore();
+    }
+  }
+}
+function hitRadius(el){
+  if(el.kind==='border')return RB*el.scale;
+  if(el.kind==='letter')return 46*el.scale;
+  return 66*el.scale;
+}
+function handlesOf(el){
+  const base=hitRadius(el)+26, a=(el.rot||0)*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
+  return {rot:{x:el.x+base*sa,y:el.y-base*ca}, scl:{x:el.x+base*ca,y:el.y+base*sa}};
+}
+function drawHandles(ctx,el){
+  const r=hitRadius(el), h=handlesOf(el);
+  const gold=COL['gold']||'#c9a227';
+  ctx.strokeStyle=gold; ctx.fillStyle='rgba(255,246,224,0.94)'; ctx.lineWidth=2.6;
+  ctx.setLineDash([9,7]);
+  ctx.beginPath(); ctx.arc(el.x,el.y,r,0,TAU); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(el.x,el.y); ctx.lineTo(h.rot.x,h.rot.y); ctx.stroke();
+  for(const p of [h.rot,h.scl]){
+    ctx.beginPath(); ctx.arc(p.x,p.y,10,0,TAU); ctx.fill(); ctx.stroke();
+  }
+  ctx.strokeStyle='#241812'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(h.scl.x-4,h.scl.y); ctx.lineTo(h.scl.x+4,h.scl.y); ctx.stroke();
+}
+let rafPend=false;
+function requestRender(){
+  if(rafPend)return; rafPend=true;
+  requestAnimationFrame(()=>{rafPend=false; renderAll();});
+}
+function renderAll(){
+  drawSealContent(faceCx,512,{mirror:!flipped,color:COL_INK,hatch:hatchOn,grid:true,axes:true,handles:true,platter:true});
+  drawSealContent(prevCx,264,{mirror:false,color:COL_INK,hatch:hatchOn,grid:false,axes:false,handles:false,platter:true});
+}
+function renderSealTo(size,o){
+  const c=document.createElement('canvas'); c.width=c.height=size;
+  const g=c.getContext('2d');
+  drawElementsInto(g,size,o);
+  return c;
+}
+
+/* ============================================================
+   §7 POINTER + KEYBOARD INTERACTION
+   ============================================================ */
+let drag=null;
+function toSeal(e){
+  const r=faceCv.getBoundingClientRect();
+  let x=((e.clientX-r.left)/r.width)*512-256;
+  let y=((e.clientY-r.top)/r.height)*512-256;
+  if(!flipped)x=-x;
+  return {x,y};
+}
+function hitElement(p){
+  for(let i=els.length-1;i>=0;i--){
+    const el=els[i];
+    if(el.kind==='border'){
+      const d=Math.hypot(p.x-el.x,p.y-el.y);
+      if(Math.abs(d-RB*el.scale)<Math.max(26,28*el.scale))return el;
+    }else{
+      const dx=p.x-el.x, dy=p.y-el.y, a=-(el.rot||0)*Math.PI/180;
+      const lx=dx*Math.cos(a)-dy*Math.sin(a), ly=dx*Math.sin(a)+dy*Math.cos(a);
+      if(Math.hypot(lx,ly)<hitRadius(el))return el;
+    }
+  }
+  return null;
+}
+faceCv.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  faceWrap.focus({preventScroll:true});
+  const p=toSeal(e);
+  const sel=elById(selId);
+  if(sel){
+    const h=handlesOf(sel);
+    if(Math.hypot(p.x-h.rot.x,p.y-h.rot.y)<17){
+      drag={mode:'rot',el:sel,orig:sel.rot||0,a0:Math.atan2(p.y-sel.y,p.x-sel.x)};
+      faceCv.setPointerCapture(e.pointerId); AudioEngine.click(); return;
+    }
+    if(Math.hypot(p.x-h.scl.x,p.y-h.scl.y)<17){
+      drag={mode:'scl',el:sel,orig:sel.scale||1,d0:Math.max(8,Math.hypot(p.x-sel.x,p.y-sel.y))};
+      faceCv.setPointerCapture(e.pointerId); AudioEngine.click(); return;
+    }
+  }
+  const el=hitElement(p);
+  if(el){
+    selId=el.id; syncSelUI();
+    drag={mode:'move',el,gx:p.x-el.x,gy:p.y-el.y};
+    faceCv.setPointerCapture(e.pointerId);
+    AudioEngine.click(); requestRender();
+  }else{
+    selId=null; syncSelUI(); requestRender();
+  }
+});
+faceCv.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  const p=toSeal(e), el=drag.el;
+  if(drag.mode==='move'){
+    let nx=p.x-drag.gx, ny=p.y-drag.gy;
+    if(set.snap){nx=Math.round(nx/16)*16; ny=Math.round(ny/16)*16;}
+    el.x=Math.round(nx); el.y=Math.round(ny);
+  }else if(drag.mode==='rot'){
+    const a1=Math.atan2(p.y-el.y,p.x-el.x);
+    let r=drag.orig+(a1-drag.a0)*180/Math.PI;
+    if(set.snap)r=Math.round(r/5)*5;
+    el.rot=Math.round(((r+540)%360)-180);
+  }else if(drag.mode==='scl'){
+    const d=Math.hypot(p.x-el.x,p.y-el.y);
+    el.scale=Math.round(Math.min(3.2,Math.max(0.25,drag.orig*d/drag.d0))*100)/100;
+  }
+  requestRender();
+});
+function endDrag(){
+  if(!drag)return;
+  drag=null; AudioEngine.tick(); scheduleSave(); requestRender();
+}
+faceCv.addEventListener('pointerup',endDrag);
+faceCv.addEventListener('pointercancel',endDrag);
+
+document.addEventListener('keydown',e=>{
+  const tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='textarea'||tag==='select')return;
+  if(openId)return;
+  const sel=elById(selId);
+  const k=e.key;
+  if(k==='Tab'){
+    if(document.activeElement===faceWrap&&els.length){
+      e.preventDefault(); cycleSel(e.shiftKey?-1:1);
+    }
+    return;
+  }
+  if(k==='ArrowLeft'&&sel){e.preventDefault(); nudge(sel,e.shiftKey?-16:-4,0); return;}
+  if(k==='ArrowRight'&&sel){e.preventDefault(); nudge(sel,e.shiftKey?16:4,0); return;}
+  if(k==='ArrowUp'&&sel){e.preventDefault(); nudge(sel,0,e.shiftKey?-16:-4); return;}
+  if(k==='ArrowDown'&&sel){e.preventDefault(); nudge(sel,0,e.shiftKey?16:4); return;}
+  if((k==='r'||k==='R')&&sel){
+    e.preventDefault(); sel.rot=((sel.rot+(e.shiftKey?-15:15))+540)%360-180;
+    AudioEngine.tick(); requestRender(); scheduleSave(); return;
+  }
+  if((k==='+'||k==='=')&&sel){e.preventDefault(); scaleBy(sel,1.09); return;}
+  if(k==='-'||k==='_'){if(sel){e.preventDefault(); scaleBy(sel,0.92);} return;}
+  if((k==='Delete'||k==='Backspace')&&sel){e.preventDefault(); removeEl(sel.id); return;}
+  if(k==='Enter'){e.preventDefault(); pressWax(); return;}
+});
+function cycleSel(d){
+  const n=els.length; if(!n)return;
+  let idx=els.findIndex(x=>x.id===selId);
+  idx=idx<0?(d>0?0:n-1):(idx+d+n)%n;
+  selId=els[idx].id; syncSelUI(); requestRender(); AudioEngine.click();
+}
+function nudge(el,dx,dy){
+  el.x+=dx; el.y+=dy;
+  requestRender(); scheduleSave();
+}
+
+/* ============================================================
+   §8 EDITOR OPS — add / remove / z-order / layouts / layers
+   ============================================================ */
+let newStyle=1, bordDev=0, curWax=0, cntW=18, widW=10;
+const elById=id=>els.find(e=>e.id===id);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function afterChange(){
+  requestRender(); rebuildLayers(); syncSelUI(); updateStats(); scheduleSave();
+}
+function addLetters(){
+  const inp=$('#initials');
+  const chars=[...inp.value].filter(c=>c.trim()).slice(0,3);
+  if(!chars.length){inp.focus(); return;}
+  chars.forEach((ch,i)=>{
+    const el=L(ch,newStyle,Math.round((i-(chars.length-1)/2)*76),-16);
+    els.push(el); selId=el.id;
+  });
+  inp.value='';
+  AudioEngine.tick(); afterChange();
+}
+function addSymbol(i){
+  const el=S(i,0,0);
+  els.push(el); selId=el.id;
+  AudioEngine.tick(); afterChange();
+}
+function addBorder(){
+  const el=B(bordDev,cntW,widW);
+  els.push(el); selId=el.id;
+  AudioEngine.tick(); afterChange();
+}
+function scaleBy(el,f){
+  el.scale=Math.round(clamp((el.scale||1)*f,0.25,3.2)*100)/100;
+  AudioEngine.tick(); requestRender(); scheduleSave(); syncSelUI();
+}
+function removeEl(id){
+  els=els.filter(e=>e.id!==id);
+  if(selId===id)selId=null;
+  AudioEngine.click(); afterChange();
+}
+function dupEl(el){
+  const c=JSON.parse(JSON.stringify(el));
+  c.id=uid(); c.x=(c.x||0)+18; c.y=(c.y||0)+18;
+  els.push(c); selId=c.id;
+  AudioEngine.tick(); afterChange();
+}
+function zMove(id,to){
+  const i=els.findIndex(e=>e.id===id); if(i<0)return;
+  els.splice(i,1);
+  els.splice(clamp(to,0,els.length),0,elById(id)||els[els.length-1]);
+  requestRender(); rebuildLayers(); scheduleSave();
+}
+$('#selBar').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]'); if(!b)return;
+  const sel=elById(selId); if(!sel)return;
+  const i=els.indexOf(sel), n=els.length;
+  switch(b.dataset.act){
+    case 'rotL': sel.rot=((sel.rot-15)+540)%360-180; break;
+    case 'rotR': sel.rot=((sel.rot+15)+540)%360-180; break;
+    case 'sclUp': scaleBy(sel,1.12); return;
+    case 'sclDn': scaleBy(sel,0.89); return;
+    case 'top': zMove(sel.id,n-1); AudioEngine.tick(); return;
+    case 'up': zMove(sel.id,i+1); AudioEngine.tick(); return;
+    case 'dn': zMove(sel.id,i-1); AudioEngine.tick(); return;
+    case 'bot': zMove(sel.id,0); AudioEngine.tick(); return;
+    case 'dup': dupEl(sel); return;
+    case 'del': removeEl(sel.id); return;
+  }
+  AudioEngine.tick(); requestRender(); scheduleSave();
+});
+function applyLetterLayout(mode){
+  const ls=els.filter(e=>e.kind==='letter');
+  if(!ls.length)return;
+  const n=ls.length;
+  if(mode===0){ ls.forEach((el,i)=>{el.x=Math.round((i-(n-1)/2)*80); el.y=0; el.rot=0;}); }
+  else if(mode===1){
+    ls.forEach((el,i)=>{
+      const a=(i-(n-1)/2)*0.72, R=138;
+      el.x=Math.round(Math.sin(a)*R); el.y=Math.round(-Math.cos(a)*R);
+      el.rot=Math.round(a*180/Math.PI*10)/10;
+    });
+  }
+  else if(mode===2){ ls.forEach((el,i)=>{el.x=0; el.y=Math.round((i-(n-1)/2)*88); el.rot=0;}); }
+  else{
+    if(n===1){ls[0].x=0; ls[0].y=0; ls[0].rot=0;}
+    else if(n===2){ls.forEach((el,i)=>{el.x=(i?72:-72); el.y=0; el.rot=0;});}
+    else{
+      const P=[[0,-74],[-72,56],[72,56]];
+      ls.forEach((el,i)=>{
+        if(i<3){el.x=P[i][0]; el.y=P[i][1]; el.rot=0;}
+        else{el.x=Math.round((i-1.5-(n-3)/2)*0+(i-2)*76); el.y=126; el.rot=0;}
+      });
+    }
+  }
+  AudioEngine.tick(); afterChange();
+}
+function elName(el){
+  const names=t('selNameL')||{};
+  const tpl=names[el.kind]||'{n}';
+  let nm='';
+  if(el.kind==='letter')nm=el.ch;
+  else if(el.kind==='symbol')nm=(tA('syms')[el.sym])||'';
+  else nm=(tA('borders')[el.dev])||'';
+  return tpl.replace('{n}',nm);
+}
+function rebuildLayers(){
+  const box=$('#layerList'); box.innerHTML='';
+  if(!els.length){
+    const d=document.createElement('div');
+    d.className='layer-empty'; d.textContent=t('layerEmpty');
+    box.appendChild(d); return;
+  }
+  const ics=t('layerIc')||{};
+  for(let i=els.length-1;i>=0;i--){
+    const el=els[i];
+    const row=document.createElement('div');
+    row.className='layer-item'+(el.id===selId?' on':'');
+    const ic=document.createElement('span'); ic.className='l-ic'; ic.textContent=ics[el.kind]||'•';
+    const nm=document.createElement('span'); nm.className='l-name'; nm.textContent=elName(el);
+    const z=document.createElement('span'); z.className='l-z'; z.textContent='#'+(i+1);
+    const bu=document.createElement('button'); bu.textContent='▲'; bu.title=t('zUp');
+    const bd=document.createElement('button'); bd.textContent='▼'; bd.title=t('zDn');
+    const bx=document.createElement('button'); bx.textContent='✕'; bx.title=t('del');
+    bu.addEventListener('click',ev=>{ev.stopPropagation(); zMove(el.id,i+1); AudioEngine.tick();});
+    bd.addEventListener('click',ev=>{ev.stopPropagation(); zMove(el.id,i-1); AudioEngine.tick();});
+    bx.addEventListener('click',ev=>{ev.stopPropagation(); removeEl(el.id);});
+    row.append(ic,nm,z,bu,bd,bx);
+    row.addEventListener('click',()=>{selId=el.id; syncSelUI(); requestRender(); AudioEngine.click();});
+    box.appendChild(row);
+  }
+}
+function syncSelUI(){
+  const sel=elById(selId);
+  $('#selBar').hidden=!sel;
+  if(sel){
+    $('#selName').textContent=elName(sel);
+    if(sel.kind==='border'){cntW=sel.count; widW=sel.width;}
+  }
+  syncSteppers();
+}
+function syncSteppers(){
+  $('#cntVal').textContent=cntW; $('#widVal').textContent=widW;
+}
+$('#cntUp').addEventListener('click',()=>stepBorder(1,0));
+$('#cntDn').addEventListener('click',()=>stepBorder(-1,0));
+$('#widUp').addEventListener('click',()=>stepBorder(0,1));
+$('#widDn').addEventListener('click',()=>stepBorder(0,-1));
+function stepBorder(dc,dw){
+  if(dc){cntW=clamp(cntW+dc,6,48); }
+  if(dw){widW=clamp(widW+dw*2,4,30);}
+  const sel=elById(selId);
+  if(sel&&sel.kind==='border'){sel.count=cntW; sel.width=widW;}
+  syncSteppers(); requestRender(); scheduleSave(); AudioEngine.click();
+}
+$('#addLetters').addEventListener('click',addLetters);
+$('#addBorder').addEventListener('click',addBorder);
+$('#initials').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); addLetters();}});
+
+/* ----- chips, symmetry, hatch, flip ----- */
+function syncChips(){
+  $('#snapChip').classList.toggle('on',set.snap);
+  $('#flipChip').classList.toggle('on',flipped);
+  $('#viewBadge').hidden=!flipped;
+  $('#viewBadge').textContent=t('positiveView');
+}
+$('#snapChip').addEventListener('click',()=>{set.snap=!set.snap; saveSet(); syncChips(); AudioEngine.click();});
+$('#flipChip').addEventListener('click',toggleFlip);
+$('#flipBtn').addEventListener('click',toggleFlip);
+function toggleFlip(){
+  flipped=!flipped; AudioEngine.whoosh();
+  syncChips(); requestRender();
+}
+$('#autoMir').addEventListener('change',e=>{
+  autoMirror=e.target.checked; AudioEngine.whoosh();
+  requestRender(); scheduleSave();
+});
+$('#hatchTg').addEventListener('change',e=>{
+  hatchOn=e.target.checked; AudioEngine.tick();
+  requestRender(); scheduleSave();
+});
+
+/* ----- autosave / restore ----- */
+let saveT=0;
+function scheduleSave(){
+  clearTimeout(saveT);
+  saveT=setTimeout(()=>{
+    store.set('seal_cur',{v:1,els,sym:symFold,am:autoMirror,ht:hatchOn,name:curName});
+  },350);
+}
+
+/* ----- PNG export: stamp face + wax impression ----- */
+function dlPNG(cv,name){
+  const a=document.createElement('a');
+  a.download=name; a.href=cv.toDataURL('image/png');
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function pngLabel(g,S){
+  g.fillStyle='rgba(255,246,224,0.85)';
+  g.font='600 36px system-ui, sans-serif';
+  g.textAlign='center'; g.textBaseline='middle';
+  g.fillText(fmt('mmLabel',38),S/2,S-48);
+}
+function exportStampPNG(){
+  const S=1024, cv=document.createElement('canvas'); cv.width=cv.height=S;
+  const g=cv.getContext('2d');
+  g.fillStyle='#231a10'; g.fillRect(0,0,S,S);
+  const face=renderSealTo(880,{mirror:!flipped,color:COL_INK,hatch:hatchOn,grid:false,axes:false,handles:false,platter:true});
+  g.drawImage(face,72,72);
+  pngLabel(g,S);
+  dlPNG(cv,'mirrorseal-stamp.png');
+  toast(t('expPng'),'ok');
+}
+function exportImpressionPNG(){
+  const S=1024, cv=document.createElement('canvas'); cv.width=cv.height=S;
+  const g=cv.getContext('2d');
+  const wx=WAXES[curWax]||WAXES[0];
+  g.fillStyle='#231a10'; g.fillRect(0,0,S,S);
+  const cx=S/2, r=440;
+  const wg=g.createRadialGradient(cx-120,cx-160,60,cx,cx,r);
+  wg.addColorStop(0,wx.lite); wg.addColorStop(0.55,wx.bg); wg.addColorStop(1,wx.deep);
+  g.beginPath(); g.arc(cx,cx,r,0,TAU); g.fillStyle=wg; g.fill();
+  g.lineWidth=14; g.strokeStyle=wx.edge; g.stroke();
+  g.save(); g.translate(72,72);
+  drawElementsInto(g,880,{mirror:false,color:wx.edge,hatch:false,grid:false,axes:false,handles:false,platter:false});
+  g.restore();
+  pngLabel(g,S);
+  dlPNG(cv,'mirrorseal-impression.png');
+  toast(t('expPng'),'ok');
+}
+$('#expStamp').addEventListener('click',exportStampPNG);
+$('#expCard').addEventListener('click',exportImpressionPNG);
+</script>
+</body>
+</html>
