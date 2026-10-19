@@ -1,0 +1,2115 @@
+<!-- 10 Originals — Hive Maestro — original concept, 100% offline -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مايسترو الخلية — Hive Maestro</title>
+<style>
+/* ================= 1. TOKENS & RESET ================= */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#171008; --bg2:#241a10; --panel:#2b1e0e; --panel2:#382712;
+  --ink:#f6e9c9; --muted:#bfaa80; --line:rgba(255,201,60,.17);
+  --acc:#ffc93c; --acc2:#8fc866; --accsoft:rgba(255,201,60,.13);
+  --danger:#ff6f5b; --shadow:0 10px 30px rgba(0,0,0,.45);
+  --r:14px; --tr:240ms;
+}
+body[data-theme="green"]{
+  --bg:#0f1508; --bg2:#18220c; --panel:#1d2a12; --panel2:#26371a;
+  --ink:#eef4dc; --muted:#a3b687; --line:rgba(165,217,107,.18);
+  --acc:#a5d96b; --acc2:#ffc93c; --accsoft:rgba(165,217,107,.13);
+}
+body[data-theme="violet"]{
+  --bg:#140f1d; --bg2:#1e1630; --panel:#251b3a; --panel2:#2f2249;
+  --ink:#efe7fb; --muted:#a995c9; --line:rgba(201,167,255,.2);
+  --acc:#c9a7ff; --acc2:#ffc93c; --accsoft:rgba(201,167,255,.14);
+}
+html{height:100%}
+body{
+  min-height:100%; background:radial-gradient(1100px 500px at 50% -10%, var(--bg2), var(--bg));
+  color:var(--ink); font:15px/1.6 "Segoe UI",Tahoma,system-ui,sans-serif;
+  -webkit-text-size-adjust:100%; overflow-x:hidden;
+}
+body::before{content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
+  background:
+    repeating-linear-gradient(60deg, transparent 0 34px, var(--accsoft) 34px 35px),
+    repeating-linear-gradient(-60deg, transparent 0 34px, var(--accsoft) 34px 35px);
+  mask-image:radial-gradient(80% 60% at 50% 0%, #000 0%, transparent 75%);
+  -webkit-mask-image:radial-gradient(80% 60% at 50% 0%, #000 0%, transparent 75%);
+}
+#app{position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column}
+button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+canvas{display:block; touch-action:none}
+.hidden{display:none!important}
+:focus-visible{outline:2px solid var(--acc); outline-offset:2px; border-radius:6px}
+::selection{background:var(--acc); color:#1a1208}
+
+/* ================= 2. TOP BAR ================= */
+#topbar{
+  position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:8px 14px; background:color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+}
+.backlink{
+  inline-size:38px; block-size:38px; display:grid; place-items:center; border-radius:50%;
+  border:1px solid var(--line); background:var(--panel); color:var(--ink);
+  font-size:19px; text-decoration:none; transition:transform var(--tr), background var(--tr);
+}
+.backlink:hover{background:var(--panel2); transform:translateY(-2px)}
+.brand{display:flex; align-items:center; gap:8px; min-width:0}
+.brand b{font-size:17px; letter-spacing:.2px; white-space:nowrap}
+.brand small{display:block; color:var(--muted); font-size:11.5px; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:34vw}
+#logo{display:grid; place-items:center; inline-size:36px; block-size:36px}
+#logo svg{filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+#hud{display:flex; gap:6px; flex-wrap:wrap; margin-inline-start:auto}
+.pill{
+  display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px;
+  background:var(--panel); border:1px solid var(--line); font-size:13.5px; white-space:nowrap;
+}
+.pill b{font-weight:700; color:var(--acc)}
+.pill.warn b{color:var(--danger)}
+.tools{display:flex; gap:6px}
+.iconbtn{
+  inline-size:38px; block-size:38px; border-radius:11px; border:1px solid var(--line);
+  background:var(--panel); font-size:17px; display:grid; place-items:center;
+  transition:background var(--tr), transform var(--tr);
+}
+.iconbtn:hover{background:var(--panel2); transform:translateY(-2px)}
+#b-lang{inline-size:auto; padding-inline:11px; font-weight:700; font-size:13px}
+
+/* ================= 3. SCREENS & CARDS ================= */
+main{flex:1; padding:14px 14px 40px}
+.screen{display:none; animation:fadein .28s ease}
+.screen.on{display:block}
+.wrap{max-width:1020px; margin-inline:auto; display:flex; flex-direction:column; gap:14px}
+.wrap.narrow{max-width:640px}
+.grid2{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:14px; align-items:start}
+.card{
+  background:linear-gradient(180deg, var(--panel2), var(--panel));
+  border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:16px 18px;
+}
+.card h2{font-size:17px; color:var(--acc); margin-bottom:10px; display:flex; align-items:center; gap:8px}
+.card h3{font-size:15px; margin-bottom:6px}
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.stack{display:flex; flex-direction:column; gap:10px}
+.mini{font-size:12.5px; color:var(--muted); line-height:1.55}
+.statline{display:flex; justify-content:space-between; gap:10px; padding:5px 0; border-bottom:1px dashed var(--line); font-size:14px}
+.statline:last-child{border-bottom:none}
+.statline b{color:var(--acc)}
+.statline .neg{color:var(--danger)}
+
+/* ================= 4. BUTTONS ================= */
+.btn{
+  padding:10px 16px; border-radius:12px; border:1px solid var(--line); background:var(--panel2);
+  font-size:15px; font-weight:600; transition:transform var(--tr), background var(--tr), box-shadow var(--tr);
+  display:inline-flex; align-items:center; gap:8px; justify-content:center;
+}
+.btn:hover:not(:disabled){background:var(--accsoft); transform:translateY(-2px)}
+.btn:active:not(:disabled){transform:translateY(1px) scale(.98)}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.btn.primary{background:var(--acc); color:#241703; border-color:transparent; box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn.gold{background:transparent; color:var(--acc); border-color:var(--acc)}
+.btn.ghost{background:transparent; color:var(--muted)}
+.btn.warn{color:var(--danger); border-color:var(--danger); background:transparent}
+.btn.big{font-size:17px; padding:13px 26px; width:100%}
+.btn.flash{animation:press .3s ease}
+
+/* ================= 5. HIVE (HUB) ================= */
+#hive-status .bigstats{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+.bstat{flex:1 1 110px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:9px 12px}
+.bstat small{display:block; color:var(--muted); font-size:12px}
+.bstat b{font-size:20px; color:var(--acc)}
+.bstat.low b{color:var(--danger)}
+.upg{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px dashed var(--line)}
+.upg:last-child{border-bottom:none}
+.upg .ic{font-size:22px; width:30px; text-align:center}
+.upg .nm{flex:1; min-width:0}
+.upg .nm small{display:block; color:var(--muted); font-size:12px; line-height:1.4}
+.pips{display:flex; gap:3px}
+.pip{width:9px; height:9px; border-radius:3px; background:var(--panel); border:1px solid var(--line)}
+.pip.on{background:var(--acc); border-color:var(--acc)}
+.upg .btn{padding:6px 12px; font-size:13px; min-width:86px}
+#winterbox{border:1px solid var(--line); border-radius:12px; padding:12px; background:var(--accsoft); margin-top:10px}
+
+/* ================= 6. MEADOW ================= */
+.meadow-lay{display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:14px; align-items:start; max-width:1060px; margin-inline:auto}
+.cv-box{position:relative; background:linear-gradient(180deg, var(--panel2), var(--panel)); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden}
+.cv-box canvas{width:100%; height:auto}
+.badge{
+  position:absolute; top:10px; inset-inline-start:10px; padding:4px 12px; border-radius:999px;
+  background:color-mix(in srgb, var(--bg) 75%, transparent); border:1px solid var(--line); font-size:13px; font-weight:600;
+}
+.fieldinfo{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:14px; min-height:64px}
+.fieldinfo b{color:var(--acc)}
+.planitem{
+  display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:10px; background:var(--panel);
+  border:1px solid var(--line); margin-bottom:6px; font-size:14px;
+}
+.planitem .slotno{inline-size:24px; block-size:24px; border-radius:8px; background:var(--acc); color:#241703; display:grid; place-items:center; font-weight:800; font-size:13px; flex:none}
+.planitem .x{margin-inline-start:auto; color:var(--muted); font-size:16px; padding:2px 6px; border-radius:8px}
+.planitem .x:hover{color:var(--danger); background:var(--accsoft)}
+#meadow-hint{margin-top:8px}
+
+/* ================= 7. DANCE ================= */
+.dance-wrap{max-width:1060px; margin-inline:auto; display:flex; flex-direction:column; gap:12px}
+#cv-box-dance{height:auto}
+.dance-hud{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.dance-hud .kpi{display:flex; flex-direction:column; min-width:86px}
+.dance-hud .kpi small{color:var(--muted); font-size:11.5px}
+.dance-hud .kpi b{font-size:19px; color:var(--acc)}
+.dance-hud .kpi b.hot{color:var(--acc2)}
+#b-release{margin-inline-start:auto}
+
+/* ================= 8. RESULTS / END SCREENS ================= */
+.endicon{font-size:44px; text-align:center; margin-bottom:4px}
+.endtitle{font-size:24px; text-align:center; color:var(--acc); margin-bottom:8px}
+.endscore{text-align:center; font-size:17px; margin:10px 0}
+.endscore b{font-size:30px; color:var(--acc)}
+.center{text-align:center}
+
+/* ================= 9. TOUCH PAD ================= */
+#pad{
+  position:fixed; bottom:14px; inset-inline:0; margin-inline:auto; width:216px; height:216px; z-index:45;
+  display:none; user-select:none; -webkit-user-select:none; filter:drop-shadow(0 10px 24px rgba(0,0,0,.5));
+}
+body.pad-on #pad{display:block}
+body.pad-on main{padding-bottom:180px}
+.pbtn{
+  position:absolute; inset-inline-start:50%; top:50%; width:48px; height:48px; margin:-24px;
+  border-radius:50%; background:color-mix(in srgb, var(--panel) 88%, transparent); border:1px solid var(--line);
+  font-size:19px; color:var(--ink); display:grid; place-items:center; touch-action:none;
+  transform:rotate(var(--a)) translateY(-82px) rotate(calc(-1 * var(--a)));
+  transition:background .15s, transform .15s;
+}
+.pbtn.hit{background:var(--acc); color:#241703; transform:rotate(var(--a)) translateY(-76px) rotate(calc(-1 * var(--a))) scale(1.06)}
+#pad-beat{
+  position:absolute; inset-inline-start:50%; top:50%; width:64px; height:64px; margin:-32px;
+  border-radius:50%; background:var(--acc); color:#241703; font-size:26px; font-weight:800;
+  display:grid; place-items:center; border:3px solid color-mix(in srgb, var(--bg) 60%, transparent); touch-action:none;
+  transition:transform .15s, filter .15s;
+}
+#pad-beat.hit{transform:scale(.9); filter:brightness(1.2)}
+
+/* ================= 10. OVERLAYS / PANELS ================= */
+.overlay{
+  position:fixed; inset:0; z-index:60; display:none; place-items:center; padding:16px;
+  background:rgba(10,6,2,.6); backdrop-filter:blur(5px);
+}
+.overlay.on{display:grid; animation:fadein .22s ease}
+.panel{
+  width:min(560px, 96vw); max-height:88vh; overflow:auto; background:linear-gradient(180deg, var(--panel2), var(--panel));
+  border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:18px 20px;
+  animation:pop .26s cubic-bezier(.2,1.4,.4,1);
+}
+.pv-head{display:flex; align-items:center; gap:10px; margin-bottom:12px}
+.pv-head h2{flex:1; font-size:19px; color:var(--acc)}
+.xbtn{inline-size:34px; block-size:34px; border-radius:10px; border:1px solid var(--line); background:var(--panel); font-size:15px}
+.xbtn:hover{background:var(--accsoft)}
+.setrow{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px dashed var(--line); flex-wrap:wrap}
+.setrow:last-of-type{border-bottom:none}
+.setrow .lbl{flex:1 1 200px; min-width:0}
+.setrow .lbl small{display:block; color:var(--muted); font-size:12px; line-height:1.45}
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:11px; overflow:hidden; background:var(--panel)}
+.seg button{padding:7px 13px; font-size:13.5px; color:var(--muted); border-inline-end:1px solid var(--line); transition:background var(--tr)}
+.seg button:last-child{border-inline-end:none}
+.seg button.sel{background:var(--acc); color:#241703; font-weight:700}
+.ob-svg{display:block; margin:10px auto; max-width:100%}
+.credit{margin-top:14px; padding-top:10px; border-top:1px dashed var(--line); color:var(--muted); font-size:12.5px; text-align:center}
+.ctrl-list{list-style:none; display:flex; flex-direction:column; gap:6px; margin:8px 0}
+.ctrl-list li{display:flex; gap:10px; align-items:baseline; font-size:14px}
+.key{font-family:Consolas,"Courier New",monospace; background:var(--panel); border:1px solid var(--line); border-bottom-width:2px; border-radius:7px; padding:1px 8px; font-size:12.5px; color:var(--acc); white-space:nowrap}
+.achrow{display:flex; gap:11px; align-items:center; padding:9px 10px; border-radius:12px; background:var(--panel); border:1px solid var(--line); margin-bottom:8px}
+.achrow .ic{font-size:23px; width:34px; text-align:center; filter:grayscale(1); opacity:.45}
+.achrow.got .ic{filter:none; opacity:1}
+.achrow .nm b{color:var(--acc)}
+.achrow.got{border-color:var(--acc)}
+.achrow .nm small{color:var(--muted); font-size:12.5px; line-height:1.45; display:block}
+
+/* wasp prompt */
+#pv-wasp .panel{text-align:center; border-color:var(--danger)}
+#wasp-ring{width:130px; height:130px; margin:6px auto; border-radius:50%; border:4px solid var(--danger); display:grid; place-items:center; transition:none}
+#wasp-bar{height:10px; border-radius:6px; background:var(--panel); border:1px solid var(--line); overflow:hidden; margin:8px 0}
+#wasp-bar i{display:block; height:100%; background:var(--danger); width:100%}
+.dodgebtn{font-size:19px; padding:14px 34px}
+
+/* banner (season change) */
+#banner{
+  position:fixed; inset-inline:0; top:34%; z-index:70; display:none; justify-content:center; pointer-events:none;
+}
+#banner.on{display:flex; animation:banner 2.1s ease forwards}
+#banner .in{
+  background:color-mix(in srgb, var(--bg) 85%, transparent); border:1px solid var(--acc);
+  border-radius:18px; padding:16px 42px; text-align:center; box-shadow:var(--shadow);
+}
+#banner .in b{font-size:26px; color:var(--acc); display:block}
+#banner .in span{color:var(--muted); font-size:14px}
+
+/* toasts */
+#toasts{position:fixed; bottom:18px; inset-inline-start:50%; transform:translateX(50%); z-index:80; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none}
+[dir="ltr"] #toasts{transform:translateX(-50%)}
+.toast{
+  background:color-mix(in srgb, var(--panel2) 92%, transparent); border:1px solid var(--acc);
+  color:var(--ink); border-radius:12px; padding:9px 18px; font-size:14px; box-shadow:var(--shadow);
+  animation:toastin 2.7s ease forwards; max-width:88vw; text-align:center;
+}
+.toast.bad{border-color:var(--danger)}
+
+/* ================= 11. KEYFRAMES ================= */
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0; transform:scale(.86) translateY(14px)}to{opacity:1; transform:none}}
+@keyframes press{0%{transform:scale(.92)}60%{transform:scale(1.05)}100%{transform:none}}
+@keyframes toastin{0%{opacity:0; transform:translateY(16px)}8%{opacity:1; transform:none}82%{opacity:1}100%{opacity:0; transform:translateY(-10px)}}
+@keyframes banner{0%{opacity:0; transform:translateY(24px) scale(.92)}12%{opacity:1; transform:none}80%{opacity:1}100%{opacity:0; transform:translateY(-18px)}}
+@keyframes beatglow{0%{box-shadow:0 0 0 0 var(--accsoft)}70%{box-shadow:0 0 0 14px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.beatpulse{animation:beatglow .5s ease}
+
+/* ================= 12. RESPONSIVE & MOTION ================= */
+@media (max-width:900px){
+  .grid2{grid-template-columns:1fr}
+  .meadow-lay{grid-template-columns:1fr}
+  .brand small{display:none}
+  .dance-hud .kpi{min-width:70px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important}
+}
+body[data-motion="reduced"] *{animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important}
+</style>
+</head>
+<body data-theme="amber" data-motion="full">
+<div id="app">
+
+  <!-- ======= TOP BAR ======= -->
+  <header id="topbar">
+    <a class="backlink" href="../index.html" aria-label="رجوع إلى الفهرس — Back to hub" data-i18n-aria="a_back">↩</a>
+    <div class="brand">
+      <span id="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="27" height="27"><path d="M12 1.8l8.4 4.9v10.6L12 22.2 3.6 17.3V6.7z" fill="none" stroke="var(--acc)" stroke-width="1.7"/><circle cx="12" cy="12" r="3" fill="var(--acc)"/><path d="M7.8 9.2c2.6-1.7 5.8-1.7 8.4 0M7.8 14.8c2.6 1.7 5.8 1.7 8.4 0" stroke="var(--acc2)" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></span>
+      <div><b data-i18n="appName">مايسترو الخلية</b><small data-i18n="tagline">قُد السربَ بإيقاع رقصة الاهتزاز</small></div>
+    </div>
+    <div id="hud" role="status">
+      <span class="pill" title="اليوم — Day"><span aria-hidden="true">📅</span><b id="hv-day">1</b></span>
+      <span class="pill" id="pill-season"><span id="hv-semj" aria-hidden="true">🌸</span><b id="hv-season">—</b></span>
+      <span class="pill" title="العسل — Honey"><span aria-hidden="true">🍯</span><b id="hv-honey">0</b></span>
+      <span class="pill" title="النحل — Bees"><span aria-hidden="true">🐝</span><b id="hv-bees">0</b></span>
+      <span class="pill" id="pill-integ" title="سلامة الخلية — Integrity"><span aria-hidden="true">🛡️</span><b id="hv-integ">100</b></span>
+    </div>
+    <nav class="tools" aria-label="أدوات — Tools">
+      <button class="iconbtn" id="b-stats" aria-label="الإحصاءات — Stats" data-i18n-aria="a_stats" title="📊">📊</button>
+      <button class="iconbtn" id="b-ach" aria-label="الإنجازات — Achievements" data-i18n-aria="a_ach" title="🏆">🏆</button>
+      <button class="iconbtn" id="b-help" aria-label="الاختصارات — Shortcuts" data-i18n-aria="a_help" title="?">؟</button>
+      <button class="iconbtn" id="b-settings" aria-label="الإعدادات — Settings" data-i18n-aria="a_settings" title="⚙">⚙</button>
+      <button class="iconbtn" id="b-about" aria-label="حول — About" data-i18n-aria="a_about" title="ⓘ">ⓘ</button>
+      <button class="iconbtn" id="b-lang" aria-label="تبديل اللغة — Toggle language">EN / عربي</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ======= SCREEN: HIVE HUB ======= -->
+    <section id="scr-hive" class="screen on" aria-label="الخلية — The hive">
+      <div class="wrap">
+        <div class="card" id="hive-status">
+          <h2><span id="hive-emj" aria-hidden="true">🐝</span><span id="hive-headline">—</span></h2>
+          <p class="mini" id="hive-brief">—</p>
+          <div class="bigstats">
+            <div class="bstat" id="bs-honey"><small>🍯 <span data-i18n="hud_honey">مخزون العسل</span></small><b>0</b></div>
+            <div class="bstat" id="bs-bees"><small>🐝 <span data-i18n="hud_bees">عدد النحل</span></small><b>0</b></div>
+            <div class="bstat" id="bs-integ"><small>🛡️ <span data-i18n="hud_integrity">سلامة الخلية</span></small><b>0</b></div>
+            <div class="bstat" id="bs-forg"><small>🚀 <span data-i18n="hud_foragers">جامعات اليوم</span></small><b>0</b></div>
+          </div>
+          <div id="winterbox" class="hidden">
+            <h3>❄️ <span id="winter-title">—</span></h3>
+            <p class="mini" id="winter-info">—</p>
+            <div class="row" style="margin-top:8px">
+              <button class="btn primary" id="b-winterday" data-i18n="btn_winterday">🛌 نوم يوم شتوي</button>
+            </div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <h2>📋 <span data-i18n="hub_ops">مهام اليوم</span></h2>
+            <div class="stack">
+              <button class="btn primary" id="b-meadow">🧭 <span data-i18n="btn_plan">إلى المرج — التخطيط للرقصات</span></button>
+              <button class="btn" id="b-repair">🛠️ <span data-i18n="btn_repair">ترميم الخلية</span> <b id="repair-cost"></b></button>
+              <p class="mini" id="hive-hint">—</p>
+            </div>
+          </div>
+          <div class="card">
+            <h2>🛒 <span data-i18n="upg_title">متجر الخلية</span></h2>
+            <div id="upg-list"></div>
+          </div>
+        </div>
+        <div class="card row" style="justify-content:space-between">
+          <span class="mini" id="seed-label">—</span>
+          <span class="mini" id="weather-line">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= SCREEN: MEADOW ======= -->
+    <section id="scr-meadow" class="screen" aria-label="المرج — The meadow">
+      <div class="meadow-lay">
+        <div class="cv-box">
+          <canvas id="cv-meadow" width="520" height="520" role="img" aria-label="خريطة المرج الشعاعية — Radial meadow map"></canvas>
+          <span class="badge" id="meadow-badge">—</span>
+        </div>
+        <aside class="card">
+          <h2>🌸 <span data-i18n="meadow_title">المرج</span></h2>
+          <div class="fieldinfo" id="field-info">—</div>
+          <h3 style="margin-top:12px"><span data-i18n="plan_head">خانات الرقصات</span> <span class="mini" id="plan-count"></span></h3>
+          <div id="plan-list"></div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn primary" id="b-add">➕ <span data-i18n="btn_add">أضف رقصة لهذا الحقل</span></button>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn gold" id="b-perform">🎶 <span data-i18n="btn_perform">ابدأ الأداء</span></button>
+            <button class="btn ghost" id="b-back-hive" data-i18n="btn_backhive">↩ عودة للخلية</button>
+          </div>
+          <p class="mini" id="meadow-hint">—</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ======= SCREEN: DANCE ======= -->
+    <section id="scr-dance" class="screen" aria-label="مسرح الرقص — The dance stage">
+      <div class="dance-wrap">
+        <div class="cv-box" id="cv-box-dance">
+          <canvas id="cv-dance" width="980" height="300" role="img" aria-label="مدرج الإيقاع — Beat staff"></canvas>
+          <span class="badge" id="dz-badge">—</span>
+        </div>
+        <div class="dance-hud card">
+          <div class="kpi"><small data-i18n="dz_dance">الرقصة</small><b id="dz-title">1/1</b></div>
+          <div class="kpi"><small data-i18n="dz_target">الهدف</small><b id="dz-target">—</b></div>
+          <div class="kpi"><small data-i18n="dz_decode">نسبة الفهم</small><b id="dz-decode">—</b></div>
+          <div class="kpi"><small data-i18n="dz_combo">متتالية</small><b id="dz-combo">0</b></div>
+          <button class="btn warn" id="b-release">⏩ <span data-i18n="btn_release">إطلاق مبكر</span></button>
+        </div>
+        <p class="mini center" id="dz-hint">—</p>
+      </div>
+    </section>
+
+    <!-- ======= SCREEN: DAY RESULTS ======= -->
+    <section id="scr-results" class="screen" aria-label="حصاد اليوم — Day results">
+      <div class="wrap narrow">
+        <div class="card">
+          <div class="endicon">🌇</div>
+          <div class="endtitle" data-i18n="res_title">حصاد اليوم</div>
+          <div id="res-body"></div>
+          <div id="res-ach" style="margin-top:10px"></div>
+          <div class="row" style="margin-top:14px"><button class="btn primary big" id="b-nextday">🌅 <span data-i18n="btn_nextday">يوم جديد</span></button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= SCREEN: LOSE ======= -->
+    <section id="scr-lose" class="screen" aria-label="نهاية الخلية — Game over">
+      <div class="wrap narrow">
+        <div class="card">
+          <div class="endicon">🕯️</div>
+          <div class="endtitle" id="lose-title">—</div>
+          <p class="mini center" id="lose-reason">—</p>
+          <div id="lose-body" style="margin-top:10px"></div>
+          <div class="endscore"><span data-i18n="score">النقاط</span>: <b id="lose-score">0</b></div>
+          <p class="mini center" id="lose-best"></p>
+          <div class="row center" style="justify-content:center; margin-top:12px">
+            <button class="btn primary big" id="b-restart">🔄 <span data-i18n="btn_restart">خلية جديدة</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= SCREEN: WINTER VICTORY ======= -->
+    <section id="scr-win" class="screen" aria-label="نجاة الشتاء — Winter survived">
+      <div class="wrap narrow">
+        <div class="card">
+          <div class="endicon">🌄</div>
+          <div class="endtitle" data-i18n="win_title">نجحتما! عُدنا من الشتاء</div>
+          <p class="mini center" data-i18n="win_reason">صمدت الخلية على مخزونها حتى عاد الربيع.</p>
+          <div id="win-body" style="margin-top:10px"></div>
+          <div class="endscore"><span data-i18n="score">النقاط</span>: <b id="win-score">0</b></div>
+          <div class="row center" style="justify-content:center; gap:10px; margin-top:12px">
+            <button class="btn primary" id="b-win-continue">♾️ <span data-i18n="btn_continue">متابعة بلا نهاية</span></button>
+            <button class="btn ghost" id="b-win-new">🔄 <span data-i18n="btn_restart">خلية جديدة</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= SCREEN: STATS ======= -->
+    <section id="scr-stats" class="screen" aria-label="الإحصاءات — Stats">
+      <div class="wrap narrow">
+        <div class="card">
+          <h2>📊 <span data-i18n="st_title">إحصاءات العمر</span></h2>
+          <div id="stats-body"></div>
+          <div class="row" style="margin-top:12px"><button class="btn ghost" id="b-stats-back">↩ <span data-i18n="btn_backhive">عودة للخلية</span></button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= SCREEN: ACHIEVEMENTS ======= -->
+    <section id="scr-ach" class="screen" aria-label="الإنجازات — Achievements">
+      <div class="wrap narrow">
+        <div class="card">
+          <h2>🏆 <span data-i18n="ach_title">الإنجازات</span> <span class="mini" id="ach-count"></span></h2>
+          <div id="ach-list"></div>
+          <div class="row" style="margin-top:12px"><button class="btn ghost" id="b-ach-back">↩ <span data-i18n="btn_backhive">عودة للخلية</span></button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ======= ON-SCREEN 8-WAY PAD + BEAT ======= -->
+  <div id="pad" aria-label="أدوات اللمس — Touch controls">
+    <button class="pbtn dir" data-d="0" style="--a:0deg" aria-label="شمال — North">↑</button>
+    <button class="pbtn dir" data-d="1" style="--a:45deg" aria-label="شمال شرق — North East">↗</button>
+    <button class="pbtn dir" data-d="2" style="--a:90deg" aria-label="شرق — East">→</button>
+    <button class="pbtn dir" data-d="3" style="--a:135deg" aria-label="جنوب شرق — South East">↘</button>
+    <button class="pbtn dir" data-d="4" style="--a:180deg" aria-label="جنوب — South">↓</button>
+    <button class="pbtn dir" data-d="5" style="--a:225deg" aria-label="جنوب غرب — South West">↙</button>
+    <button class="pbtn dir" data-d="6" style="--a:270deg" aria-label="غرب — West">←</button>
+    <button class="pbtn dir" data-d="7" style="--a:315deg" aria-label="شمال غرب — North West">↖</button>
+    <button id="pad-beat" aria-label="نبضة / مسافة — Beat / Space">♩</button>
+  </div>
+
+  <!-- ======= OVERLAY: ONBOARDING ======= -->
+  <div class="overlay" id="pv-onboard" role="dialog" aria-modal="true" aria-labelledby="ob-title">
+    <div class="panel">
+      <div class="pv-head"><h2 id="ob-title">🐝 <span data-i18n="ob_title">أهلاً بك أيها المايسترو</span></h2></div>
+      <p data-i18n="ob_p1">أنتَ مايسترو الخلية: أدِّ رقصة الاهتزاز على إيقاع النقرات لتُخبر جامعات الرحيق أين الرحيقُ الوفير.</p>
+      <p style="margin-top:8px" data-i18n="ob_p2">اختر حقولاً في المرج، اضغط الأسهم على الضربة الصحيحة، وسيطير السرب على مسارك تمامًا — واجمع العسل قبل أن يهاجم الدبور أو يأتي الشتاء.</p>
+      <svg class="ob-svg" viewBox="0 0 280 120" width="280" height="120" aria-hidden="true">
+        <path d="M28 78l17-10 17 10v20l-17 10-17-10z" fill="var(--acc)" opacity=".92"/>
+        <path d="M28 78l17-10 17 10v20l-17 10-17-10z" fill="none" stroke="#241703" stroke-width="2"/>
+        <path d="M62 84 C 110 30, 170 26, 224 62" fill="none" stroke="var(--acc2)" stroke-width="2.4" stroke-dasharray="6 7" stroke-linecap="round"/>
+        <path d="M224 62 l-12 -2 m12 2 l-4 -11" stroke="var(--acc2)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <circle cx="243" cy="70" r="7" fill="var(--acc2)"/><circle cx="234" cy="63" r="5.4" fill="var(--acc2)"/><circle cx="252" cy="63" r="5.4" fill="var(--acc2)"/><circle cx="238" cy="79" r="5.4" fill="var(--acc2)"/><circle cx="248" cy="79" r="5.4" fill="var(--acc2)"/>
+        <g font-size="11" fill="var(--muted)" font-family="inherit">
+          <circle cx="86" cy="104" r="4" fill="var(--acc)"/><circle cx="126" cy="104" r="4" fill="var(--acc)"/><circle cx="166" cy="104" r="4" fill="var(--acc)"/>
+          <text x="80" y="94">1</text><text x="120" y="94">2</text><text x="160" y="94">3</text>
+        </g>
+      </svg>
+      <div class="row" style="justify-content:center; margin-top:6px">
+        <button class="btn primary big" id="b-ob-go">👍 <span data-i18n="ob_gotit">فهمت، لنبدأ</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= OVERLAY: SETTINGS ======= -->
+  <div class="overlay" id="pv-settings" role="dialog" aria-modal="true" aria-labelledby="set-title">
+    <div class="panel">
+      <div class="pv-head"><h2 id="set-title">⚙ <span data-i18n="set_title">الإعدادات</span></h2><button class="xbtn" id="b-set-x" aria-label="إغلاق — Close" data-i18n-aria="a_close">✕</button></div>
+      <div class="setrow"><div class="lbl"><span data-i18n="set_sound">الصوت</span></div>
+        <div class="seg" data-k="sound"><button data-v="1" data-i18n="on">مفعّل</button><button data-v="0" data-i18n="off">صامت</button></div></div>
+      <div class="setrow"><div class="lbl"><span data-i18n="set_motion">الحركة</span><small data-i18n="set_motion_d">الحركة الكاملة تتضمن اهتزاز الإشارات وتأثيرات السرب</small></div>
+        <div class="seg" data-k="motion"><button data-v="1" data-i18n="motion_full">كاملة</button><button data-v="0" data-i18n="motion_reduced">مخففة</button></div></div>
+      <div class="setrow"><div class="lbl"><span data-i18n="set_tempo">سرعة الإيقاع</span><small data-i18n="set_tempo_d">تُدمج مع إيقاع الموسم المطلوب في الرقصة</small></div>
+        <div class="seg" data-k="tempo"><button data-v="90" data-i18n="tempo_chill">هادئ 90</button><button data-v="110" data-i18n="tempo_steady">متوسط 110</button><button data-v="135" data-i18n="tempo_brisk">سريع 135</button></div></div>
+      <div class="setrow"><div class="lbl"><span data-i18n="set_assist">مساعدة القراءة</span><small data-i18n="set_assist_d">تُظهر السهم القادم كبيرًا قرب خط النقر</small></div>
+        <div class="seg" data-k="assist"><button data-v="1" data-i18n="on">مفعّل</button><button data-v="0" data-i18n="off">صامت</button></div></div>
+      <div class="setrow"><div class="lbl"><span data-i18n="set_theme">لوحة الألوان</span></div>
+        <div class="seg" data-k="theme"><button data-v="amber" data-i18n="theme_amber">عسلية</button><button data-v="green" data-i18n="theme_green">مرجية</button><button data-v="violet" data-i18n="theme_violet">غسقية</button></div></div>
+      <div class="setrow"><div class="lbl"><span data-i18n="set_touch">أدوات اللمس</span><small data-i18n="set_touch_d">لوحة الاتجاهات الثمانية وزر النبضة</small></div>
+        <div class="seg" data-k="touch"><button data-v="auto" data-i18n="touch_auto">تلقائي</button><button data-v="on" data-i18n="on">مفعّل</button><button data-v="off" data-i18n="off">صامت</button></div></div>
+      <div class="setrow"><div class="lbl"><span data-i18n="set_winter">بعد اليوم 90</span><small data-i18n="set_winter_d">الشتاء: صمُد على المخزون — أو وضع النقاط اللانهائي</small></div>
+        <div class="seg" data-k="winter"><button data-v="survive" data-i18n="winter_survive">شتاء حقيقي</button><button data-v="endless" data-i18n="winter_endless">نقاط لانهائية</button></div></div>
+      <div class="setrow"><div class="lbl"><span data-i18n="set_reset">تفريغ كل البيانات</span><small data-i18n="set_reset_d">يمسح التقدم والإنجازات والإعدادات نهائيًا</small></div>
+        <button class="btn warn" id="b-reset" data-i18n="set_reset_b">🗑️ تفريغ</button></div>
+    </div>
+  </div>
+
+  <!-- ======= OVERLAY: ABOUT ======= -->
+  <div class="overlay" id="pv-about" role="dialog" aria-modal="true" aria-labelledby="about-title">
+    <div class="panel">
+      <div class="pv-head"><h2 id="about-title">ⓘ <span data-i18n="about_title">عن مايسترو الخلية</span></h2><button class="xbtn" id="b-about-x" aria-label="إغلاق — Close" data-i18n-aria="a_close">✕</button></div>
+      <p data-i18n="about_pitch">أنتَ قائد فرقة الخلية: تعزف رقصة الاهتزاز على إيقاع دقيق لتوجيه جامعات الرحيق إلى حقول المرج، ثم تشاهد السربَ يطير على تصميمك الحرفي. نسبة فهم السرب لإشارتك تحدد كم نحلة تصل إلى الحقل الصحيح — والبطء أو التلعثم يُشوّش الخريطة. اجمع العسل، وسّع الخلية، وراقب الدبور… فالشتاء قادم.</p>
+      <h3 style="margin-top:12px" data-i18n="about_controls">التحكم الكامل</h3>
+      <ul class="ctrl-list">
+        <li><span class="key">↑ ↓ ← →</span><span class="key">W A S D</span><span data-i18n="c_dirs">إشارات الاتجاهات الأصلية على الضربة</span></li>
+        <li><span class="key">Q E Z C</span><span class="key">لوحة الأرقام</span><span data-i18n="c_diag">الاتجاهات القُطرية</span></li>
+        <li><span class="key">Space</span><span data-i18n="c_space">إطلاق مبكر للسرب / مراوغة الدبور</span></li>
+        <li><span class="key">Enter</span><span data-i18n="c_enter">تأكيد وزر الإجراء الرئيسي</span></li>
+        <li><span class="key">1 2 3</span><span data-i18n="c_slots">اختيار خانة رقصة في المرج</span></li>
+        <li><span class="key">Esc</span><span data-i18n="c_esc">إغلاق اللوحات / إطلاق مبكر أثناء الرقصة</span></li>
+        <li><span class="key">☝️</span><span data-i18n="c_pad">لوحة اللمس الثمانية وزر النبضة ♩ على الشاشة</span></li>
+      </ul>
+      <div class="row" style="margin-top:10px">
+        <button class="btn gold" id="b-ob-replay">📖 <span data-i18n="about_onboard_btn">إعادة عرض الشرح</span></button>
+      </div>
+      <p class="credit" data-i18n="credit">جزء من مجموعة «الأصيلة العشرة» — تعمل دون اتصال بالكامل</p>
+    </div>
+  </div>
+
+  <!-- ======= OVERLAY: SHORTCUTS ======= -->
+  <div class="overlay" id="pv-help" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="panel">
+      <div class="pv-head"><h2 id="help-title">⌨️ <span data-i18n="sc_title">اختصارات لوحة المفاتيح</span></h2><button class="xbtn" id="b-help-x" aria-label="إغلاق — Close" data-i18n-aria="a_close">✕</button></div>
+      <ul class="ctrl-list">
+        <li><span class="key">↑ / W</span><span data-i18n="sc_up">شمال — على الضربة</span></li>
+        <li><span class="key">→ / D</span><span data-i18n="sc_right">شرق</span></li>
+        <li><span class="key">↓ / S</span><span data-i18n="sc_down">جنوب</span></li>
+        <li><span class="key">← / A</span><span data-i18n="sc_left">غرب</span></li>
+        <li><span class="key">Q E Z C</span><span data-i18n="sc_diag">شمال‌غربي / شمال‌شرقي / جنوب‌غربي / جنوب‌شرقي</span></li>
+        <li><span class="key">Numpad 1-9</span><span data-i18n="sc_numpad">الاتجاهات الثمانية (5 فارغ)</span></li>
+        <li><span class="key">Space / ♩</span><span data-i18n="sc_space">إطلاق مبكر أو مراوغة الدبور</span></li>
+        <li><span class="key">Enter</span><span data-i18n="sc_enter">تأكيد</span></li>
+        <li><span class="key">1 / 2 / 3</span><span data-i18n="sc_slots">تمييز خانة رقصة (ثم Delete لإزالتها)</span></li>
+        <li><span class="key">Delete</span><span data-i18n="sc_del">إزالة الرقصة المحددة</span></li>
+        <li><span class="key">Esc</span><span data-i18n="sc_esc">إغلاق / رجوع</span></li>
+      </ul>
+      <p class="credit" data-i18n="sc_note">التقييم: ±100 ملي‌ثانية «مثالي» — ±200 «جيد» — وما بعد «فات».</p>
+    </div>
+  </div>
+
+  <!-- ======= OVERLAY: CONFIRM ======= -->
+  <div class="overlay" id="pv-confirm" role="dialog" aria-modal="true" aria-labelledby="cf-title">
+    <div class="panel" style="width:min(430px,94vw)">
+      <div class="pv-head"><h2 id="cf-title">—</h2></div>
+      <p class="mini" id="cf-body" style="font-size:14px">—</p>
+      <div class="row" style="justify-content:flex-end; margin-top:14px">
+        <button class="btn ghost" id="b-cf-cancel" data-i18n="cancel">إلغاء</button>
+        <button class="btn warn" id="b-cf-ok" data-i18n="yes">نعم، تابع</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= OVERLAY: WASP ENCOUNTER ======= -->
+  <div class="overlay" id="pv-wasp" role="alertdialog" aria-modal="true" aria-labelledby="wasp-title">
+    <div class="panel" style="width:min(380px,94vw)">
+      <h2 id="wasp-title" style="text-align:center">🐝⚠️ <span data-i18n="wasp_title">دبور في الطريق!</span></h2>
+      <svg viewBox="0 0 48 34" width="88" height="62" style="display:block; margin:2px auto" aria-hidden="true">
+        <ellipse cx="24" cy="20" rx="12" ry="7" fill="#ffd23f"/>
+        <path d="M16 14h16M14 20h20M16 26h16" stroke="#241a10" stroke-width="3.2"/>
+        <ellipse cx="24" cy="7" rx="9" ry="4" fill="#cfe8ff" opacity=".85"/>
+        <path d="M36 20l9-5M36 20l9 6" stroke="#241a10" stroke-width="2"/>
+        <circle cx="10.5" cy="17" r="2.6" fill="#241a10"/>
+      </svg>
+      <div id="wasp-ring"><button class="btn primary dodgebtn" id="b-dodge" data-i18n="wasp_dodge">مراوغة!</button></div>
+      <div id="wasp-bar"><i></i></div>
+      <p class="mini" data-i18n="wasp_hint">اضغط مسافة — أو زر النبضة ♩ — قبل أن يغلق الحلقة!</p>
+    </div>
+  </div>
+
+  <div id="banner" aria-hidden="true"><div class="in"><b id="banner-big">—</b><span id="banner-sub">—</span></div></div>
+  <div id="toasts" aria-live="polite"></div>
+</div>
+
+<script>
+'use strict';
+/* ================= 1. UTILITIES ================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const lerp=(a,b,k)=>a+(b-a)*k;
+const TAU=Math.PI*2, RAD=Math.PI/180;
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+const tf=(k,m)=>{let s=t(k); for(const x in m) s=s.split('{'+x+'}').join(m[x]); return s;};
+function mulberry32(a){return function(){a|=0; a=a+0x6D2B79F5|0; let x=Math.imul(a^a>>>15,1|a); x=x+Math.imul(x^x>>>7,61|x)^x; return((x^x>>>14)>>>0)/4294967296;};}
+let vtShift=0, hiddenAt=0;
+const vt=()=>performance.now()+vtShift; /* virtual clock: survives background pauses */
+
+/* ================= 2. SAFE STORAGE ================= */
+const store={mem:{},ok:false,init(){try{localStorage.setItem("_t1","1");localStorage.removeItem("_t1");this.ok=true}catch(e){this.ok=false}},get(k,d){try{if(this.ok){const v=localStorage.getItem(k);if(v!=null)return JSON.parse(v)}}catch(e){}return k in this.mem?this.mem[k]:d},set(k,v){try{if(this.ok){localStorage.setItem(k,JSON.stringify(v));return}}catch(e){}this.mem[k]=v}};
+store.init();
+
+/* ================= 3. I18N — ARABIC ================= */
+const I18N={ar:{
+appName:"مايسترو الخلية", tagline:"قُد السربَ بإيقاع رقصة الاهتزاز",
+a_back:"رجوع إلى الفهرس", a_settings:"الإعدادات", a_about:"حول", a_help:"الاختصارات", a_stats:"الإحصاءات", a_ach:"الإنجازات", a_close:"إغلاق",
+hud_day:"اليوم", hud_honey:"مخزون العسل", hud_bees:"عدد النحل", hud_integrity:"سلامة الخلية", hud_foragers:"جامعات اليوم",
+season0:"الربيع", season1:"الصيف", season2:"الخريف", season3:"الشتاء",
+weather_clear:"جو صافٍ", weather_rain:"مطر منعش — غلة ×1.2 لكن الإشارات تنحرف",
+dir0:"شمال", dir1:"شمال شرق", dir2:"شرق", dir3:"جنوب شرق", dir4:"جنوب", dir5:"جنوب غرب", dir6:"غرب", dir7:"شمال غرب",
+dshort0:"ش", dshort1:"ش‌ق", dshort2:"ق", dshort3:"ج‌ق", dshort4:"ج", dshort5:"ج‌غ", dshort6:"غ", dshort7:"ش‌غ",
+ring1:"الحلقة القريبة", ring2:"الحلقة الوسطى", ring3:"الحلقة البعيدة",
+hub_ops:"مهام اليوم", btn_plan:"إلى المرج — التخطيط للرقصات", btn_repair:"ترميم الخلية", btn_winterday:"🛌 نوم يوم شتوي",
+upg_title:"متجر الخلية", buy:"شراء", maxed:"مكتمل", lv:"المستوى",
+upg_smoke:"مبخرة الدخان", upg_smoke_d:"تزيد فرصة تبديد الدبور تلقائيًا (25٪ لكل مستوى)",
+upg_scout:"كشّافة إضافية", upg_scout_d:"تكشف حقلاً إضافيًا كل صباح",
+upg_assist:"نقرات العدّ", upg_assist_d:"أربع نقرات استعداد قبل كل رقصة مع عرض الأرقام",
+upg_wax:"أقراص الشمع", upg_wax_d:"نمو نحل إضافي +1 يوميًا لكل مستوى (دون الشتاء)",
+seed_label:"بذرة اليوم", hub_hint1:"راقب الدبور في الحلقات البعيدة — الغلة أكبر والخطر أكبر.",
+hub_hint2:"الإطلاق المبكر (مسافة) يوفر الوقت لكنه يُشوّش بقية الإشارة.",
+hub_hint3:"الترميم أرخص قبل أن تنخفض السلامة كثيرًا… لا تنتج.",
+hub_hint4:"الخريف يقصّر الأيام الخصبة — اخزن العسل مبكرًا.",
+hub_hint5:"كل ضربة «مثالية» ترفع نسبة الفهم أكثر من «جيدة».",
+hive_head_spring:"الخلية تفيق مع الربيع", hive_head_summer:"أيام الصيف المزدحمة", hive_head_autumn:"خريف الذهب الأخير", hive_head_winter:"الشتاء يكدّس الثلوج",
+hive_brief_spring:"زهور متنافرة في كل مكان — موسم النمو والتوسع.",
+hive_brief_summer:"الغلة ممتازة والدبور جائع — راقب السماء.",
+hive_brief_autumn:"آخر أزهار الموسم؛ الغلة تتراجع والدفء مطلوب.",
+hive_brief_winter:"لا رقص اليوم: العنقود يتذبذب حول الملكة وياكل من المخزون.",
+meadow_title:"المرج", field_sel:"حقل {n} — {dir}، {ring}", field_yield:"الغلة اليوم", unscouted:"غير مكتشَف (تقدير الحلقة: {lo}–{hi})", scouted_by:"عادت الكشافة",
+plan_head:"خانات الرقصات", btn_add:"أضف رقصة لهذا الحقل", btn_perform:"ابدأ الأداء", btn_backhive:"↩ عودة للخلية",
+meadow_hint:"اضغط حقلاً على الخريطة أو استخدم الأسهم للتنسيق. 1/2/3 لتمييز خانة ثم Delete لإزالتها.",
+plan_item:"خانة {i}: {dir} — {ring}", plan_full:"ثلاث رقصات كحد أقصى لليوم", plan_dup:"رقصت لهذا الحقل بالفعل", plan_need:"اختر حقلاً أولًا", plan_added:"أُضيفت رقصة إلى الخانة {i}", plan_removed:"أُزيلت الرقصة", plan_start_need:"أضف رقصة واحدة على الأقل",
+dance_title:"الرقصة {i} من {n}", dz_dance:"الرقصة", dz_target:"الهدف", dz_decode:"نسبة الفهم", dz_combo:"متتالية", btn_release:"إطلاق مبكر",
+dz_ready:"استعد… انطلق مع النقرات", dz_go:"ارقص! اتبع الأسهم على الضربة", dz_hint:"مثالي ±100ms • جيد ±200ms • مسافة = إطلاق مبكر",
+grade_perfect:"مثالي", grade_good:"جيد", grade_miss:"فات", grade_off:"خارج الضربة",
+res_title:"حصاد اليوم", res_dance_line:"↗ {dir} — {ring}: فهم {p}٪ • انطلقت {b} نحلة • +{h} 🍯",
+res_stray:"+{n} 🍯 من جامعات تاهت وعادت بخبيرها", res_rain:"المطر أخصب الأزهار: الغلة ×1.2",
+res_wasp_stung:"🐝‍⬛ دبور! خسرت {h} 🍯 و{b} نحل وتضررت السلامة {i}٪", res_wasp_smoked:"🪔 مبخرة الشمع أبعدت الدبور", res_wasp_dodged:"🌀 راوغتَ الدبور ببراعة!",
+res_upkeep:"الاستهلاك اليومي: −{c} 🍯", res_growth:"نمت المستعمرة: +{g} نحلة", res_nogrowth:"لا نمو اليوم — المخزون أو السلامة لا تسمح",
+res_total:"الوضع الآن: {h} 🍯 • {b} 🐝 • سلامة {i}٪", res_ach_head:"🏆 إنجاز جديد:", btn_nextday:"🌅 يوم جديد",
+wasp_title:"دبور في الطريق!", wasp_dodge:"مراوغة!", wasp_hint:"اضغط مسافة — أو زر النبضة ♩ — قبل أن يغلق الحلقة!",
+score:"النقاط", btn_restart:"خلية جديدة", btn_continue:"متابعة بلا نهاية",
+lose_winter_title:"المخزون نفد", lose_winter_reason:" بردَت الخلية جوعًا؛ العسل هو وقود المملكة الصغير.",
+lose_collapse_title:"انهارت الخلية", lose_collapse_reason:"تسارّت الكسور والفجوات حتى لم يعد بالإمكان احتمال السكن.",
+lose_swarm_title:"السرب تلاشى", lose_swarm_reason:"ما بقي من نحل يكفي لحمل اسم خلية.",
+lose_days:"أيام الصمود: {d}", lose_honey:"إجمالي العسل المجموع: {h}", lose_best:"أفضل نتيجة: {s} • أفضل صمود: {d} يوم",
+win_title:"نجونا! عُدنا من الشتاء", win_reason:"صمدت الخلية على مخزونها حتى عاد الربيع.",
+win_line:"أيام: {d} • عسل متبقٍ: {h} • نحل: {b}",
+st_title:"إحصاءات العمر", st_runs:"خلايا أدرتَها", st_days:"أيام عاشتها خلاياك", st_dances:"رقصات أدّيتها", st_perfects:"ضربات مثالية", st_honey:"عسل مجموع عبر العصور", st_decode:"أعلى نسبة فهم", st_wasps:"دبور مروَّغ", st_winters:"شتاء نُجي منه", st_best:"أفضل نتيجة",
+ach_title:"الإنجازات", ach_x_of_y:"{a} / {b}",
+ach_harvest:"الحصاد الأول", ach_harvest_d:"أكمل رقصة بنسبة فهم 50٪ فأكثر.",
+ach_perfect:"الرقصة المثالية", ach_perfect_d:"10 ضربات مثالية في رقصة واحدة.",
+ach_winter:"ناجي الشتاء", ach_winter_d:"عُد من الشتاء والخلية حية.",
+ach_h1000:"خزّان الألف", ach_h1000_d:"احتفظ بـ1000 عسل في المخزون دفعة واحدة.",
+ach_wasp:"راقص الدبور", ach_wasp_d:"راوغ 5 دبابير عبر حياتك.",
+ach_scout:"شيخ الكشافة", ach_scout_d:"اكشف 60 حقلاً عبر رحلتك.",
+ach_pop:"خلية مكتظة", ach_pop_d:"بلّغ عدد النحل 150.",
+ach_day30:"ثلاثون يومًا", ach_day30_d:"صمد حتى اليوم 30.",
+ach_dec:"إشارة حادة", ach_dec_d:"نسبة فهم 95٪ أو أكثر في رقصة واحدة.",
+ach_arch:"باني العظمى", ach_arch_d:"أكمل كل الترقيات إلى أقصاها.",
+set_title:"الإعدادات", set_sound:"الصوت", on:"مفعّل", off:"صامت",
+set_motion:"الحركة", set_motion_d:"الحركة الكاملة تتضمن اهتزاز الإشارات وتأثيرات السرب", motion_full:"كاملة", motion_reduced:"مخففة",
+set_tempo:"سرعة الإيقاع", set_tempo_d:"تُدمج مع إيقاع الموسم المطلوب في الرقصة", tempo_chill:"هادئ 90", tempo_steady:"متوسط 110", tempo_brisk:"سريع 135",
+set_assist:"مساعدة القراءة", set_assist_d:"تُظهر السهم القادم كبيرًا قرب خط النقر",
+set_theme:"لوحة الألوان", theme_amber:"عسلية", theme_green:"مرجية", theme_violet:"غسقية",
+set_touch:"أدوات اللمس", set_touch_d:"لوحة الاتجاهات الثمانية وزر النبضة", touch_auto:"تلقائي",
+set_winter:"بعد اليوم 90", set_winter_d:"الشتاء: صمُد على المخزون — أو وضع النقاط اللانهائي", winter_survive:"شتاء حقيقي", winter_endless:"نقاط لانهائية",
+set_reset:"تفريغ كل البيانات", set_reset_d:"يمسح التقدم والإنجازات والإعدادات نهائيًا", set_reset_b:"🗑️ تفريغ",
+cf_reset_title:"تفريغ كل شيء؟", cf_reset_body:"سيُمحى تقدمك وإنجازاتك وإعداداتك بلا رجعة. هل أنت متأكد؟",
+yes:"نعم، تابع", cancel:"إلغاء",
+about_title:"عن مايسترو الخلية",
+about_pitch:"أنتَ قائد فرقة الخلية: تعزف رقصة الاهتزاز على إيقاع دقيق لتوجيه جامعات الرحيق إلى حقول المرج، ثم تشاهد السربَ يطير على تصميمك الحرفي. نسبة فهم السرب لإشارتك تحدد كم نحلة تصل إلى الحقل الصحيح — والتلعثم يُشوّش الخريطة. اجمع العسل، وسّع الخلية، وراقب الدبور… فالشتاء قادم.",
+about_controls:"التحكم الكامل", c_dirs:"إشارات الاتجاهات الأصلية على الضربة", c_diag:"الاتجاهات القُطرية", c_space:"إطلاق مبكر للسرب / مراوغة الدبور", c_enter:"تأكيد وزر الإجراء الرئيسي", c_slots:"اختيار خانة رقصة في المرج", c_esc:"إغلاق اللوحات / إطلاق مبكر أثناء الرقصة", c_pad:"لوحة اللمس الثمانية وزر النبضة ♩ على الشاشة",
+about_onboard_btn:"إعادة عرض الشرح", credit:"جزء من مجموعة «الأصيلة العشرة» — تعمل دون اتصال بالكامل",
+ob_title:"أهلاً بك أيها المايسترو",
+ob_p1:"أنتَ مايسترو الخلية: أدِّ رقصة الاهتزاز على إيقاع النقرات لتُخبر جامعات الرحيق أين الرحيقُ الوفير.",
+ob_p2:"اختر حقولاً في المرج، اضغط الأسهم على الضربة الصحيحة، وسيطير السرب على مسارك تمامًا — واجمع العسل قبل أن يهاجم الدبور أو يأتي الشتاء.",
+ob_gotit:"فهمت، لنبدأ",
+sc_title:"اختصارات لوحة المفاتيح", sc_up:"شمال — على الضربة", sc_right:"شرق", sc_down:"جنوب", sc_left:"غرب", sc_diag:"الاتجاهات القُطرية الأربع", sc_numpad:"الاتجاهات الثمانية (5 فارغ)", sc_space:"إطلاق مبكر أو مراوغة الدبور", sc_enter:"تأكيد", sc_slots:"تمييز خانة رقصة (ثم Delete لإزالتها)", sc_del:"إزالة الرقصة المحددة", sc_esc:"إغلاق / رجوع", sc_note:"التقييم: ±100 ملي‌ثانية «مثالي» — ±200 «جيد» — وما بعدها «فات».",
+toast_saved:"حُفظ التقدم", toast_resumed:"استأنفنا خليتك من حيث تركتها", toast_newrun:"بدأت خلية جديدة — بالتوفيق أيها المايسترو!",
+toast_scout:"🧭 الكشافة عادت: كشفت {n} حقولًا اليوم", toast_repair:"🛠️ رُمّمت الخلية إلى 100٪", toast_no_honey:"العسل لا يكفي", toast_bought:"اشتريت: {n}", toast_maxed:"هذه الترقية مكتملة",
+toast_dance_slot:"خانة الرقصة {i} محددة", toast_no_slot:"لا رقصة في هذه الخانة", toast_season:"بدأ {s}!", toast_day:"اليوم {d}",
+toast_starving:"⚠️ المخزون يكفي أيامًا معدودة!", toast_integrity:"⚠️ سلامة الخلية منخفضة — رمّمها!",
+banner_winter_sub:"لا رقصات — صمد على المخزون", banner_spring_sub:"عاد الدفء وعاد الرحيق",
+a_pad:"لوحة الاتجاهات", a_beat:"نبضة", a_cv_meadow:"خريطة المرج الشعاعية", a_cv_dance:"مدرج الإيقاع المتحرك",
+num_bee:"نحلة", bees_word:"نحلة",
+},
+/* ================= 3b. I18N — ENGLISH ================= */
+en:{
+appName:"Hive Maestro", tagline:"Conduct the swarm with the waggle-dance beat",
+a_back:"Back to the hub", a_settings:"Settings", a_about:"About", a_help:"Shortcuts", a_stats:"Stats", a_ach:"Achievements", a_close:"Close",
+hud_day:"Day", hud_honey:"Honey stores", hud_bees:"Bee population", hud_integrity:"Hive integrity", hud_foragers:"Today's foragers",
+season0:"Spring", season1:"Summer", season2:"Autumn", season3:"Winter",
+weather_clear:"Clear skies", weather_rain:"Fresh rain — yield ×1.2 but cues drift",
+dir0:"North", dir1:"North East", dir2:"East", dir3:"South East", dir4:"South", dir5:"South West", dir6:"West", dir7:"North West",
+dshort0:"N", dshort1:"NE", dshort2:"E", dshort3:"SE", dshort4:"S", dshort5:"SW", dshort6:"W", dshort7:"NW",
+ring1:"Near ring", ring2:"Middle ring", ring3:"Far ring",
+hub_ops:"Today's tasks", btn_plan:"To the meadow — plan dances", btn_repair:"Repair the hive", btn_winterday:"🛌 Sleep through a winter day",
+upg_title:"Hive shop", buy:"Buy", maxed:"Maxed", lv:"Level",
+upg_smoke:"Smoke pot", upg_smoke_d:"Chance to auto-shoo wasps (+25% per level)",
+upg_scout:"Extra scout", upg_scout_d:"Reveals one more field every morning",
+upg_assist:"Count-in clicks", upg_assist_d:"Four count-in clicks before each dance, with numbers",
+upg_wax:"Wax combs", upg_wax_d:"+1 extra bee growth per level daily (not in winter)",
+seed_label:"Today's seed", hub_hint1:"Watch for wasps on far rings — bigger yield, bigger risk.",
+hub_hint2:"Early release (Space) saves time but garbles the rest of the signal.",
+hub_hint3:"Repairs are cheaper before integrity falls too low… don't wait.",
+hub_hint4:"Autumn shortens the fertile days — stock honey early.",
+hub_hint5:"Every «perfect» hit raises decode more than a «good» one.",
+hive_head_spring:"The hive wakes to spring", hive_head_summer:"Busy summer days", hive_head_autumn:"Autumn's last gold", hive_head_winter:"Winter piles the snow",
+hive_brief_spring:"Flowers everywhere — the season of growth and expansion.",
+hive_brief_summer:"Great yields and hungry wasps — watch the sky.",
+hive_brief_autumn:"The last blooms; yields taper and warmth is needed.",
+hive_brief_winter:"No dancing today: the cluster shivers around the queen and lives off stores.",
+meadow_title:"The Meadow", field_sel:"Field {n} — {dir}, {ring}", field_yield:"Today's yield", unscouted:"Unscouted (ring estimate: {lo}–{hi})", scouted_by:"Scouts visited",
+plan_head:"Dance slots", btn_add:"Add a dance for this field", btn_perform:"Start the performance", btn_backhive:"↩ Back to the hive",
+meadow_hint:"Tap a field on the map. 1/2/3 highlights a slot, Delete removes it.",
+plan_item:"Slot {i}: {dir} — {ring}", plan_full:"Three dances max per day", plan_dup:"You already planned this field", plan_need:"Select a field first", plan_added:"Dance added to slot {i}", plan_removed:"Dance removed", plan_start_need:"Add at least one dance",
+dance_title:"Dance {i} of {n}", dz_dance:"Dance", dz_target:"Target", dz_decode:"Decode", dz_combo:"Combo", btn_release:"Release early",
+dz_ready:"Get ready… start with the clicks", dz_go:"Dance! Follow the arrows on the beat", dz_hint:"Perfect ±100ms • Good ±200ms • Space = early release",
+grade_perfect:"Perfect", grade_good:"Good", grade_miss:"Miss", grade_off:"Offbeat",
+res_title:"Day Harvest", res_dance_line:"↗ {dir} — {ring}: decode {p}% • {b} bees flew • +{h} 🍯",
+res_stray:"+{n} 🍯 from strays that wandered home", res_rain:"Rain enriched the blooms: yield ×1.2",
+res_wasp_stung:"🐝‍⬛ Wasp! Lost {h} 🍯 and {b} bees, integrity −{i}%", res_wasp_smoked:"🪔 Your smoke pot shooed the wasp away", res_wasp_dodged:"🌀 You dodged the wasp brilliantly!",
+res_upkeep:"Daily upkeep: −{c} 🍯", res_growth:"Colony grew: +{g} bees", res_nogrowth:"No growth today — stores or integrity won't allow",
+res_total:"Now: {h} 🍯 • {b} 🐝 • integrity {i}%", res_ach_head:"🏆 New achievement:", btn_nextday:"🌅 New day",
+wasp_title:"Wasp on the route!", wasp_dodge:"Dodge!", wasp_hint:"Press Space — or the ♩ beat button — before the ring closes!",
+score:"Score", btn_restart:"New hive", btn_continue:"Continue endless",
+lose_winter_title:"Stores ran dry", lose_winter_reason:"The colony starved in the cold; honey is the kingdom's only fuel.",
+lose_collapse_title:"The hive collapsed", lose_collapse_reason:"Cracks and gaps compounded until the walls could hold no longer.",
+lose_swarm_title:"The swarm faded", lose_swarm_reason:"Too few bees remain to carry the name of a hive.",
+lose_days:"Days survived: {d}", lose_honey:"Total honey gathered: {h}", lose_best:"Best score: {s} • Best survival: {d} days",
+win_title:"We made it! Winter is over", win_reason:"The hive held on its stores until spring returned.",
+win_line:"Days: {d} • Honey left: {h} • Bees: {b}",
+st_title:"Lifetime stats", st_runs:"Hives conducted", st_days:"Days lived by your hives", st_dances:"Dances performed", st_perfects:"Perfect hits", st_honey:"Honey gathered across ages", st_decode:"Best decode", st_wasps:"Wasps dodged", st_winters:"Winters survived", st_best:"Best score",
+ach_title:"Achievements", ach_x_of_y:"{a} / {b}",
+ach_harvest:"First Harvest", ach_harvest_d:"Complete a dance with decode 50% or more.",
+ach_perfect:"Perfect Dance", ach_perfect_d:"10 perfect hits in a single dance.",
+ach_winter:"Winter Survivor", ach_winter_d:"Return from winter with the hive alive.",
+ach_h1000:"Honey 1000", ach_h1000_d:"Hold 1,000 honey in stores at once.",
+ach_wasp:"Wasp Dancer", ach_wasp_d:"Dodge 5 wasps in your career.",
+ach_scout:"Scout Master", ach_scout_d:"Reveal 60 fields across your journey.",
+ach_pop:"Full House", ach_pop_d:"Reach a population of 150 bees.",
+ach_day30:"Thirty Days", ach_day30_d:"Survive to day 30.",
+ach_dec:"Sharp Signal", ach_dec_d:"Reach decode 95% or more in one dance.",
+ach_arch:"Master Builder", arch_note:"", ach_arch_d:"Max out every upgrade.",
+set_title:"Settings", set_sound:"Sound", on:"On", off:"Off",
+set_motion:"Motion", set_motion_d:"Full motion includes cue drift and swarm effects", motion_full:"Full", motion_reduced:"Reduced",
+set_tempo:"Tempo", set_tempo_d:"Combined with the season's beat inside dances", tempo_chill:"Chill 90", tempo_steady:"Steady 110", tempo_brisk:"Brisk 135",
+set_assist:"Reading assist", set_assist_d:"Shows the upcoming arrow large near the hit line",
+set_theme:"Palette", theme_amber:"Hive amber", theme_green:"Meadow green", theme_violet:"Dusk violet",
+set_touch:"Touch controls", set_touch_d:"The 8-way pad and beat button", touch_auto:"Auto",
+set_winter:"After day 90", set_winter_d:"Winter: survive on stores — or endless score mode", winter_survive:"True winter", winter_endless:"Endless score",
+set_reset:"Reset all data", set_reset_d:"Wipes progress, achievements and settings permanently", set_reset_b:"🗑️ Reset",
+cf_reset_title:"Reset everything?", cf_reset_body:"Your progress, achievements and settings will be wiped beyond recovery. Are you sure?",
+yes:"Yes, continue", cancel:"Cancel",
+about_title:"About Hive Maestro",
+about_pitch:"You are the hive's dance conductor: perform waggle dances on the beat to tell your foragers where the nectar is — then watch the swarm fly your exact choreography. The swarm's decode of your signal decides how many bees reach the right field; stumbling garbles the map. Gather honey, grow the colony, mind the wasps… winter is coming.",
+about_controls:"Full controls", c_dirs:"Cardinal direction cues on the beat", c_diag:"The diagonal directions", c_space:"Early swarm release / wasp dodge", c_enter:"Confirm & primary action", c_slots:"Select a dance slot in the meadow", c_esc:"Close panels / early release mid-dance", c_pad:"On-screen 8-way pad and ♩ beat button",
+about_onboard_btn:"Replay the onboarding", credit:"Part of '10 Originals' — fully offline",
+ob_title:"Welcome, Maestro",
+ob_p1:"You are the hive's conductor: perform waggle dances on the beat to tell your foragers where the rich nectar is.",
+ob_p2:"Pick fields in the meadow, hit the arrow cues on the beat, and the swarm flies your exact choreography — gather honey before wasps strike or winter falls.",
+ob_gotit:"Got it, let's start",
+sc_title:"Keyboard shortcuts", sc_up:"North — on the beat", sc_right:"East", sc_down:"South", sc_left:"West", sc_diag:"The four diagonals", sc_numpad:"All eight directions (5 is empty)", sc_space:"Early release or wasp dodge", sc_enter:"Confirm", sc_slots:"Highlight a dance slot (then Delete removes it)", sc_del:"Remove the highlighted dance", sc_esc:"Close / back", sc_note:"Grading: ±100ms «perfect» — ±200ms «good» — beyond is a «miss».",
+toast_saved:"Progress saved", toast_resumed:"Resumed your hive where you left it", toast_newrun:"A new hive begins — good luck, Maestro!",
+toast_scout:"🧭 Scouts returned: {n} fields revealed today", toast_repair:"🛠️ Hive repaired to 100%", toast_no_honey:"Not enough honey", toast_bought:"Purchased: {n}", toast_maxed:"This upgrade is maxed",
+toast_dance_slot:"Dance slot {i} selected", toast_no_slot:"That slot is empty", toast_season:"{s} has begun!", toast_day:"Day {d}",
+toast_starving:"⚠️ Stores will last only a few days!", toast_integrity:"⚠️ Hive integrity is low — repair it!",
+banner_winter_sub:"No dances — survive on stores", banner_spring_sub:"Warmth and nectar return",
+a_pad:"Direction pad", a_beat:"Beat", a_cv_meadow:"Radial meadow map", a_cv_dance:"Scrolling beat staff",
+num_bee:"bee", bees_word:"bees",
+}};
+/* ================= 4. LANGUAGE & THEME ================= */
+let lang=store.get('hive_lang','ar');
+if(lang!=='ar'&&lang!=='en')lang='ar';
+const t=k=>(I18N[lang]&&I18N[lang][k])??I18N.en[k]??k;
+const COL={};
+function refreshCols(){
+  const cs=getComputedStyle(document.body);
+  for(const [k,p] of Object.entries({acc:'--acc',acc2:'--acc2',ink:'--ink',muted:'--muted',panel:'--panel',panel2:'--panel2',bg:'--bg',danger:'--danger',line:'--line'})) COL[k]=cs.getPropertyValue(p).trim()||'#ffc93c';
+  COL.accRGB=COL.acc.startsWith('#')?hexRGB(COL.acc):[255,201,60];
+  COL.greenRGB=COL.acc2.startsWith('#')?hexRGB(COL.acc2):[143,200,102];
+}
+function hexRGB(h){h=h.replace('#',''); if(h.length===3)h=h.split('').map(c=>c+c).join(''); const n=parseInt(h,16); return[(n>>16)&255,(n>>8)&255,n&255];}
+const rgba=(rgb,a)=>`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.documentElement.dir=(lang==='ar')?'rtl':'ltr';
+  $$('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
+  $$('[data-i18n-aria]').forEach(el=>{el.setAttribute('aria-label',t(el.dataset.i18nAria));});
+  $('#b-lang').textContent=(lang==='ar')?'EN / عربي':'عربي / EN';
+  $('#cv-meadow').setAttribute('aria-label',t('a_cv_meadow'));
+  $('#cv-dance').setAttribute('aria-label',t('a_cv_dance'));
+  $$('.pbtn.dir').forEach(b=>{const d=+b.dataset.d; b.setAttribute('aria-label',t('dir'+d));});
+  refreshDynamic();
+}
+function setLang(l){lang=l; store.set('hive_lang',l); applyLang(); refreshCols();}
+
+/* ================= 5. SETTINGS ================= */
+const DEFS={sound:1,motion:1,tempo:110,assist:1,theme:'amber',touch:'auto',winter:'survive'};
+let S=Object.assign({},DEFS,store.get('hive_settings',{}));
+if(![90,110,135].includes(S.tempo))S.tempo=110;
+const saveS=()=>store.set('hive_settings',S);
+function applyTheme(){document.body.dataset.theme=S.theme; refreshCols();}
+function applyMotion(){document.body.dataset.motion=(S.motion&&motionMediaOk())?'full':'reduced';}
+function motionMediaOk(){try{return !matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){return true;}}
+function applyTouch(){
+  let on;
+  if(S.touch==='on')on=true; else if(S.touch==='off')on=false;
+  else{try{on=matchMedia('(pointer: coarse)').matches||('ontouchstart' in window);}catch(e){on=false;}}
+  document.body.classList.toggle('pad-on',!!on);
+}
+function applyAllSettings(){applyTheme(); applyMotion(); applyTouch(); AU.setMute(!S.sound);}
+function setSetting(k,v){
+  S[k]=v; saveS();
+  if(k==='sound'){AU.setMute(!v);}
+  else if(k==='theme')applyTheme();
+  else if(k==='motion')applyMotion();
+  else if(k==='touch')applyTouch();
+  renderSettings();
+}
+
+/* ================= 6. ACHIEVEMENTS & LIFETIME STATS ================= */
+const ACH=[
+  {id:'harvest', ic:'🍯'},
+  {id:'perfect', ic:'🎯'},
+  {id:'winter',  ic:'❄️'},
+  {id:'h1000',   ic:'🏺'},
+  {id:'wasp',    ic:'🛡️'},
+  {id:'scout',   ic:'🧭'},
+  {id:'pop',     ic:'👑'},
+  {id:'day30',   ic:'🌅'},
+  {id:'dec',     ic:'⚡'},
+  {id:'arch',    ic:'🛠️'},
+];
+const STAT_DEFS={runs:0,days:0,dances:0,perfects:0,honey:0,decode:0,wasps:0,winters:0,reveals:0};
+let ACHV=store.get('hive_ach',{});
+let STATS=Object.assign({},STAT_DEFS,store.get('hive_stats',{}));
+let BEST=store.get('hive_best',{score:0,days:0,decode:0});
+const saveMeta=()=>{store.set('hive_ach',ACHV); store.set('hive_stats',STATS); store.set('hive_best',BEST);};
+let todayAch=[];
+function unlock(id){
+  if(ACHV[id])return;
+  ACHV[id]=1; saveMeta();
+  const def=ACH.find(a=>a.id===id);
+  toast(def.ic+' '+t('res_ach_head')+' '+t('ach_'+id));
+  todayAch.push({ic:def.ic,id});
+  sChime();
+  if(PH==='ach')renderAch();
+}
+
+/* ================= 7. RUN STATE ================= */
+const SECTORS=8, RINGS=3, NFIELDS=24, SEASON_DAYS=30, WINTER_LEN=12;
+const SEASONS=[
+  {ic:'🌸', mul:1.15, rain:.22, growth:3, waspMul:.9},
+  {ic:'☀️', mul:1.0,  rain:.10, growth:2, waspMul:1.0},
+  {ic:'🍂', mul:.85,  rain:.20, growth:1, waspMul:1.35},
+  {ic:'❄️', mul:0,    rain:0,   growth:0, waspMul:0},
+];
+const RING_YIELD=[[3,5],[5,8],[8,12]];
+const UPG=[
+  {k:'smoke',  ic:'🪔', max:3, cost:l=>60+l*55},
+  {k:'scoutsB',ic:'🧭', max:2, cost:l=>50+l*70},
+  {k:'assistB',ic:'🎵', max:1, cost:()=>45},
+  {k:'wax',    ic:'🐝', max:2, cost:l=>40+l*45},
+];
+let R=null;
+let PH='hub';           /* hub | meadow | dance | flight | results | lose | win | stats | ach */
+let FLD=[];             /* today's 24 fields (volatile) */
+let WEATHER=0;          /* 0 clear, 1 rain */
+let DAYRNG=null;
+function newRun(){
+  R={v:1, seed:(Math.random()*1e9)>>>0, day:1, honey:24, bees:64, integ:100,
+     smoke:0, scoutsB:0, assistB:0, wax:0, revealed:[], plans:[], weather:0,
+     earnedTotal:0, winterDay:0, endlessRun:false, winterEnd:102, over:false, lastDances:[], strays:0, waspLog:[], slotSel:0};
+}
+function saveRun(){if(R&&!R.over)store.set('hive_run',R);}
+function loadRun(){
+  const r=store.get('hive_run',null);
+  if(r&&r.v===1&&!r.over){R=r; return true;}
+  return false;
+}
+function seasonOfDay(d){
+  if(R&&R.endlessRun) return Math.floor(((((d-R.winterEnd-1)%90)+90)%90)/SEASON_DAYS);
+  return d<=90?Math.min(2,Math.floor((d-1)/SEASON_DAYS)):3;
+}
+function dailyConsumption(){const c=2+R.bees*.05; return Math.round(seasonOfDay(R.day)===3&&!R.endlessRun?c*1.4:c);}
+function foragerCount(){return Math.max(6,Math.min(48,Math.floor(R.bees*.45)));}
+function genDay(){
+  DAYRNG=mulberry32(((R.seed^Math.imul(R.day,2654435761))>>>0));
+  const s=seasonOfDay(R.day);
+  FLD=[];
+  for(let i=0;i<NFIELDS;i++){
+    const ring=Math.floor(i/SECTORS), lo=RING_YIELD[ring][0], hi=RING_YIELD[ring][1];
+    FLD.push({id:i, ring, sec:i%SECTORS, y:Math.max(1,Math.round(lerp(lo,hi,DAYRNG())*SEASONS[s].mul))});
+  }
+  WEATHER=(s<3&&DAYRNG()<SEASONS[s].rain)?1:0;
+  R.weather=WEATHER;
+}
+function revealFields(){
+  const n=3+R.scoutsB;
+  const pool=FLD.map(f=>f.id);
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(DAYRNG()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]];}
+  R.revealed=pool.slice(0,n);
+  STATS.reveals+=n;
+  if(STATS.reveals>=60)unlock('scout');
+}
+function startDay(n){
+  R.day=n; R.plans=[]; R.slotSel=0;
+  R.lastDances=[]; R.strays=0; R.waspLog=[]; todayAch=[];
+  STATS.days++;
+  if(n>=30)unlock('day30');
+  const prevS=(n>1)?seasonOfDay(n-1):-1, s=seasonOfDay(n);
+  genDay();
+  if(s===3&&!R.endlessRun){R.winterDay=(n-90)||R.winterDay;}
+  else R.winterDay=0;
+  revealFields();
+  if(s!==prevS&&s===3&&!R.endlessRun){showBanner('❄️ '+t('season3'),t('banner_winter_sub')); sAlarm();}
+  else if(s!==prevS&&n>1){showBanner(SEASONS[s].ic+' '+t('season'+s),t('banner_spring_sub')); sChime();}
+  if(s<3)toast(tf('toast_scout',{n:3+R.scoutsB}));
+  if(R.honey<dailyConsumption()*4)toast(t('toast_starving'),true);
+  if(R.integ<35)toast(t('toast_integrity'),true);
+  saveRun();
+  updateHUD();
+  go('hub'); renderHive();
+}
+
+/* ================= 8. AUDIO ENGINE (Web Audio synth) ================= */
+const AU={
+  ctx:null, master:null,
+  ensure(){
+    if(this.ctx)return true;
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC)return false;
+      this.ctx=new AC();
+      this.master=this.ctx.createGain();
+      this.master.gain.value=S.sound?.5:0;
+      this.master.connect(this.ctx.destination);
+    }catch(e){this.ctx=null; return false;}
+    return true;
+  },
+  setMute(m){if(this.master)this.master.gain.value=m?0:.5;},
+  t(){return this.ctx?this.ctx.currentTime:0;},
+  /* osc + gain envelope helper. at = absolute ctx time (or relative secs if rel) */
+  osc({f=440,f2=null,type='sine',dur=.15,vol=.4,at=0,curve=.0001,filter=null}={}){
+    if(!this.ctx)return;
+    const c=this.ctx, o=c.createOscillator(), g=c.createGain();
+    o.type=type; o.frequency.setValueAtTime(f,at);
+    if(f2!==null)o.frequency.exponentialRampToValueAtTime(Math.max(20,f2),at+dur);
+    g.gain.setValueAtTime(0,at);
+    g.gain.linearRampToValueAtTime(vol,at+Math.min(.02,dur*.25));
+    g.gain.exponentialRampToValueAtTime(curve,at+dur);
+    let node=o;
+    if(filter){const fl=c.createBiquadFilter(); fl.type=filter.type||'lowpass'; fl.frequency.value=filter.f||800; if(filter.q)fl.Q.value=filter.q; o.connect(fl); node=fl;}
+    node.connect(g); g.connect(this.master);
+    o.start(at); o.stop(at+dur+.05);
+  },
+  noise({dur=.06,vol=.3,at=0,f=1800,q=1.2}={}){
+    if(!this.ctx)return;
+    const c=this.ctx, len=Math.max(1,Math.floor(c.sampleRate*dur));
+    const buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
+    const src=c.createBufferSource(); src.buffer=buf;
+    const fl=c.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=f; fl.Q.value=q;
+    const g=c.createGain(); g.gain.value=vol;
+    src.connect(fl); fl.connect(g); g.connect(this.master);
+    src.start(at);
+  },
+  now(){return this.ctx?this.ctx.currentTime:performance.now()/1000;}
+};
+function sTick(at){ /* metronome wood tick */
+  if(!AU.ctx)return;
+  AU.osc({f:920,f2:420,type:'triangle',dur:.045,vol:.28,at});
+  AU.noise({dur:.03,vol:.22,at,f:2400,q:.9});
+}
+function sClick(at){ /* count-in click */
+  if(!AU.ctx)return;
+  AU.osc({f:1250,type:'sine',dur:.05,vol:.3,at});
+}
+function sPluck(good){ /* correct cue pluck: perfect brighter than good */
+  if(!AU.ctx)return;
+  const at=AU.now();
+  AU.osc({f:good?590:780,f2:good?560:760,type:'triangle',dur:.13,vol:.4,at});
+  AU.osc({f:good?1180:1560,type:'sine',dur:.07,vol:.12,at});
+}
+function sBuzz(){ /* swarm release swell */
+  if(!AU.ctx)return;
+  const c=AU.ctx, at=AU.now(), dur=.9;
+  const o1=c.createOscillator(), o2=c.createOscillator(), g=c.createGain(), fl=c.createBiquadFilter();
+  o1.type='sawtooth'; o2.type='sawtooth';
+  o1.frequency.setValueAtTime(150,at); o2.frequency.setValueAtTime(163,at);
+  fl.type='lowpass'; fl.frequency.setValueAtTime(320,at); fl.frequency.linearRampToValueAtTime(900,at+dur*.5);
+  g.gain.setValueAtTime(0,at);
+  g.gain.linearRampToValueAtTime(.32,at+dur*.4);
+  g.gain.linearRampToValueAtTime(0,at+dur);
+  const lfo=c.createOscillator(), lg=c.createGain();
+  lfo.frequency.value=27; lg.gain.value=.1;
+  lfo.connect(lg); lg.connect(g.gain);
+  o1.connect(fl); o2.connect(fl); fl.connect(g); g.connect(AU.master);
+  o1.start(at); o2.start(at); lfo.start(at);
+  o1.stop(at+dur+.05); o2.stop(at+dur+.05); lfo.stop(at+dur+.05);
+}
+function sAlarm(){ /* wasp alarm */
+  if(!AU.ctx)return;
+  const at=AU.now();
+  AU.osc({f:470,type:'square',dur:.42,vol:.16,at,filter:{type:'lowpass',f:1400}});
+  AU.osc({f:496,type:'square',dur:.42,vol:.14,at,filter:{type:'lowpass',f:1400}});
+  AU.osc({f:740,f2:520,type:'sine',dur:.42,vol:.1,at});
+}
+function sThud(){ if(!AU.ctx)return; AU.osc({f:130,f2:64,type:'sine',dur:.1,vol:.35,at:AU.now()}); }
+function sChime(){ if(!AU.ctx)return; const at=AU.now(); AU.osc({f:880,type:'sine',dur:.3,vol:.22,at}); AU.osc({f:1318,type:'sine',dur:.42,vol:.16,at:at+.09}); }
+function sUI(){ if(!AU.ctx)return; AU.osc({f:660,f2:640,type:'sine',dur:.05,vol:.12,at:AU.now()}); }
+/* ================= 9. TOASTS / PANELS / BANNER ================= */
+function toast(msg,bad){
+  const box=$('#toasts');
+  while(box.children.length>=3)box.firstChild.remove();
+  const el=document.createElement('div');
+  el.className='toast'+(bad?' bad':''); el.textContent=msg;
+  box.appendChild(el);
+  setTimeout(()=>el.remove(),2750);
+}
+const PANELS=['pv-onboard','pv-settings','pv-about','pv-help','pv-confirm','pv-wasp'];
+function openPanel(id){$('#'+id).classList.add('on');}
+function closePanel(id){$('#'+id).classList.remove('on');}
+function topPanel(){for(let i=PANELS.length-1;i>=0;i--){if($('#'+PANELS[i]).classList.contains('on'))return PANELS[i];}return null;}
+function anyPanelOpen(){return !!topPanel();}
+let confirmCb=null;
+function showConfirm(titleKey,bodyKey,cb){
+  $('#cf-title').textContent=t(titleKey);
+  $('#cf-body').textContent=t(bodyKey);
+  confirmCb=cb; openPanel('pv-confirm');
+  $('#b-cf-ok').focus();
+}
+function showBanner(big,sub){
+  const b=$('#banner');
+  $('#banner-big').textContent=big; $('#banner-sub').textContent=sub;
+  b.classList.remove('on'); void b.offsetWidth; b.classList.add('on');
+  setTimeout(()=>b.classList.remove('on'),2150);
+}
+
+/* ================= 10. NAVIGATION & DYNAMIC RENDER ================= */
+function go(phase){
+  PH=phase;
+  $$('.screen').forEach(s=>s.classList.remove('on'));
+  const map={hub:'scr-hive',meadow:'scr-meadow',dance:'scr-dance',flight:'scr-meadow',results:'scr-results',lose:'scr-lose',win:'scr-win',stats:'scr-stats',ach:'scr-ach'};
+  const el=$('#'+map[phase]); if(el)el.classList.add('on');
+  refreshDynamic();
+}
+function refreshDynamic(){
+  updateHUD();
+  if(PH==='hub')renderHive();
+  else if(PH==='meadow'||PH==='flight'){renderMeadowSide();}
+  else if(PH==='results'){renderResults();}
+  else if(PH==='lose'){renderLose();}
+  else if(PH==='win'){renderWin();}
+  else if(PH==='stats'){renderStats();}
+  else if(PH==='ach'){renderAch();}
+  else if(PH==='dance'){renderDanceHud();}
+}
+function updateHUD(){
+  if(!R)return;
+  const s=seasonOfDay(R.day);
+  $('#hv-day').textContent=R.day;
+  $('#hv-season').textContent=t('season'+s);
+  $('#hv-semj').textContent=SEASONS[s].ic;
+  $('#hv-honey').textContent=fmt(R.honey);
+  $('#hv-bees').textContent=fmt(R.bees);
+  $('#hv-integ').textContent=Math.round(R.integ);
+  $('#pill-integ').classList.toggle('warn',R.integ<35);
+  $('#bs-honey').classList.toggle('low',R.honey<20);
+  $('#bs-bees').classList.toggle('low',R.bees<15);
+  $('#bs-integ').classList.toggle('low',R.integ<35);
+  const bh=$('#bs-honey b'), bb=$('#bs-bees b'), bi=$('#bs-integ b'), bf=$('#bs-forg b');
+  if(bh)bh.textContent=fmt(R.honey);
+  if(bb)bb.textContent=fmt(R.bees);
+  if(bi)bi.textContent=Math.round(R.integ);
+  if(bf)bf.textContent=foragerCount();
+}
+
+/* ================= 11. HIVE HUB ================= */
+function renderHive(){
+  if(!R)return;
+  const s=seasonOfDay(R.day), winter=s===3&&!R.endlessRun;
+  $('#hive-emj').textContent=SEASONS[s].ic;
+  $('#hive-headline').textContent=t('hive_head_'+['spring','summer','autumn','winter'][s]);
+  $('#hive-brief').textContent=(WEATHER?t('weather_rain')+' ':'')+t('hive_brief_'+['spring','summer','autumn','winter'][s]);
+  $('#repair-cost').textContent='(' + fmt(repairCost()) + ' 🍯)';
+  $('#b-repair').disabled=R.integ>=99.5||R.honey<repairCost();
+  $('#b-meadow').disabled=winter;
+  $('#winterbox').classList.toggle('hidden',!winter);
+  if(winter){
+    const left=WINTER_LEN-(R.day-90);
+    $('#winter-title').textContent=t('season3')+' — '+tf('lose_days',{d:left});
+    $('#winter-info').textContent=t('hive_brief_winter')+' '+tf('res_upkeep',{c:fmt(dailyConsumption())})+' • '+tf('res_total',{h:fmt(R.honey),b:fmt(R.bees),i:Math.round(R.integ)});
+  }
+  renderUpg();
+  $('#seed-label').textContent=t('seed_label')+': '+(R.seed%10000);
+  $('#weather-line').textContent=(s<3)?((WEATHER?'🌧️ ':'☀️ ')+t(WEATHER?'weather_rain':'weather_clear')):t('season3');
+  const hints=['hub_hint1','hub_hint2','hub_hint3','hub_hint4','hub_hint5'];
+  $('#hive-hint').textContent='💡 '+t(hints[R.day%hints.length]);
+}
+function repairCost(){return Math.max(0,Math.ceil((100-R.integ)*.8));}
+function doRepair(){
+  const c=repairCost();
+  if(R.integ>=99.5)return;
+  if(R.honey<c){toast(t('toast_no_honey'),true); sThud(); return;}
+  R.honey-=c; R.integ=100;
+  toast(t('toast_repair')); sChime();
+  saveRun(); updateHUD(); renderHive();
+}
+function renderUpg(){
+  const box=$('#upg-list'); if(!box)return;
+  box.textContent='';
+  for(const u of UPG){
+    const lvl=R[u.k]||0, row=document.createElement('div'); row.className='upg';
+    const ic=document.createElement('span'); ic.className='ic'; ic.textContent=u.ic;
+    const nm=document.createElement('div'); nm.className='nm';
+    const b=document.createElement('b'); b.textContent=t('upg_'+u.k);
+    const small=document.createElement('small'); small.textContent=t('upg_'+u.k+'_d');
+    nm.append(b,small);
+    const pips=document.createElement('span'); pips.className='pips';
+    for(let i=0;i<u.max;i++){const p=document.createElement('span'); p.className='pip'+(i<lvl?' on':''); pips.appendChild(p);}
+    const btn=document.createElement('button'); btn.className='btn';
+    if(lvl>=u.max){btn.textContent=t('maxed'); btn.disabled=true;}
+    else{btn.textContent=t('buy')+' '+fmt(u.cost(lvl))+' 🍯'; btn.disabled=R.honey<u.cost(lvl); btn.addEventListener('click',()=>buyUpg(u.k));}
+    row.append(ic,nm,pips,btn);
+    box.appendChild(row);
+  }
+}
+function buyUpg(k){
+  const u=UPG.find(x=>x.k===k); if(!u)return;
+  const lvl=R[k]||0;
+  if(lvl>=u.max){toast(t('toast_maxed'),true); return;}
+  const c=u.cost(lvl);
+  if(R.honey<c){toast(t('toast_no_honey'),true); sThud(); return;}
+  R.honey-=c; R[k]=lvl+1;
+  toast(tf('toast_bought',{n:t('upg_'+k)})); sChime();
+  if(UPG.every(x=>(R[x.k]||0)>=x.max))unlock('arch');
+  checkHoneyAch();
+  saveRun(); updateHUD(); renderHive();
+}
+function checkHoneyAch(){if(R.honey>=1000)unlock('h1000');}
+
+/* ================= 12. WINTER / LOSE / WIN ================= */
+function calcScore(){return Math.max(0,Math.round(R.earnedTotal+R.day*8+R.bees));}
+let LAST_END=null;
+function doLose(reason){
+  const sc=calcScore(), nb=sc>BEST.score;
+  BEST.score=Math.max(BEST.score,sc); BEST.days=Math.max(BEST.days,R.day);
+  R.over=true; store.set('hive_run',null); saveMeta();
+  LAST_END={type:'lose',reason,sc,nb};
+  sAlarm(); go('lose');
+}
+function renderLose(){
+  if(!LAST_END)return;
+  $('#lose-title').textContent=t('lose_'+LAST_END.reason+'_title');
+  $('#lose-reason').textContent=t('lose_'+LAST_END.reason+'_reason');
+  const box=$('#lose-body'); box.textContent='';
+  for(const [k,m] of [['lose_days',{d:R.day}],['lose_honey',{h:fmt(R.earnedTotal)}]]){
+    const p=document.createElement('p'); p.className='statline';
+    p.textContent=tf(k,m); box.appendChild(p);
+  }
+  $('#lose-score').textContent=fmt(LAST_END.sc);
+  $('#lose-best').textContent=tf('lose_best',{s:fmt(BEST.score),d:BEST.days})+(LAST_END.nb?' 🌟':'');
+}
+function winterAdvance(){
+  const c=dailyConsumption();
+  R.honey-=c;
+  updateHUD();
+  if(R.honey<0){R.honey=0; doLose('winter'); return;}
+  if(R.day-90>=WINTER_LEN){victory(); return;}
+  sTick(AU.now());
+  toast(tf('res_upkeep',{c:fmt(c)})+' — '+tf('lose_days',{d:WINTER_LEN-(R.day-90)}));
+  R.day++; R.winterDay=R.day-90;
+  saveRun(); renderHive(); updateHUD();
+}
+function victory(){
+  unlock('winter'); STATS.winters++;
+  const sc=calcScore(), nb=sc>BEST.score;
+  BEST.score=Math.max(BEST.score,sc); BEST.days=Math.max(BEST.days,R.day);
+  R.winPending=true; saveMeta(); saveRun();
+  LAST_END={type:'win',sc,nb};
+  sChime(); go('win');
+}
+function renderWin(){
+  if(!LAST_END)return;
+  const box=$('#win-body'); box.textContent='';
+  const p=document.createElement('p'); p.className='statline';
+  p.textContent=tf('win_line',{d:R.day,h:fmt(R.honey),b:fmt(R.bees)});
+  box.appendChild(p);
+  $('#win-score').textContent=fmt(LAST_END.sc);
+}
+function continueEndless(){
+  R.winPending=false; R.endlessRun=true; R.winterEnd=R.day; LAST_END=null;
+  saveRun(); startDay(R.day+1);
+}
+
+/* ================= 13. RESULTS SCREEN ================= */
+function renderResults(){
+  const box=$('#res-body'); box.textContent='';
+  const add=(txt,cls)=>{
+    const p=document.createElement('p'); p.className='statline'+(cls?' '+cls:'');
+    p.textContent=txt; box.appendChild(p); return p;
+  };
+  for(const d of R.lastDances) add(tf('res_dance_line',{dir:t('dir'+d.dir),ring:t('ring'+(d.ring+1)),p:d.decode,b:d.depart,h:fmt(d.honey)}));
+  if(R.strays>0)add(tf('res_stray',{n:fmt(R.strays)}));
+  for(const w of R.waspLog)add(w,false&&'neg');
+  if(WEATHER)add(t('res_rain'));
+  const ups=R.dayUps||[];
+  for(const u of ups)add(u);
+  if(todayAch.length){
+    const h=document.createElement('p'); h.className='mini'; h.style.color='var(--acc)';
+    h.textContent=todayAch.map(a=>a.ic+' '+t('ach_'+a.id)).join(' • ');
+    $('#res-ach').textContent=''; $('#res-ach').appendChild(h);
+  } else $('#res-ach').textContent='';
+}
+function nextDay(){startDay(R.day+1);}
+
+/* ================= 14. STATS & ACHIEVEMENTS SCREENS ================= */
+function renderStats(){
+  const box=$('#stats-body'); box.textContent='';
+  const rows=[
+    ['st_runs',STATS.runs],['st_days',fmt(STATS.days)],['st_dances',fmt(STATS.dances)],
+    ['st_perfects',fmt(STATS.perfects)],['st_honey',fmt(STATS.honey)],['st_decode',STATS.decode+'%'],
+    ['st_wasps',STATS.wasps],['st_winters',STATS.winters],['st_best',fmt(BEST.score)],
+  ];
+  for(const [k,v] of rows){
+    const p=document.createElement('div'); p.className='statline';
+    const a=document.createElement('span'); a.textContent=t(k);
+    const b=document.createElement('b'); b.textContent=v;
+    p.append(a,b); box.appendChild(p);
+  }
+}
+function renderAch(){
+  const got=ACH.filter(a=>ACHV[a.id]).length;
+  $('#ach-count').textContent=tf('ach_x_of_y',{a:got,b:ACH.length});
+  const box=$('#ach-list'); box.textContent='';
+  for(const a of ACH){
+    const row=document.createElement('div'); row.className='achrow'+(ACHV[a.id]?' got':'');
+    const ic=document.createElement('span'); ic.className='ic'; ic.textContent=a.ic; ic.setAttribute('aria-hidden','true');
+    const nm=document.createElement('div'); nm.className='nm';
+    const b=document.createElement('b'); b.textContent=t('ach_'+a.id);
+    const small=document.createElement('small'); small.textContent=t('ach_'+a.id+'_d');
+    nm.append(b,small); row.append(ic,nm); box.appendChild(row);
+  }
+}
+
+/* ================= 15. SETTINGS RENDER ================= */
+function renderSettings(){
+  $$('#pv-settings .seg').forEach(seg=>{
+    const k=seg.dataset.k;
+    seg.querySelectorAll('button').forEach(btn=>{
+      let v=btn.dataset.v;
+      if(v==='1'||v==='0')v=+v;
+      else if(!isNaN(+v)&&k==='tempo')v=+v;
+      btn.classList.toggle('sel',S[k]===v);
+    });
+  });
+}
+/* ================= 16. MEADOW: PLANNING ================= */
+Object.assign(I18N.ar,{
+fl_badge:"السرب في الجو…", fl_launch:"🚀 انطلق السرب نحو {dir}",
+fl_note:"النحل المتاهة يتجه إلى الحقول المجاورة بغلة أقل",
+fl_plus:"+{h} 🍯", plan_badge:"الرقصات: {n}/3",
+});
+Object.assign(I18N.en,{
+fl_badge:"The swarm is airborne…", fl_launch:"🚀 Swarm launched toward {dir}",
+fl_note:"Wandering bees head for adjacent fields at lower yield",
+fl_plus:"+{h} 🍯", plan_badge:"Dances: {n}/3",
+});
+let SEL=-1;
+function openMeadow(){
+  if(seasonOfDay(R.day)===3&&!R.endlessRun){go('hub'); renderHive(); return;}
+  go('meadow'); renderMeadowSide();
+}
+function fieldInfoText(){
+  if(SEL<0)return '👆 '+t('meadow_hint');
+  const f=FLD[SEL], scouted=R.revealed.includes(f.id);
+  let s='<b>'+tf('field_sel',{n:f.id+1,dir:t('dir'+f.sec),ring:t('ring'+(f.ring+1))})+'</b><br>';
+  if(scouted){
+    s+=t('field_yield')+': <b>'+fmt(f.y)+' 🍯</b> • '+t('scouted_by');
+  }else{
+    const s2=seasonOfDay(R.day);
+    const lo=Math.max(1,Math.round(RING_YIELD[f.ring][0]*SEASONS[s2].mul));
+    const hi=Math.max(1,Math.round(RING_YIELD[f.ring][1]*SEASONS[s2].mul));
+    s+=t('unscouted').replace('{lo}',lo).replace('{hi}',hi);
+  }
+  const pi=R.plans.findIndex(p=>p.field===SEL);
+  if(pi>=0)s+='<br>🎶 '+tf('plan_item',{i:pi+1,dir:t('dir'+f.sec),ring:t('ring'+(f.ring+1))});
+  return s;
+}
+function renderMeadowSide(){
+  $('#meadow-badge').textContent=(PH==='flight')?t('fl_badge'):tf('plan_badge',{n:R.plans.length});
+  $('#field-info').innerHTML=(PH==='flight')?'🚀 '+t('fl_note'):fieldInfoText();
+  const list=$('#plan-list'); list.textContent='';
+  R.plans.forEach((p,i)=>{
+    const row=document.createElement('div'); row.className='planitem'+(R.slotSel===i?' sel':'');
+    row.style.borderColor=R.slotSel===i?'var(--acc)':'';
+    const no=document.createElement('span'); no.className='slotno'; no.textContent=i+1;
+    const tx=document.createElement('span'); tx.textContent=tf('plan_item',{i:i+1,dir:t('dir'+p.dir),ring:t('ring'+(p.ring+1))});
+    const x=document.createElement('button'); x.className='x'; x.textContent='✕'; x.setAttribute('aria-label',t('plan_removed'));
+    x.addEventListener('click',()=>removePlan(i));
+    row.addEventListener('click',()=>selectSlot(i));
+    row.append(no,tx,x); list.appendChild(row);
+  });
+  $('#b-add').disabled=PH!=='meadow'||SEL<0||R.plans.length>=3;
+  $('#b-perform').disabled=PH!=='meadow'||!R.plans.length;
+  $('#meadow-hint').textContent='💡 '+t('meadow_hint');
+}
+function selectField(id){
+  SEL=id; sUI(); renderMeadowSide();
+}
+function addDance(){
+  if(PH!=='meadow')return;
+  if(SEL<0){toast(t('plan_need'),true); return;}
+  if(R.plans.length>=3){toast(t('plan_full'),true); sThud(); return;}
+  if(R.plans.some(p=>p.field===SEL)){toast(t('plan_dup'),true); sThud(); return;}
+  const f=FLD[SEL];
+  R.plans.push({field:SEL,dir:f.sec,ring:f.ring});
+  R.slotSel=R.plans.length-1;
+  toast(tf('plan_added',{i:R.plans.length})); sUI();
+  renderMeadowSide();
+}
+function removePlan(i){
+  if(i<0||i>=R.plans.length)return;
+  R.plans.splice(i,1);
+  if(R.slotSel>=R.plans.length)R.slotSel=R.plans.length-1;
+  toast(t('plan_removed')); sUI(); renderMeadowSide();
+}
+function selectSlot(i){
+  if(i<0||i>=R.plans.length){toast(t('toast_no_slot'),true); return;}
+  R.slotSel=i; toast(tf('toast_dance_slot',{i:i+1})); sUI(); renderMeadowSide();
+}
+function startPerformance(){
+  if(!R.plans.length){toast(t('plan_start_need'),true); sThud(); return;}
+  if(PH!=='meadow')return;
+  DZ={idx:0,results:[]};
+  startChart();
+}
+
+/* ================= 17. MEADOW: CANVAS MAP ================= */
+const M_W=520, M_H=520, M_CX=260, M_CY=260;
+const RING_R=[78,132,186], RING_IN=[44,86,140];
+function fieldGeom(f){
+  const a=(-90+f.sec*45)*RAD, half=20.5*RAD;
+  return {r0:RING_IN[f.ring], r1:RING_R[f.ring], a0:a-half, a1:a+half, am:a};
+}
+function annSector(ctx,r0,r1,a0,a1){
+  ctx.beginPath();
+  ctx.arc(M_CX,M_CY,r1,a0,a1);
+  ctx.arc(M_CX,M_CY,r0,a1,a0,true);
+  ctx.closePath();
+}
+function drawMeadow(now){
+  const ctx=CTX_M;
+  ctx.clearRect(0,0,M_W,M_H);
+  const bg=ctx.createRadialGradient(M_CX,M_CY,30,M_CX,M_CY,300);
+  bg.addColorStop(0,rgba(COL.accRGB,.08)); bg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,M_W,M_H);
+  /* rings & dividers */
+  ctx.strokeStyle=rgba(COL.accRGB,.14); ctx.lineWidth=1;
+  for(const r of RING_R){ctx.beginPath(); ctx.arc(M_CX,M_CY,r,0,TAU); ctx.stroke();}
+  ctx.beginPath();
+  for(let s=0;s<SECTORS;s++){
+    const a=(-90+s*45-22.5)*RAD;
+    ctx.moveTo(M_CX+Math.cos(a)*40,M_CY+Math.sin(a)*40);
+    ctx.lineTo(M_CX+Math.cos(a)*206,M_CY+Math.sin(a)*206);
+  }
+  ctx.stroke();
+  /* fields */
+  const motion=document.body.dataset.motion!=='reduced';
+  for(const f of FLD){
+    const g=fieldGeom(f), scouted=R.revealed.includes(f.id), pi=R.plans.findIndex(p=>p.field===f.id);
+    annSector(ctx,g.r0,g.r1,g.a0,g.a1);
+    if(pi>=0){ctx.fillStyle=rgba(COL.accRGB,.3); ctx.fill();}
+    else if(scouted){ctx.fillStyle=rgba(COL.greenRGB,.14+.4*(f.y/12)); ctx.fill();}
+    else{ctx.fillStyle='rgba(255,255,255,.05)'; ctx.fill();}
+    if(f.id===SEL){ctx.strokeStyle=COL.acc; ctx.lineWidth=2.4; ctx.stroke();}
+    else{ctx.strokeStyle=rgba(COL.accRGB,pi>=0?.8:.25); ctx.lineWidth=1; ctx.stroke();}
+    const mr=(g.r0+g.r1)/2, tx=M_CX+Math.cos(g.am)*mr, ty=M_CY+Math.sin(g.am)*mr;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    if(scouted){
+      ctx.font='700 13px "Segoe UI",Tahoma,sans-serif';
+      ctx.fillStyle=scouted&&f.y>=9?COL.acc2:COL.ink;
+      ctx.fillText(f.y,tx,ty);
+    }else{
+      ctx.font='600 13px "Segoe UI",Tahoma,sans-serif';
+      ctx.fillStyle=COL.muted; ctx.fillText('?',tx,ty);
+    }
+    if(pi>=0){
+      const bx=M_CX+Math.cos(g.am)*(g.r1-11), by=M_CY+Math.sin(g.am)*(g.r1-11);
+      ctx.beginPath(); ctx.arc(bx,by,9,0,TAU);
+      ctx.fillStyle=COL.acc; ctx.fill();
+      ctx.fillStyle='#241703'; ctx.font='800 11px "Segoe UI",Tahoma,sans-serif';
+      ctx.fillText(pi+1,bx,by+.5);
+      /* dance angle line */
+      ctx.strokeStyle=rgba(COL.accRGB,.65); ctx.lineWidth=2; ctx.setLineDash([5,6]);
+      ctx.beginPath(); ctx.moveTo(M_CX+Math.cos(g.am)*32,M_CY+Math.sin(g.am)*32);
+      ctx.lineTo(M_CX+Math.cos(g.am)*(g.r0-2),M_CY+Math.sin(g.am)*(g.r0-2));
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+  /* compass labels */
+  ctx.font='700 12px "Segoe UI",Tahoma,sans-serif'; ctx.fillStyle=COL.muted;
+  for(let s=0;s<SECTORS;s++){
+    const a=(-90+s*45)*RAD;
+    ctx.fillText(t('dshort'+s),M_CX+Math.cos(a)*207,M_CY+Math.sin(a)*207);
+  }
+  /* hive center */
+  const pulse=(PH==='flight')?1+.05*Math.sin(now/140):1;
+  drawHex(ctx,M_CX,M_CY,26*pulse,COL.acc,'#241703');
+  ctx.fillStyle='rgba(0,0,0,.55)';
+  ctx.beginPath(); ctx.arc(M_CX,M_CY+9,6,0,TAU); ctx.fill();
+  if(PH==='flight'&&FL)drawFlight(ctx,now,motion);
+}
+function drawHex(ctx,x,y,r,fill,stroke){
+  ctx.beginPath();
+  for(let i=0;i<6;i++){
+    const a=(60*i-30)*RAD, px=x+Math.cos(a)*r, py=y+Math.sin(a)*r;
+    i?ctx.lineTo(px,py):ctx.moveTo(px,py);
+  }
+  ctx.closePath();
+  ctx.fillStyle=fill; ctx.fill();
+  if(stroke){ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.stroke();}
+}
+function pickField(ev){
+  if(PH!=='meadow')return;
+  const rect=$('#cv-meadow').getBoundingClientRect();
+  const x=(ev.clientX-rect.left)*(M_W/rect.width)-M_CX;
+  const y=(ev.clientY-rect.top)*(M_H/rect.height)-M_CY;
+  const r=Math.hypot(x,y);
+  if(r<38){selectField(-1); return;}
+  const ring=r<105?0:r<159?1:r<213?2:-1;
+  if(ring<0){selectField(-1); return;}
+  let sec=Math.round((Math.atan2(y,x)/RAD+90)/45);
+  sec=((sec%8)+8)%8;
+  const id=ring*SECTORS+sec;
+  selectField(FLD[id]?id:-1);
+}
+
+/* ================= 18. FLIGHT SIMULATION ================= */
+let FL=null;
+const dirAngle=d=>(-90+d*45)*RAD;
+function makeBees(n,seedFn){
+  const k=Math.min(n,34), arr=[];
+  for(let i=0;i<k;i++)arr.push({a:(seedFn()-.5)*.34, sp:.85+seedFn()*.3, ph:seedFn()*TAU});
+  return arr;
+}
+function startFlight(){
+  const s=seasonOfDay(R.day);
+  const total=foragerCount(), n=R.plans.length;
+  const per=Math.max(4,Math.floor(total/n));
+  FL={flights:[],earned:0,floats:[],wasp:null,endAt:0};
+  R.plans.forEach((p,i)=>{
+    const res=DZ.results[i];
+    const depart=Math.max(0,Math.round(per*res.decode/100));
+    const wander=Math.max(0,per-depart);
+    let wasp='none';
+    const chance=[.07,.15,.24][p.ring]*SEASONS[s].waspMul;
+    if(DAYRNG()<chance)wasp='pending';
+    if(wasp==='pending'&&R.smoke>0&&DAYRNG()<.25*R.smoke)wasp='smoked';
+    const f=FLD[p.field];
+    const acc=(res.perfects+.6*res.goods)/res.n;
+    const honey=Math.round(f.y*depart*.12*acc*(WEATHER?1.2:1));
+    FL.flights.push({p,res,f,depart0:depart,depart,wander,wasp,acc,
+      state:'out',t:0,bees:makeBees(depart,DAYRNG),wanderBees:makeBees(wander,DAYRNG),
+      honeyBase:honey,honey:0,collected:false,
+      durOut:1.5+p.ring*1.1, durHold:.7, durBack:(1.5+p.ring*1.1)*.75});
+  });
+  sBuzz();
+  go('flight'); renderMeadowSide();
+}
+function flightTotalDur(fl){return fl.durOut+fl.durHold+fl.durBack;}
+function updateFlight(dt){
+  if(!FL)return;
+  if(FL.wasp){
+    FL.wasp.t+=dt;
+    if(FL.wasp.t>=FL.wasp.dur)resolveWasp(false);
+    return;
+  }
+  let allDone=true;
+  for(const fl of FL.flights){
+    if(fl.state==='done')continue;
+    allDone=false;
+    fl.t+=dt;
+    /* wasp trigger mid-outbound */
+    if(fl.state==='out'&&fl.t>=fl.durOut*.5){
+      if(fl.wasp==='pending'){activateWasp(fl); continue;}
+      if(fl.wasp==='smoked'){fl.wasp='none'; R.waspLog.push(t('res_wasp_smoked')); toast(t('res_wasp_smoked')); sChime();}
+    }
+    if(fl.state==='out'&&fl.t>=fl.durOut){
+      fl.state='hold'; fl.t=0;
+      if(!fl.collected){
+        fl.collected=true;
+        fl.honey=Math.round(fl.f.y*fl.depart*.12*fl.acc*(WEATHER?1.2:1));
+        R.honey+=fl.honey; R.earnedTotal+=fl.honey; STATS.honey+=fl.honey; FL.earned+=fl.honey;
+        FL.floats.push({x:M_CX+Math.cos(dirAngle(fl.p.dir))*(RING_R[fl.p.ring]-6),y:M_CY+Math.sin(dirAngle(fl.p.dir))*(RING_R[fl.p.ring]-6),txt:tf('fl_plus',{h:fl.honey}),t0:vt()});
+        updateHUD(); checkHoneyAch();
+      }
+    }else if(fl.state==='hold'&&fl.t>=fl.durHold){
+      fl.state='back'; fl.t=0;
+    }else if(fl.state==='back'&&fl.t>=fl.durBack){
+      fl.state='done';
+    }
+  }
+  for(const f of FL.floats)f.age=(f.age||0)+dt;
+  FL.floats=FL.floats.filter(f=>(f.age||0)<1.4);
+  if(allDone){
+    if(!FL.endAt)FL.endAt=vt();
+    if(vt()-FL.endAt>650)finishDay();
+  }
+}
+function activateWasp(fl){
+  FL.wasp={fl,t:0,dur:.95};
+  R.waspLog.push('');
+  sAlarm();
+  openPanel('pv-wasp');
+  /* CSS transition handles the shrinking ring; JS clock decides the outcome */
+  const ring=$('#wasp-ring'), bar=$('#wasp-bar i');
+  ring.style.transition='none'; ring.style.transform='scale(1)';
+  bar.style.transition='none'; bar.style.width='100%';
+  void ring.offsetWidth;
+  const red=document.body.dataset.motion!=='reduced';
+  if(red)ring.style.transition='transform .95s linear';
+  bar.style.transition='width .95s linear';
+  ring.style.transform='scale(.34)';
+  bar.style.width='0%';
+}
+function resolveWasp(dodged){
+  const w=FL.wasp; if(!w)return;
+  FL.wasp=null;
+  closePanel('pv-wasp');
+  const fl=w.fl;
+  if(dodged){
+    fl.wasp='dodged';
+    STATS.wasps++;
+    if(STATS.wasps>=5)unlock('wasp');
+    R.waspLog.push(t('res_wasp_dodged'));
+    toast(t('res_wasp_dodged')); sPluck(false);
+  }else{
+    fl.wasp='stung';
+    const ring=fl.p.ring;
+    const hl=5+4*ring+Math.floor(DAYRNG()*4), bl=2+ring*2, il=6+3*ring;
+    R.honey=Math.max(0,R.honey-hl);
+    R.bees=Math.max(1,R.bees-bl);
+    fl.depart=Math.max(0,fl.depart-bl);
+    R.integ=Math.max(0,R.integ-il);
+    R.waspLog.push(tf('res_wasp_stung',{h:hl,b:bl,i:il}));
+    toast(tf('res_wasp_stung',{h:hl,b:bl,i:il}),true);
+    sThud(); updateHUD();
+    if(R.integ<=0){doLose('collapse'); return;}
+  }
+}
+function finishDay(){
+  const s=seasonOfDay(R.day);
+  const cons=dailyConsumption();
+  R.honey-=cons;
+  let growth=0;
+  if(R.honey>0&&R.integ>=25&&s<3)growth=SEASONS[s].growth+(R.wax||0);
+  R.bees=Math.min(200,R.bees+growth);
+  R.honey=Math.max(0,R.honey);
+  R.dayUps=[
+    tf('res_upkeep',{c:fmt(cons)}),
+    growth>0?tf('res_growth',{g}):t('res_nogrowth'),
+    tf('res_total',{h:fmt(R.honey),b:fmt(R.bees),i:Math.round(R.integ)}),
+  ];
+  checkHoneyAch();
+  if(R.bees<=5){doLose('swarm'); return;}
+  if(R.integ<=0){doLose('collapse'); return;}
+  if(R.honey<dailyConsumption()*2)toast(t('toast_starving'),true);
+  saveRun();
+  FL=null;
+  go('results');
+}
+function drawFlight(ctx,now,motion){
+  for(const fl of FL.flights){
+    if(fl.state==='done')continue;
+    const da=dirAngle(fl.p.dir);
+    let prog=0, phase=fl.state;
+    if(phase==='out')prog=Math.min(1,fl.t/fl.durOut);
+    else if(phase==='hold')prog=1;
+    else prog=Math.max(0,1-fl.t/fl.durBack);
+    const rBase=lerp(34,RING_R[fl.p.ring],prog);
+    /* decoded bees fly the danced angle */
+    for(const b of fl.bees){
+      const wob=motion?Math.sin(now/110+b.ph)*4:0;
+      const ang=da+b.a*prog;
+      const r=rBase+(motion?Math.sin(now/150+b.ph)*5:0);
+      drawBee(ctx,M_CX+Math.cos(ang)*r-wob*Math.sin(ang),M_CY+Math.sin(ang)*r+wob*Math.cos(ang),ang,fl.state==='hold'?COL.acc2:COL.acc);
+    }
+    /* wanderers drift to adjacent sectors */
+    if(fl.wander>0&&prog<1){
+      const wa=da+(fl.p.dir%2===0?1:-1)*45*RAD*Math.min(1,prog*1.4);
+      for(const b of fl.wanderBees){
+        const wob=motion?Math.sin(now/130+b.ph)*5:0;
+        const ang=wa+b.a*prog;
+        const r=lerp(34,RING_R[fl.p.ring],prog)*b.sp;
+        drawBee(ctx,M_CX+Math.cos(ang)*r,M_CY+Math.sin(ang)*r+wob,ang,'rgba(190,180,150,.9)');
+      }
+    }
+    /* wasp marker */
+    if(fl.wasp==='stung'||fl.wasp==='dodged'||(FL.wasp&&FL.wasp.fl===fl)){
+      const wx=M_CX+Math.cos(da)*rBase, wy=M_CY+Math.sin(da)*rBase;
+      drawWaspMark(ctx,wx,wy,now);
+    }
+  }
+  /* honey floats */
+  ctx.textAlign='center'; ctx.font='800 15px "Segoe UI",Tahoma,sans-serif';
+  for(const f of FL.floats){
+    const a=clamp(1-(f.age||0)/1.4,0,1);
+    ctx.fillStyle=rgba(COL.accRGB,a);
+    ctx.fillText(f.txt,f.x,f.y-20-(f.age||0)*26);
+  }
+}
+function drawBee(ctx,x,y,ang,col){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(ang);
+  ctx.fillStyle='rgba(255,255,255,.35)';
+  ctx.beginPath(); ctx.ellipse(-1,-4,4.5,2,-.6,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-1,4,4.5,2,.6,0,TAU); ctx.fill();
+  ctx.fillStyle=col;
+  ctx.beginPath(); ctx.ellipse(0,0,5.5,3.2,0,0,TAU); ctx.fill();
+  ctx.fillStyle='rgba(40,26,8,.8)';
+  ctx.fillRect(-2.5,-2.6,1.6,5.2); ctx.fillRect(1,-2.4,1.4,4.8);
+  ctx.restore();
+}
+function drawWaspMark(ctx,x,y,now){
+  const shake=document.body.dataset.motion!=='reduced'?Math.sin(now/28)*2.5:0;
+  ctx.save(); ctx.translate(x+shake,y);
+  ctx.fillStyle='#ffd23f';
+  ctx.beginPath(); ctx.ellipse(0,0,11,6.5,0,0,TAU); ctx.fill();
+  ctx.strokeStyle='#241a10'; ctx.lineWidth=2.6;
+  ctx.beginPath(); ctx.moveTo(-6,-5); ctx.lineTo(-6,5); ctx.moveTo(0,-6.2); ctx.lineTo(0,6.2); ctx.moveTo(6,-5); ctx.lineTo(6,5); ctx.stroke();
+  ctx.fillStyle='#241a10';
+  ctx.beginPath(); ctx.arc(-11,-1.5,2.2,0,TAU); ctx.fill();
+  ctx.restore();
+}
+/* ================= 19. BEAT ENGINE & DANCE PERFORMANCE ================= */
+let CH=null, beatFlash=0, pressFlash=0, lastDir=-1, lastBeatInt=-999;
+const HITX=96, LANEY=196, PPB=104, D_W=980, D_H=300;
+function effBPM(){
+  const sb=[100,110,125][Math.min(2,seasonOfDay(R.day))];
+  return clamp(Math.round(sb*(S.tempo/110)),70,160);
+}
+function makeChart(dir,ring){
+  /* figure-eight waggle: run (ring beats) → turn left → turn right, repeated */
+  const cues=[], phrases=ring+3, step=ring+2;
+  for(let p=0;p<phrases;p++){
+    const b=p*step;
+    cues.push({beat:b,dir,dur:ring});
+    cues.push({beat:b+ring,dir:(dir+1)%8,dur:1});
+    cues.push({beat:b+ring+1,dir:(dir+7)%8,dur:1});
+  }
+  const totalBeats=(phrases-1)*step+ring+2;
+  return {cues,totalBeats,dir,ring};
+}
+function startChart(){
+  const plan=R.plans[DZ.idx];
+  const bpm=effBPM(), bd=60/bpm;
+  const ch=makeChart(plan.dir,plan.ring);
+  const lead=R.assistB?4:2;
+  const delay=lead*bd+.4;
+  Object.assign(ch,{bpm,bd,lead,judged:ch.cues.map(()=>null),finished:false,early:false,goShown:false,
+    floats:[],ghosts:[],combo:0,maxCombo:0,perfects:0,goods:0,off:0,doneAt:0,t0vt:vt()+delay*1000});
+  if(AU.ctx&&S.sound){
+    const at0=AU.ctx.currentTime+delay;
+    for(let i=0;i<ch.totalBeats+lead;i++){
+      const at=at0+i*bd, bt=i-lead;
+      if(bt<0)sClick(at); else sTick(at);
+    }
+  }
+  CH=ch; lastBeatInt=-999; lastDir=plan.dir;
+  go('dance'); renderDanceHud();
+  $('#dz-hint').textContent='💡 '+t('dz_hint');
+}
+function beatPos(){return (vt()-CH.t0vt)/1000/CH.bd;}
+function renderDanceHud(){
+  if(!DZ||!R.plans.length)return;
+  const p=R.plans[Math.min(DZ.idx,R.plans.length-1)];
+  $('#dz-title').textContent=tf('dance_title',{i:Math.min(DZ.idx+1,R.plans.length),n:R.plans.length});
+  $('#dz-target').textContent=t('dir'+p.dir)+' • '+t('ring'+(p.ring+1));
+  const dec=CH?clamp(Math.round(100*(CH.perfects+.6*CH.goods)/CH.cues.length),0,100):0;
+  const de=$('#dz-decode'); de.textContent=CH?dec+'%':'—';
+  de.classList.toggle('hot',dec>=90);
+  $('#dz-combo').textContent=CH?CH.combo:0;
+  $('#dz-badge').textContent=(CH&&beatPos()<0)?t('dz_ready'):t('dz_go');
+}
+function updateDance(dt){
+  if(!CH)return;
+  const bp=beatPos();
+  const bi=Math.floor(bp);
+  if(bi!==lastBeatInt&&bp>-.5){
+    lastBeatInt=bi; beatFlash=1;
+    const lg=$('#logo'); lg.classList.remove('beatpulse'); void lg.offsetWidth; lg.classList.add('beatpulse');
+  }
+  if(!CH.goShown&&bp>=0){CH.goShown=true; $('#dz-badge').textContent=t('dz_go');}
+  CH.cues.forEach((c,i)=>{
+    if(!CH.judged[i]&&bp-c.beat>.25/CH.bd)applyJudge(i,'M',true);
+  });
+  for(const f of CH.floats)f.age=(f.age||0)+dt;
+  CH.floats=CH.floats.filter(f=>(f.age||0)<.9);
+  for(const g of CH.ghosts)g.age=(g.age||0)+dt;
+  CH.ghosts=CH.ghosts.filter(g=>(g.age||0)<.5);
+  if(!CH.finished&&bp>CH.totalBeats+.6)finishChart();
+  if(CH.finished&&vt()-CH.doneAt>750)nextChart();
+}
+function applyJudge(i,g,silent){
+  const c=CH.cues[i];
+  CH.judged[i]=g; lastDir=c.dir; pressFlash=1;
+  if(g==='P'){CH.perfects++;CH.combo++;CH.maxCombo=Math.max(CH.maxCombo,CH.combo);STATS.perfects++;if(!silent)sPluck(false);}
+  else if(g==='G'){CH.goods++;CH.combo++;CH.maxCombo=Math.max(CH.maxCombo,CH.combo);if(!silent)sPluck(true);}
+  else{CH.combo=0;if(!silent)sThud();}
+  CH.ghosts.push({dir:c.dir,g,age:0});
+  renderDanceHud();
+}
+function judgeDir(d){
+  if(PH!=='dance'||!CH||CH.finished)return;
+  const bp=beatPos();
+  if(bp<0){offbeat(); return;}
+  let best=-1,bestAbs=1e9;
+  CH.cues.forEach((c,i)=>{
+    if(CH.judged[i])return;
+    const dtMs=(bp-c.beat)*CH.bd*1000;
+    if(dtMs<-250||dtMs>250||c.dir!==d)return;
+    if(Math.abs(dtMs)<bestAbs){bestAbs=Math.abs(dtMs);best=i;}
+  });
+  if(best>=0){applyJudge(best,bestAbs<=100?'P':'G'); return;}
+  let victim=-1;
+  CH.cues.forEach((c,i)=>{
+    if(CH.judged[i])return;
+    const dtMs=(bp-c.beat)*CH.bd*1000;
+    if(dtMs>=-250&&dtMs<=250)victim=i;
+  });
+  if(victim>=0){applyJudge(victim,'M'); return;}
+  offbeat();
+}
+function offbeat(){
+  if(!CH||CH.finished)return;
+  CH.off++; sThud(); pressFlash=1;
+  CH.floats.push({txt:t('grade_off'),g:'O',age:0});
+}
+function releaseEarly(){
+  if(PH!=='dance'||!CH||CH.finished)return;
+  CH.early=true;
+  CH.cues.forEach((c,i)=>{if(!CH.judged[i]){CH.judged[i]='M';}});
+  CH.combo=0; finishChart();
+}
+function finishChart(){
+  if(!CH||CH.finished)return;
+  CH.finished=true; CH.doneAt=vt();
+  CH.cues.forEach((c,i)=>{if(!CH.judged[i])CH.judged[i]='M';});
+  const n=CH.cues.length;
+  const dec=clamp(Math.round(100*(CH.perfects+.6*CH.goods)/n)-CH.off,0,100);
+  const res={dir:CH.dir,ring:CH.ring,decode:dec,perfects:CH.perfects,goods:CH.goods,n,depart:0,honey:0};
+  DZ.results.push(res);
+  R.lastDances.push(res);
+  STATS.dances++;
+  STATS.decode=Math.max(STATS.decode,dec);
+  if(dec>=50)unlock('harvest');
+  if(CH.perfects>=10)unlock('perfect');
+  if(dec>=95)unlock('dec');
+  saveMeta();
+}
+function nextChart(){
+  CH=null;
+  DZ.idx++;
+  if(DZ.idx<R.plans.length)startChart();
+  else startFlight();
+}
+
+/* ================= 20. DANCE CANVAS (SCROLLING STAFF) ================= */
+function drawDance(now){
+  if(!CH)return;
+  const ctx=CTX_D, W=D_W, H=D_H;
+  ctx.clearRect(0,0,W,H);
+  const bp=beatPos();
+  const motion=document.body.dataset.motion!=='reduced';
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,rgba(COL.accRGB,.06)); g.addColorStop(.55,'rgba(0,0,0,0)'); g.addColorStop(1,rgba(COL.accRGB,.05));
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=rgba(COL.accRGB,.2); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,LANEY); ctx.lineTo(W,LANEY); ctx.stroke();
+  const xOf=b=>HITX+(b-bp)*PPB;
+  const xZero=xOf(0);
+  if(xZero>HITX){ /* count-in zone */
+    ctx.fillStyle=rgba(COL.accRGB,.07);
+    ctx.fillRect(HITX,22,Math.min(xZero,W)-HITX,H-44);
+  }
+  /* beat lines */
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  const firstB=Math.max(Math.ceil(bp-(W-HITX)/PPB),-CH.lead);
+  const lastB=Math.min(Math.ceil(bp+2),CH.totalBeats+1);
+  for(let b=firstB;b<=lastB;b++){
+    const x=xOf(b), major=b%(CH.ring+2)===0;
+    ctx.strokeStyle=rgba(COL.accRGB,major?.42:.13);
+    ctx.lineWidth=major?1.6:1;
+    ctx.beginPath(); ctx.moveTo(x,LANEY-52); ctx.lineTo(x,LANEY+52); ctx.stroke();
+    if(S.assist&&b<0){
+      ctx.fillStyle=COL.muted; ctx.font='700 13px "Segoe UI",Tahoma,sans-serif';
+      ctx.fillText(-b,x,LANEY+70);
+    }else if(S.assist&&major&&b>=0&&b>0){
+      ctx.fillStyle=rgba(COL.accRGB,.65); ctx.font='600 11px "Segoe UI",Tahoma,sans-serif';
+      ctx.fillText(b,x,LANEY+70);
+    }
+  }
+  /* cues */
+  CH.cues.forEach((c,i)=>{
+    if(CH.judged[i])return;
+    const x=xOf(c.beat);
+    if(x<-90||x>W+30)return;
+    const wob=(WEATHER&&motion)?Math.sin(now/170+c.beat*2.1)*7:0;
+    const drift=(WEATHER&&motion)?Math.sin(now/240+c.beat)*6:0;
+    drawCue(ctx,x+drift,LANEY+wob,c);
+  });
+  /* judged ghosts */
+  for(const gh of CH.ghosts){
+    ctx.globalAlpha=clamp(1-gh.age/.5,0,1);
+    drawArrow(ctx,HITX,LANEY-30-gh.age*46,gh.dir,14,gh.g==='P'?COL.acc:gh.g==='G'?COL.acc2:COL.danger);
+    ctx.globalAlpha=1;
+  }
+  /* grade floats */
+  for(const f of CH.floats){
+    ctx.globalAlpha=clamp(1-(f.age||0)/.9,0,1);
+    ctx.font='800 16px "Segoe UI",Tahoma,sans-serif';
+    ctx.fillStyle=f.g==='P'?COL.acc:f.g==='G'?COL.acc2:f.g==='M'?COL.danger:COL.muted;
+    ctx.fillText(f.txt,HITX,LANEY-118-(f.age||0)*30);
+    ctx.globalAlpha=1;
+  }
+  /* hit line & pulse target */
+  const frac=((bp%1)+1)%1;
+  const rr=motion?26+9*(1-frac)+beatFlash*6:26;
+  ctx.strokeStyle=rgba(COL.accRGB,.45+beatFlash*.5); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(HITX,LANEY,rr,0,TAU); ctx.stroke();
+  ctx.strokeStyle=COL.acc; ctx.lineWidth=2.6;
+  ctx.beginPath(); ctx.moveTo(HITX,LANEY-62); ctx.lineTo(HITX,LANEY+62); ctx.stroke();
+  /* reading assist: the upcoming arrow, large */
+  if(S.assist){
+    let next=-1;
+    for(let i=0;i<CH.cues.length;i++){if(!CH.judged[i]&&CH.cues[i].beat>=bp-.12){next=i;break;}}
+    if(next>=0){
+      const c=CH.cues[next];
+      drawArrow(ctx,W-64,50,c.dir,20,COL.acc);
+      const dtS=Math.max(0,(c.beat-bp)*CH.bd);
+      ctx.fillStyle=COL.muted; ctx.font='600 12px "Segoe UI",Tahoma,sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText(dtS.toFixed(1)+'s',W-64,80);
+    }
+  }
+  drawConductor(ctx,now,motion);
+  beatFlash=Math.max(0,beatFlash-.06);
+}
+function drawCue(ctx,x,y,c){
+  const wBar=c.dur*PPB-10, hue=c.dir*45;
+  ctx.fillStyle=`hsla(${hue},72%,60%,.3)`;
+  roundRect(ctx,x,y-9,wBar,18,8); ctx.fill();
+  ctx.strokeStyle=`hsla(${hue},74%,64%,.85)`; ctx.lineWidth=1.4;
+  roundRect(ctx,x,y-9,wBar,18,8); ctx.stroke();
+  drawArrow(ctx,x+14,y,c.dir,13,COL.ink);
+  if(c.dur>1)for(let k=1;k<c.dur;k++)drawArrow(ctx,x+14+k*PPB*.5,y,c.dir,8,`hsla(${hue},74%,64%,.9)`);
+}
+function drawArrow(ctx,x,y,dir,size,col){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(dir*45*RAD);
+  ctx.fillStyle=col;
+  ctx.beginPath();
+  ctx.moveTo(size,0); ctx.lineTo(-size*.7,-size*.75); ctx.lineTo(-size*.25,0); ctx.lineTo(-size*.7,size*.75);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function roundRect(ctx,x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+function drawConductor(ctx,now,motion){
+  const bob=motion?-Math.abs(Math.sin(beatPos()*Math.PI))*9:0;
+  const x=HITX, y=LANEY-92+bob;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.scale(1+pressFlash*.25,1-pressFlash*.18);
+  const flap=motion?Math.sin(now/38)*.9:.45;
+  ctx.fillStyle='rgba(255,255,255,.4)';
+  ctx.save(); ctx.rotate(-.45+flap*.22); ctx.beginPath(); ctx.ellipse(-4,-11,10,4,0,0,TAU); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.rotate(.45-flap*.22); ctx.beginPath(); ctx.ellipse(4,-11,10,4,0,0,TAU); ctx.fill(); ctx.restore();
+  ctx.fillStyle=COL.acc;
+  ctx.beginPath(); ctx.ellipse(0,0,15,10,0,0,TAU); ctx.fill();
+  ctx.fillStyle='#241703';
+  ctx.fillRect(-5,-8,4,16); ctx.fillRect(2,-8,4,16);
+  ctx.beginPath(); ctx.arc(-13,-2,3.4,0,TAU); ctx.fill();
+  ctx.restore();
+  if(lastDir>=0)drawArrow(ctx,x+32,y,lastDir,10,rgba(COL.accRGB,.9));
+}
+/* ================= 21. INPUT: KEYBOARD / 8-WAY PAD / POINTER ================= */
+const KEYDIR={ArrowUp:0,KeyW:0,Numpad8:0,KeyE:1,Numpad9:1,ArrowRight:2,KeyD:2,Numpad6:2,
+  KeyC:3,Numpad3:3,ArrowDown:4,KeyS:4,Numpad2:4,KeyZ:5,Numpad1:5,ArrowLeft:6,KeyA:6,Numpad4:6,KeyQ:7,Numpad7:7};
+let paused=false;
+function padFlash(d){
+  const b=document.querySelector('.pbtn.dir[data-d="'+d+'"]');
+  if(!b)return;
+  b.classList.add('hit'); setTimeout(()=>b.classList.remove('hit'),160);
+}
+function padFlashBeat(){
+  const b=$('#pad-beat');
+  b.classList.add('hit'); setTimeout(()=>b.classList.remove('hit'),140);
+}
+function judgeDirOrNav(d){
+  if(PH==='dance'){judgeDir(d); return;}
+  if(PH==='meadow'){
+    let ring=0;
+    if(SEL>=0&&FLD[SEL])ring=FLD[SEL].ring;
+    else if(R.plans[R.slotSel])ring=FLD[R.plans[R.slotSel].field].ring;
+    selectField(ring*SECTORS+d);
+  }
+}
+function spaceAction(){
+  if($('#pv-wasp').classList.contains('on')){resolveWasp(true); return;}
+  if(anyPanelOpen())return;
+  if(PH==='dance')releaseEarly();
+  else if(PH==='flight'&&FL&&FL.wasp)resolveWasp(true);
+}
+function enterAction(){
+  if($('#pv-confirm').classList.contains('on')){
+    const cb=confirmCb; confirmCb=null; closePanel('pv-confirm');
+    if(cb)cb(); return;
+  }
+  if(anyPanelOpen())return;
+  if(PH==='hub'){(seasonOfDay(R.day)===3&&!R.endlessRun)?winterAdvance():openMeadow();}
+  else if(PH==='meadow')startPerformance();
+  else if(PH==='results')nextDay();
+  else if(PH==='lose')restartRun();
+  else if(PH==='win')continueEndless();
+  else if(PH==='stats'||PH==='ach')goHub();
+}
+function onEsc(){
+  const top=topPanel();
+  if(top){
+    if(top!=='pv-wasp')closePanel(top);
+    return;
+  }
+  if(PH==='meadow')goHub();
+  else if(PH==='dance')releaseEarly();
+  else if(PH==='stats'||PH==='ach')goHub();
+}
+function goHub(){go('hub'); renderHive();}
+addEventListener('keydown',e=>{
+  const c=e.code;
+  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(c))e.preventDefault();
+  AU.ensure();
+  if(AU.ctx&&AU.ctx.state==='suspended'&&!document.hidden){try{AU.ctx.resume();}catch(err){}}
+  if(c==='Escape'){onEsc(); return;}
+  if(e.repeat)return;
+  if(c==='Space'){spaceAction(); return;}
+  if(c==='Enter'){enterAction(); return;}
+  if(c in KEYDIR){const d=KEYDIR[c]; padFlash(d); judgeDirOrNav(d); return;}
+  if(c==='Digit1')selectSlot(0);
+  else if(c==='Digit2')selectSlot(1);
+  else if(c==='Digit3')selectSlot(2);
+  else if((c==='Delete'||c==='Backspace')&&PH==='meadow')removePlan(R.slotSel);
+});
+document.addEventListener('pointerdown',()=>{
+  AU.ensure();
+  if(AU.ctx&&AU.ctx.state==='suspended'&&!document.hidden){try{AU.ctx.resume();}catch(err){}}
+},true);
+function restartRun(){
+  newRun(); STATS.runs++; saveRun(); saveMeta();
+  startDay(1);
+}
+function resetAll(){
+  for(const k of ['hive_run','hive_ach','hive_stats','hive_best','hive_settings','hive_lang','hive_seen'])purgeKey(k);
+  S=Object.assign({},DEFS);
+  ACHV={}; STATS=Object.assign({},STAT_DEFS,{runs:1}); BEST={score:0,days:0};
+  lang='ar';
+  applyAllSettings(); refreshCols();
+  newRun(); saveRun();
+  applyLang(); renderSettings();
+  startDay(1);
+  toast(t('toast_newrun'));
+}
+function purgeKey(k){
+  if(store.ok){try{localStorage.removeItem(k);}catch(e){}}
+  else delete store.mem[k];
+}
+/* ================= 22. CANVAS FIT & MAIN LOOP ================= */
+let CTX_M=null, CTX_D=null;
+function fitCanvases(){
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const m=$('#cv-meadow'), d=$('#cv-dance');
+  m.width=Math.round(M_W*dpr); m.height=Math.round(M_H*dpr);
+  d.width=Math.round(D_W*dpr); d.height=Math.round(D_H*dpr);
+  CTX_M=m.getContext('2d'); CTX_M.setTransform(dpr,0,0,dpr,0,0);
+  CTX_D=d.getContext('2d'); CTX_D.setTransform(dpr,0,0,dpr,0,0);
+}
+addEventListener('resize',fitCanvases);
+let lastT=performance.now();
+function frame(now){
+  requestAnimationFrame(frame);
+  if(paused)return;
+  let dt=(now-lastT)/1000;
+  lastT=now;
+  dt=clamp(dt,0,.05);
+  pressFlash=Math.max(0,pressFlash-dt*4.5);
+  if(PH==='dance')updateDance(dt);
+  else if(PH==='flight')updateFlight(dt);
+  if(PH==='meadow'||PH==='flight')drawMeadow(now);
+  else if(PH==='dance')drawDance(now);
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    paused=true; hiddenAt=performance.now();
+    if(AU.ctx){try{AU.ctx.suspend();}catch(err){}}
+    saveRun(); saveMeta(); saveS();
+  }else{
+    if(!paused)return;
+    vtShift+=performance.now()-hiddenAt;
+    paused=false; lastT=performance.now();
+    if(AU.ctx){try{AU.ctx.resume();}catch(err){}}
+  }
+});
+addEventListener('pagehide',()=>{saveRun(); saveMeta(); saveS();});
+/* ================= 23. WIRING & INIT ================= */
+function wire(){
+  $('#b-lang').addEventListener('click',()=>{setLang(lang==='ar'?'en':'ar'); sUI();});
+  $('#b-settings').addEventListener('click',()=>{renderSettings(); openPanel('pv-settings'); sUI();});
+  $('#b-about').addEventListener('click',()=>{openPanel('pv-about'); sUI();});
+  $('#b-help').addEventListener('click',()=>{openPanel('pv-help'); sUI();});
+  $('#b-set-x').addEventListener('click',()=>closePanel('pv-settings'));
+  $('#b-about-x').addEventListener('click',()=>closePanel('pv-about'));
+  $('#b-help-x').addEventListener('click',()=>closePanel('pv-help'));
+  $('#b-stats').addEventListener('click',()=>{closeAllPanels(); go('stats'); sUI();});
+  $('#b-ach').addEventListener('click',()=>{closeAllPanels(); go('ach'); sUI();});
+  $('#b-stats-back').addEventListener('click',goHub);
+  $('#b-ach-back').addEventListener('click',goHub);
+  $('#b-ob-go').addEventListener('click',()=>{store.set('hive_seen',1); closePanel('pv-onboard'); sUI();});
+  $('#b-ob-replay').addEventListener('click',()=>{closePanel('pv-about'); openPanel('pv-onboard'); sUI();});
+  $('#b-reset').addEventListener('click',()=>showConfirm('cf_reset_title','cf_reset_body',resetAll));
+  $('#b-cf-cancel').addEventListener('click',()=>{confirmCb=null; closePanel('pv-confirm');});
+  $('#b-cf-ok').addEventListener('click',()=>{const cb=confirmCb; confirmCb=null; closePanel('pv-confirm'); if(cb)cb();});
+  $('#b-meadow').addEventListener('click',openMeadow);
+  $('#b-repair').addEventListener('click',doRepair);
+  $('#b-winterday').addEventListener('click',winterAdvance);
+  $('#b-add').addEventListener('click',addDance);
+  $('#b-perform').addEventListener('click',startPerformance);
+  $('#b-back-hive').addEventListener('click',goHub);
+  $('#b-release').addEventListener('click',releaseEarly);
+  $('#b-nextday').addEventListener('click',nextDay);
+  $('#b-restart').addEventListener('click',restartRun);
+  $('#b-win-continue').addEventListener('click',continueEndless);
+  $('#b-win-new').addEventListener('click',restartRun);
+  $('#b-dodge').addEventListener('click',()=>resolveWasp(true));
+  $$('#pv-settings .seg').forEach(seg=>{
+    const k=seg.dataset.k;
+    seg.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        let v=btn.dataset.v;
+        if(v==='1'||v==='0')v=+v;
+        else if(k==='tempo')v=+v;
+        setSetting(k,v); sUI();
+      });
+    });
+  });
+  $$('.pbtn.dir').forEach(b=>{
+    b.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      const d=+b.dataset.d;
+      padFlash(d); judgeDirOrNav(d);
+    });
+  });
+  $('#pad-beat').addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    padFlashBeat(); spaceAction();
+  });
+  $('#cv-meadow').addEventListener('pointerdown',pickField);
+  /* close overlays by tapping the dim backdrop */
+  $$('.overlay').forEach(ov=>{
+    ov.addEventListener('pointerdown',e=>{
+      if(e.target===ov&&ov.id!=='pv-wasp'&&ov.id!=='pv-onboard'&&ov.id!=='pv-confirm')closePanel(ov.id);
+    });
+  });
+}
+function closeAllPanels(){PANELS.forEach(id=>{if(id!=='pv-onboard')closePanel(id);});}
+function init(){
+  refreshCols();
+  applyAllSettings();
+  const resumed=loadRun();
+  if(resumed){
+    genDay(); WEATHER=R.weather;
+    updateHUD(); renderHive();
+    toast(t('toast_resumed'));
+    if(R.winPending){LAST_END={type:'win',sc:calcScore(),nb:false}; go('win');}
+  }else{
+    newRun(); STATS.runs++; saveRun(); saveMeta();
+    startDay(1);
+    toast(t('toast_newrun'));
+  }
+  applyLang();
+  fitCanvases();
+  wire();
+  if(!store.get('hive_seen',false))setTimeout(()=>openPanel('pv-onboard'),500);
+  requestAnimationFrame(frame);
+}
+init();
+</script>
+</body>
+</html>

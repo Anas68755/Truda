@@ -1,0 +1,1741 @@
+<!-- 10 Originals — Mizwala: Sundial Studio — original concept, 100% offline -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>مِزْوَلة — استوديو المزاول · Mizwala — Sundial Studio</title>
+<style>
+/* ============================================================
+   01 · TOKENS & THEMES
+   ============================================================ */
+:root{
+  --brass:#d4a94e; --brass-2:#b3893a; --brass-3:#7c5f22;
+  --bg:#131518; --bg2:#0c0e10; --panel:#1c2026; --panel2:#242a32; --edge:#333a44;
+  --text:#efe8da; --muted:#aca292; --faint:#837b6c;
+  --accent:#d4a94e; --accent-ink:#1c1505; --focus:#ffd97a;
+  --ok:#93c47d; --warn:#e0a24a; --danger:#e2694f;
+  --shadow:0 12px 34px rgba(0,0,0,.5);
+  --r:14px; --rs:9px;
+  --f:"Segoe UI",Tahoma,system-ui,sans-serif;
+}
+[data-theme="stone"]{
+  --bg:#191713; --bg2:#12100c; --panel:#232017; --panel2:#2c2820; --edge:#40392b;
+  --text:#f0ead9; --muted:#aea389; --faint:#847a64;
+  --accent:#cdb279; --accent-ink:#201a08; --focus:#ecd9a4;
+}
+[data-theme="slate"]{
+  --bg:#11151b; --bg2:#0b0e12; --panel:#19212a; --panel2:#212b36; --edge:#33424f;
+  --text:#e9eef4; --muted:#96a6b5; --faint:#6f8291;
+  --accent:#93bad6; --accent-ink:#0d1a24; --focus:#c2e0f4;
+}
+[data-theme="paper"]{
+  --bg:#ece4cf; --bg2:#e1d6bc; --panel:#f7f1e1; --panel2:#efe6cf; --edge:#cdc1a2;
+  --text:#2b2416; --muted:#6c6350; --faint:#8d8471;
+  --accent:#8a6a2a; --accent-ink:#fff8e8; --focus:#b3893a;
+  --shadow:0 10px 26px rgba(96,80,44,.28);
+}
+/* ============================================================
+   02 · RESET & BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:16px}
+body{
+  margin:0; min-height:100vh; background:
+  radial-gradient(1100px 600px at 85% -10%, rgba(212,169,78,.07), transparent 60%),
+  var(--bg);
+  color:var(--text); font-family:var(--f); font-size:16px; line-height:1.55;
+  transition:background .35s ease,color .35s ease;
+}
+button,input,select,textarea{font:inherit; color:inherit}
+h1,h2,h3{margin:0; line-height:1.25; font-weight:700}
+p{margin:.4em 0}
+b,strong{font-weight:700}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:6px}
+::selection{background:var(--accent); color:var(--accent-ink)}
+.skip{position:absolute; inset-inline-start:-999px; top:8px; z-index:300;
+  background:var(--accent); color:var(--accent-ink); padding:.5em 1em; border-radius:8px; font-weight:700}
+.skip:focus{inset-inline-start:8px}
+/* ============================================================
+   03 · HEADER
+   ============================================================ */
+.top{
+  display:flex; align-items:center; gap:14px; padding:12px clamp(12px,3vw,28px);
+  border-bottom:1px solid var(--edge); background:color-mix(in srgb, var(--bg2) 72%, transparent);
+  backdrop-filter:blur(6px); position:sticky; top:0; z-index:40;
+}
+.back{
+  display:grid; place-items:center; width:42px; height:42px; flex:0 0 auto;
+  border:1px solid var(--edge); border-radius:12px; background:var(--panel);
+  color:var(--accent); font-size:20px; text-decoration:none;
+  transition:transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.back:hover{transform:translateX(calc(var(--dirflip,-1) * -3px)); border-color:var(--accent)}
+html[dir="ltr"] .back{--dirflip:1}
+.brand{display:flex; align-items:center; gap:12px; min-width:0}
+.brand svg{width:38px; height:38px; flex:0 0 auto; filter:drop-shadow(0 2px 6px rgba(212,169,78,.35))}
+.brand h1{font-size:1.35rem; letter-spacing:.3px; color:var(--accent)}
+.brand .tag{margin:0; font-size:.78rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hbtns{margin-inline-start:auto; display:flex; gap:8px}
+.chipbtn{
+  display:inline-flex; align-items:center; gap:6px; padding:.45em .85em;
+  border:1px solid var(--edge); border-radius:999px; background:var(--panel);
+  color:var(--text); cursor:pointer; font-size:.88rem;
+  transition:border-color .18s ease, background .18s ease, transform .12s ease;
+}
+.chipbtn:hover{border-color:var(--accent); background:var(--panel2)}
+.chipbtn:active{transform:scale(.96)}
+.chipbtn .ico{font-size:1em}
+#langBtn{min-width:64px; justify-content:center; font-weight:700; color:var(--accent); letter-spacing:.5px}
+/* ============================================================
+   04 · LAYOUT
+   ============================================================ */
+#app{
+  display:grid; grid-template-columns:minmax(0,1fr) 392px;
+  gap:20px; padding:18px clamp(12px,3vw,28px) 8px; max-width:1400px; margin:0 auto;
+  align-items:start;
+}
+.stage{
+  position:relative; border:1px solid var(--edge); border-radius:var(--r);
+  background:
+   radial-gradient(120% 120% at 50% 0%, rgba(212,169,78,.06), transparent 55%),
+   var(--bg2);
+  padding:18px; display:grid; place-items:center; min-height:420px;
+  box-shadow:var(--shadow); overflow:hidden;
+}
+.stage.flash::after{
+  content:""; position:absolute; inset:0; pointer-events:none; border-radius:var(--r);
+  box-shadow:inset 0 0 0 3px var(--accent); opacity:0; animation:flashK .9s ease;
+}
+@keyframes flashK{0%{opacity:.95}100%{opacity:0}}
+#dial{display:block; touch-action:none; cursor:grab; border-radius:12px}
+#dial:active{cursor:grabbing}
+.hud{
+  position:absolute; inset-inline:18px; bottom:12px; display:flex; flex-wrap:wrap;
+  gap:6px 16px; align-items:baseline; justify-content:center; pointer-events:none;
+}
+.hud > div{
+  background:color-mix(in srgb, var(--panel) 82%, transparent);
+  border:1px solid var(--edge); border-radius:999px; padding:.25em .9em;
+  font-size:.85rem; color:var(--muted); white-space:nowrap;
+}
+.hud-time{font-size:1.05rem !important; font-weight:700; color:var(--accent); letter-spacing:1px;
+  font-variant-numeric:tabular-nums}
+/* ============================================================
+   05 · CONTROL PANEL
+   ============================================================ */
+.panel{
+  border:1px solid var(--edge); border-radius:var(--r); background:var(--panel);
+  padding:14px 14px 18px; display:flex; flex-direction:column; gap:14px;
+  max-height:calc(100vh - 120px); overflow:auto; box-shadow:var(--shadow);
+  scrollbar-width:thin;
+}
+.grp{border:1px solid var(--edge); border-radius:var(--rs); padding:10px 12px 12px; background:var(--panel2)}
+.grp > h3, .grp > .ghead{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  font-size:.8rem; text-transform:uppercase; letter-spacing:1.2px;
+  color:var(--muted); margin:0 0 8px; font-weight:700;
+}
+.gout{font-size:.95rem; color:var(--accent); font-weight:700; font-variant-numeric:tabular-nums;
+  text-transform:none; letter-spacing:.4px}
+/* segmented */
+.seg{display:grid; gap:6px}
+.seg.c3{grid-template-columns:repeat(3,1fr)}
+.seg.c2{grid-template-columns:repeat(2,1fr)}
+.segbtn{
+  border:1px solid var(--edge); background:var(--panel); color:var(--text);
+  border-radius:var(--rs); padding:.5em .35em; cursor:pointer; text-align:center;
+  display:grid; gap:2px; justify-items:center;
+  transition:border-color .16s ease, background .16s ease, transform .12s ease;
+}
+.segbtn b{font-size:.9rem}
+.segbtn small{font-size:.68rem; color:var(--muted); line-height:1.25}
+.segbtn:hover{border-color:var(--accent)}
+.segbtn:active{transform:scale(.97)}
+.segbtn[aria-checked="true"], .segbtn.on{
+  border-color:var(--accent); background:color-mix(in srgb, var(--accent) 16%, var(--panel));
+  box-shadow:inset 0 0 0 1px var(--accent);
+}
+.segbtn[aria-checked="true"] small{color:var(--text)}
+/* chips */
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
+.chip{
+  border:1px solid var(--edge); background:var(--panel); color:var(--muted);
+  border-radius:999px; padding:.22em .7em; font-size:.78rem; cursor:pointer;
+  transition:all .15s ease;
+}
+.chip:hover{color:var(--text); border-color:var(--accent)}
+.chip.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700}
+/* sliders */
+input[type="range"]{
+  -webkit-appearance:none; appearance:none; width:100%; height:30px;
+  background:transparent; cursor:pointer; margin:2px 0 0;
+}
+input[type="range"]::-webkit-slider-runnable-track{
+  height:6px; border-radius:99px;
+  background:linear-gradient(var(--edge),var(--edge));
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #f4d98b, var(--brass) 60%, var(--brass-3));
+  border:2px solid var(--bg2); margin-top:-8px;
+  box-shadow:0 2px 8px rgba(0,0,0,.5); transition:transform .12s ease;
+}
+input[type="range"]:hover::-webkit-slider-thumb{transform:scale(1.12)}
+input[type="range"]::-moz-range-track{height:6px; border-radius:99px; background:var(--edge)}
+input[type="range"]::-moz-range-thumb{
+  width:20px; height:20px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #f4d98b, var(--brass) 60%, var(--brass-3));
+  border:2px solid var(--bg2); box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+/* switches */
+.swrow{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:.3em 0}
+.swrow span{font-size:.9rem}
+.switch{position:relative; width:46px; height:26px; flex:0 0 auto}
+.switch input{position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer}
+.switch i{
+  position:absolute; inset:0; border-radius:99px; background:var(--edge);
+  transition:background .2s ease; pointer-events:none;
+}
+.switch i::after{
+  content:""; position:absolute; top:3px; inset-inline-start:3px; width:20px; height:20px;
+  border-radius:50%; background:var(--muted); transition:transform .2s ease, background .2s ease;
+}
+.switch input:checked + i{background:color-mix(in srgb, var(--accent) 45%, var(--panel))}
+.switch input:checked + i::after{transform:translateX(calc(var(--dirflip,-1) * -20px)); background:var(--accent)}
+html[dir="ltr"] .switch{--dirflip:1}
+.switch input:focus-visible + i{outline:2px solid var(--focus); outline-offset:2px}
+/* style swatches */
+.swatches{display:grid; grid-template-columns:repeat(4,1fr); gap:6px}
+.swbtn{
+  border:1px solid var(--edge); background:var(--panel); border-radius:var(--rs);
+  padding:.45em .2em .4em; cursor:pointer; display:grid; gap:5px; justify-items:center;
+  transition:border-color .16s ease, transform .12s ease; color:var(--muted); font-size:.72rem;
+}
+.swbtn:hover{border-color:var(--accent); transform:translateY(-1px)}
+.swbtn.on{border-color:var(--accent); color:var(--text); box-shadow:inset 0 0 0 1px var(--accent)}
+.sw{width:26px; height:26px; border-radius:50%; border:2px solid rgba(0,0,0,.35);
+  box-shadow:inset -3px -4px 6px rgba(0,0,0,.25), inset 3px 4px 6px rgba(255,255,255,.25)}
+.sw.brass{background:radial-gradient(circle at 35% 30%, #efd28a, #d4a94e 55%, #8a6a2a)}
+.sw.stone{background:radial-gradient(circle at 35% 30%, #e2dbc9, #c9c1ae 60%, #8f8875)}
+.sw.slate{background:radial-gradient(circle at 35% 30%, #5d6a75, #3a434c 60%, #232a31)}
+.sw.paper{background:radial-gradient(circle at 35% 30%, #fbf5e6, #efe6cf 60%, #cfc3a6)}
+/* action buttons */
+.acts{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  border:1px solid var(--edge); border-radius:var(--rs); padding:.6em .8em;
+  background:var(--panel); color:var(--text); cursor:pointer; font-size:.9rem;
+  transition:border-color .16s ease, background .16s ease, transform .12s ease;
+}
+.btn:hover{border-color:var(--accent); background:var(--panel2)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--danger); border-color:color-mix(in srgb, var(--danger) 55%, var(--edge))}
+.btn.danger:hover{background:color-mix(in srgb, var(--danger) 18%, var(--panel)); border-color:var(--danger)}
+.btn.wide{grid-column:1 / -1}
+/* EoT */
+.eot-main{font-size:.92rem; color:var(--text); background:var(--panel); border:1px solid var(--edge);
+  border-radius:var(--rs); padding:.5em .7em; margin-bottom:8px}
+.eot-main b{color:var(--accent); font-variant-numeric:tabular-nums}
+.eot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:5px}
+.eot-cell{
+  border:1px solid var(--edge); border-radius:7px; padding:.28em .3em; text-align:center;
+  background:var(--panel); font-size:.72rem; color:var(--muted); line-height:1.3;
+}
+.eot-cell b{display:block; font-size:.8rem; font-variant-numeric:tabular-nums}
+.eot-cell.fast b{color:var(--ok)}
+.eot-cell.slow b{color:var(--warn)}
+.eot-cell.now{border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
+/* library list */
+.liblist{display:grid; gap:8px; margin:10px 0 4px}
+.libitem{
+  display:flex; align-items:center; gap:10px; border:1px solid var(--edge);
+  border-radius:var(--rs); padding:8px 10px; background:var(--panel);
+}
+.libitem .li-name{font-weight:700; font-size:.92rem}
+.libitem .li-meta{font-size:.74rem; color:var(--muted)}
+.libitem .li-acts{margin-inline-start:auto; display:flex; gap:5px}
+.mini{
+  border:1px solid var(--edge); background:var(--panel2); border-radius:8px;
+  padding:.28em .6em; font-size:.76rem; cursor:pointer; color:var(--text);
+  transition:border-color .15s ease, background .15s ease;
+}
+.mini:hover{border-color:var(--accent)}
+.mini.del:hover{border-color:var(--danger); color:var(--danger)}
+/* ============================================================
+   06 · OVERLAYS & SHEETS
+   ============================================================ */
+.overlay{
+  position:fixed; inset:0; z-index:100; display:none; place-items:center;
+  background:rgba(5,6,8,.62); backdrop-filter:blur(4px); padding:18px;
+}
+.overlay.show{display:grid; animation:fadeIn .22s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.sheet{
+  width:min(620px, 94vw); max-height:min(86vh, 780px); display:flex; flex-direction:column;
+  background:var(--panel); border:1px solid var(--edge); border-radius:18px;
+  box-shadow:0 24px 70px rgba(0,0,0,.6); animation:pop .26s cubic-bezier(.2,.9,.3,1.2);
+  overflow:hidden;
+}
+@keyframes pop{from{transform:translateY(14px) scale(.97); opacity:0}to{transform:none; opacity:1}}
+.sheet-h{
+  display:flex; align-items:center; gap:10px; padding:14px 18px;
+  border-bottom:1px solid var(--edge); background:var(--panel2);
+}
+.sheet-h h2{font-size:1.08rem; color:var(--accent)}
+.sheet-h .x{
+  margin-inline-start:auto; width:34px; height:34px; border-radius:10px;
+  border:1px solid var(--edge); background:var(--panel); cursor:pointer; font-size:1rem;
+  color:var(--muted); transition:all .15s ease;
+}
+.sheet-h .x:hover{color:var(--text); border-color:var(--accent)}
+.sheet-b{padding:16px 18px 20px; overflow:auto; font-size:.95rem}
+.sheet-b .lead{color:var(--muted)}
+/* onboarding */
+#ovOnb .sheet{width:min(520px,94vw); text-align:center}
+#onbFig{margin:6px auto 2px; max-width:300px}
+#onbFig svg{width:100%; height:auto; display:block}
+.onb-actions{margin-top:14px}
+/* about */
+.kbdlist{display:grid; gap:6px; margin:8px 0}
+.kbdlist div{display:flex; gap:10px; align-items:baseline; font-size:.88rem}
+kbd{
+  background:var(--panel2); border:1px solid var(--edge); border-bottom-width:2px;
+  border-radius:6px; padding:.05em .5em; font-family:var(--f); font-size:.8rem; color:var(--accent);
+  min-width:2.2em; text-align:center;
+}
+.creditline{
+  margin-top:12px; padding:10px 12px; border:1px dashed var(--edge); border-radius:var(--rs);
+  color:var(--muted); font-size:.85rem; background:var(--panel2);
+}
+.about-acts{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+/* settings rows */
+.setrow{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:9px 2px; border-bottom:1px solid color-mix(in srgb, var(--edge) 55%, transparent);
+}
+.setrow:last-of-type{border-bottom:none}
+.setrow > span{font-size:.92rem}
+.setrow .ctl{display:flex; gap:6px; align-items:center}
+/* lesson & guide */
+.lrow{display:grid; grid-template-columns:110px 1fr; gap:14px; align-items:center;
+  padding:12px 0; border-bottom:1px solid color-mix(in srgb, var(--edge) 50%, transparent)}
+.lrow:last-child{border-bottom:none}
+.lrow svg{width:110px; height:82px; justify-self:center}
+.lrow h3{font-size:.95rem; color:var(--accent); margin-bottom:3px}
+.lrow p{font-size:.86rem; color:var(--muted); margin:0}
+.gsteps{counter-reset:g; display:grid; gap:10px; padding:0; margin:10px 0 0; list-style:none}
+.gsteps li{
+  counter-increment:g; position:relative; padding-inline-start:44px; font-size:.9rem;
+}
+.gsteps li::before{
+  content:counter(g); position:absolute; inset-inline-start:0; top:0;
+  width:30px; height:30px; display:grid; place-items:center; border-radius:50%;
+  background:var(--accent); color:var(--accent-ink); font-weight:700; font-size:.9rem;
+}
+/* name / confirm / copy modals */
+.mini-form{display:grid; gap:12px}
+.tinput{
+  width:100%; border:1px solid var(--edge); border-radius:var(--rs); background:var(--bg2);
+  padding:.6em .8em; color:var(--text); font-size:1rem;
+}
+.tinput:focus-visible{outline:2px solid var(--focus)}
+.ctext{color:var(--muted); font-size:.92rem}
+.copyta{
+  width:100%; height:220px; resize:vertical; background:var(--bg2); color:var(--text);
+  border:1px solid var(--edge); border-radius:var(--rs); padding:10px;
+  font-family:ui-monospace,Consolas,monospace; font-size:.8rem; direction:ltr; text-align:left;
+}
+/* toasts */
+#toasts{
+  position:fixed; bottom:18px; inset-inline-start:50%; transform:translateX(50%);
+  z-index:220; display:grid; gap:8px; justify-items:center; pointer-events:none;
+}
+html[dir="ltr"] #toasts{transform:translateX(-50%)}
+.toast{
+  background:var(--panel2); color:var(--text); border:1px solid var(--accent);
+  border-radius:999px; padding:.55em 1.2em; font-size:.88rem; box-shadow:var(--shadow);
+  animation:toastIn .3s cubic-bezier(.2,.9,.3,1.25); max-width:min(90vw,480px); text-align:center;
+}
+.toast.out{animation:toastOut .3s ease forwards}
+.toast.warn{border-color:var(--warn)}
+.toast.err{border-color:var(--danger)}
+@keyframes toastIn{from{opacity:0; transform:translateY(14px) scale(.94)}to{opacity:1; transform:none}}
+@keyframes toastOut{to{opacity:0; transform:translateY(10px) scale(.96)}}
+/* footer */
+.foot{
+  text-align:center; color:var(--faint); font-size:.78rem; padding:14px 10px 20px;
+}
+/* ============================================================
+   07 · MOTION SAFETY & RESPONSIVE
+   ============================================================ */
+/* tips rotator strip — cycles real sundial facts over the stage */
+.tipstrip{
+  position:absolute; top:14px; inset-inline:16px; z-index:6;
+  display:flex; align-items:center; gap:8px;
+  padding:7px 10px; border-radius:14px;
+  background:rgba(12,14,17,.78); border:1px solid rgba(255,255,255,.14);
+  color:#f0ece2; font-size:12.5px; backdrop-filter:blur(6px);
+}
+.tipchip{
+  background:#e0a83c; color:#241b08; border-radius:8px;
+  padding:2px 9px; font-weight:700; font-size:11px; white-space:nowrap;
+}
+.tiptxt{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tipnav{display:flex; gap:4px; align-items:center}
+.tipnav .chipbtn{padding:2px 9px}
+.tipdots{display:flex; gap:4px; align-items:center}
+.tipdot{width:7px; height:7px; border-radius:50%; border:1px solid rgba(255,255,255,.4); background:transparent; padding:0; cursor:pointer}
+.tipdot.on{background:#e0a83c; border-color:#e0a83c}
+.anlsvg{display:block; margin:2px auto 10px}
+.anlsvg text{font-family:inherit}
+.anlsvg + .ctext{margin-top:4px}
+@keyframes tipIn{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+.tiptxt.in{animation:tipIn .35s ease}
+.tipdot:focus-visible{outline:2px solid #e0a83c; outline-offset:2px}
+.tipstrip:focus-within{border-color:#e0a83c}
+@media (max-width:560px){.tipdots{display:none}}
+@media print{.tipstrip,.overlay{display:none!important}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; transition-duration:.01ms !important}
+  .stage.flash::after{display:none}
+}
+@media (max-width:1020px){
+  #app{grid-template-columns:1fr}
+  .panel{max-height:none}
+  .brand .tag{display:none}
+}
+@media (max-width:560px){
+  .chipbtn span{display:none}
+  #langBtn span{display:inline}
+  .hud{inset-inline:8px}
+  .acts{grid-template-columns:1fr 1fr}
+}
+/* ============================================================
+   08 · PRINT — 1:1-ish template + hour table + build steps
+   ============================================================ */
+#printSheet{display:none}
+@media print{
+  @page{size:A4 portrait; margin:11mm}
+  body{background:#fff; color:#000}
+  body > *:not(#printSheet){display:none !important}
+  #printSheet{display:block; font-family:var(--f); color:#000}
+  #printSheet h2{font-size:17pt; margin:0 0 2px}
+  #printSheet .prsub{font-size:9.5pt; color:#444; margin:0 0 8px}
+  #printCanvas{width:118mm; height:118mm; display:block; margin:0 auto; border:1px solid #999; border-radius:6px}
+  .prcols{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:8px}
+  #printSheet table{width:100%; border-collapse:collapse; font-size:8.5pt}
+  #printSheet th,#printSheet td{border:1px solid #777; padding:1.5px 5px; text-align:center}
+  #printSheet th{background:#eee}
+  #printSheet h3{font-size:10.5pt; margin:8px 0 4px; border-bottom:1px solid #999; padding-bottom:2px}
+  #prSteps{margin:4px 0 0; padding-inline-start:18px; font-size:8.8pt}
+  #prSteps li{margin-bottom:2.5px}
+  .prfoot{margin-top:10px; font-size:8pt; color:#555; text-align:center; border-top:1px solid #bbb; padding-top:5px}
+  #printSheet .eot-tbl td b.fast{color:#1a7a2e}
+  #printSheet .eot-tbl td b.slow{color:#a04a10}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#controls" data-i18n="skip">تخطَّ إلى أدوات التحكم</a>
+
+<header class="top">
+  <a class="back" href="../index.html" data-i18n-aria="back" aria-label="عودة إلى مجموعة الأصيلة العشرة">↩</a>
+  <div class="brand">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="21" fill="none" stroke="#d4a94e" stroke-width="2.5"/>
+      <circle cx="24" cy="24" r="3" fill="#d4a94e"/>
+      <g stroke="#d4a94e" stroke-width="2" stroke-linecap="round">
+        <line x1="24" y1="21" x2="24" y2="6"/>
+        <line x1="26.5" y1="22.5" x2="39" y2="12"/>
+        <line x1="27" y1="25" x2="42" y2="24"/>
+        <line x1="21.5" y1="22.5" x2="9" y2="12"/>
+      </g>
+      <line x1="24" y1="27" x2="17" y2="40" stroke="#8a6a2a" stroke-width="3.4" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1 data-i18n="title">مِزْوَلة</h1>
+      <p class="tag" data-i18n="tagline">صمّم مِزْوَلة تعمل لأي مكان على الأرض — ثم اطبعها وابنِها</p>
+    </div>
+  </div>
+  <div class="hbtns">
+    <button id="langBtn" class="chipbtn" type="button" aria-label="English / العربية"><span>EN</span></button>
+    <button id="aboutBtn" class="chipbtn" type="button" aria-haspopup="dialog"><span class="ico">ⓘ</span><span data-i18n="about">حول</span></button>
+    <button id="settingsBtn" class="chipbtn" type="button" aria-haspopup="dialog"><span class="ico">⚙</span><span data-i18n="settings">الإعدادات</span></button>
+  </div>
+</header>
+
+<main id="app">
+  <!-- ======= STAGE ======= -->
+  <section class="stage" id="stage">
+    <canvas id="dial" role="img" aria-label="وجه الميزولة الحي"></canvas>
+    <div class="hud" aria-hidden="false">
+      <div class="hud-time" id="hudTime">12:00</div>
+      <div id="hudSun">—</div>
+      <div id="hudDate">—</div>
+    </div>
+    <div class="tipstrip" id="tipStrip" role="group" data-i18n-aria="grpTips" aria-label="حِيَل سريعة">
+      <span class="tipchip" id="tipK">حيلة</span>
+      <span class="tiptxt" id="tipTxt" role="status" aria-live="polite"></span>
+      <span class="tipdots" id="tipDots" aria-hidden="true"></span>
+      <span class="tipnav">
+        <button class="chipbtn" id="tipPrev" type="button" data-i18n-aria="tipPrev" aria-label="الحيلة السابقة">‹</button>
+        <button class="chipbtn" id="tipNext" type="button" data-i18n-aria="tipNext" aria-label="الحيلة التالية">›</button>
+        <button class="chipbtn" id="anlBtn" type="button" aria-haspopup="dialog" data-i18n="anlBtn">ما الأنالَما؟</button>
+      </span>
+    </div>
+  </section>
+
+  <!-- ======= CONTROLS ======= -->
+  <aside class="panel" id="controls" data-i18n-aria="controlsAria" aria-label="أدوات التصميم">
+
+    <div class="grp">
+      <h3 data-i18n="gType">نوع المِزْوَلة</h3>
+      <div class="seg c3" id="segType" role="radiogroup" data-i18n-aria="gType" aria-label="نوع الميزولة">
+        <button class="segbtn" type="button" data-type="horizontal" role="radio" aria-checked="true">
+          <b data-i18n="tyHor">أفقية</b><small data-i18n="tyHorD">الأصل الكلاسيكي</small>
+        </button>
+        <button class="segbtn" type="button" data-type="equatorial" role="radio" aria-checked="false">
+          <b data-i18n="tyEq">استوائية</b><small data-i18n="tyEqD">٢٤ شعاعًا وقضيب</small>
+        </button>
+        <button class="segbtn" type="button" data-type="vertical" role="radio" aria-checked="false">
+          <b data-i18n="tyVer">جدارية</b><small data-i18n="tyVerD">جدار يواجه الجنوب</small>
+        </button>
+      </div>
+    </div>
+
+    <div class="grp">
+      <div class="ghead"><h3 data-i18n="gLat">خط العرض</h3><output class="gout" id="latOut">33.5°</output></div>
+      <input type="range" id="latR" min="-66" max="66" step="0.5" value="33.5" data-i18n-aria="aLat" aria-label="خط العرض">
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="grp">
+      <h3 data-i18n="gStyle">الخامة</h3>
+      <div class="swatches" id="swatches" role="radiogroup" data-i18n-aria="gStyle" aria-label="خامة الميزولة">
+        <button class="swbtn on" type="button" data-style="brass" role="radio" aria-checked="true"><span class="sw brass"></span><span data-i18n="stBrass">نحاس</span></button>
+        <button class="swbtn" type="button" data-style="stone" role="radio" aria-checked="false"><span class="sw stone"></span><span data-i18n="stStone">حجر</span></button>
+        <button class="swbtn" type="button" data-style="slate" role="radio" aria-checked="false"><span class="sw slate"></span><span data-i18n="stSlate">سواند</span></button>
+        <button class="swbtn" type="button" data-style="paper" role="radio" aria-checked="false"><span class="sw paper"></span><span data-i18n="stPaper">ورق</span></button>
+      </div>
+    </div>
+
+    <div class="grp">
+      <h3 data-i18n="gNum">أرقام الساعات</h3>
+      <div class="seg c3" id="segNum" role="radiogroup" data-i18n-aria="gNum" aria-label="نمط أرقام الساعات">
+        <button class="segbtn" type="button" data-num="roman" role="radio" aria-checked="true"><b>IV·XII</b><small data-i18n="nmRoman">رومانية</small></button>
+        <button class="segbtn" type="button" data-num="arabic" role="radio" aria-checked="false"><b>٤·١٢</b><small data-i18n="nmArabic">هندية</small></button>
+        <button class="segbtn" type="button" data-num="western" role="radio" aria-checked="false"><b>4·12</b><small data-i18n="nmWest">غربية</small></button>
+      </div>
+      <div class="swrow"><span data-i18n="tgAnl">منحنى التمايل (أنالما)</span>
+        <label class="switch"><input type="checkbox" id="tgAnl" data-i18n-aria="tgAnl" aria-label="منحنى الأنالما"><i></i></label></div>
+      <div class="swrow"><span data-i18n="tgRose">وردة البوصلة</span>
+        <label class="switch"><input type="checkbox" id="tgRose" checked data-i18n-aria="tgRose" aria-label="وردة البوصلة"><i></i></label></div>
+      <div class="swrow"><span data-i18n="tgMoon">زخرفة أطوار القمر</span>
+        <label class="switch"><input type="checkbox" id="tgMoon" data-i18n-aria="tgMoon" aria-label="زخرفة أطوار القمر"><i></i></label></div>
+    </div>
+
+    <div class="grp">
+      <div class="ghead"><h3 data-i18n="gTime">وقت اليوم</h3><output class="gout" id="timeOut">12:00</output></div>
+      <input type="range" id="timeR" min="0" max="192" step="1" value="96" data-i18n-aria="aTime" aria-label="وقت اليوم">
+      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+        <button id="playDay" type="button" data-i18n-aria="sweepAria" aria-label="تشغيل حركة الشمس عبر النهار" style="font:inherit;cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:inherit;border-radius:999px;padding:6px 16px;transition:background .25s">▶ <span data-i18n="sweepBtn">تشغيل اليوم</span></button>
+      </div>
+      <div class="ghead" style="margin-top:6px"><h3 data-i18n="gDate">اليوم من السنة</h3><output class="gout" id="dateOut">—</output></div>
+      <input type="range" id="dateR" min="1" max="365" step="1" value="172" data-i18n-aria="aDate" aria-label="اليوم من السنة">
+    </div>
+
+    <div class="grp">
+      <h3 data-i18n="gEot">معادلة الزمن</h3>
+      <div class="eot-main" id="eotMain">—</div>
+      <div class="eot-grid" id="eotGrid"></div>
+    </div>
+
+    <div class="grp">
+      <h3 data-i18n="gOut">المخرجات</h3>
+      <div class="acts">
+        <button class="btn primary" id="btnPng" type="button">⬇ <span data-i18n="expPng">قالب PNG</span></button>
+        <button class="btn" id="btnPrint" type="button">🖨 <span data-i18n="doPrint">طباعة</span></button>
+        <button class="btn" id="btnJson" type="button">{ } <span data-i18n="copyJson">انسخ المواصفات</span></button>
+        <button class="btn" id="btnSteps" type="button">📋 <span data-i18n="copySteps">انسخ خطوات البناء</span></button>
+        <button class="btn" id="btnSave" type="button">💾 <span data-i18n="saveDesign">احفظ التصميم</span></button>
+        <button class="btn" id="btnLib" type="button">🗂 <span data-i18n="openLib">المكتبة</span></button>
+      </div>
+    </div>
+
+    <div class="grp" id="cmpGrp">
+      <h3 data-i18n="gCmp">مقارنة تصميمين</h3>
+      <select class="tinput" id="cmpSel" data-i18n-aria="gCmp" aria-label="قارن مع تصميم محفوظ"></select>
+    </div>
+  </aside>
+</main>
+
+<footer class="foot"><span data-i18n="credit">جزء من مجموعة «الأصيلة العشرة» — تعمل دون اتصال بالكامل</span><div id="tipLine"></div></footer>
+
+<!-- ======= ONBOARDING ======= -->
+<div class="overlay" id="ovOnb" role="dialog" aria-modal="true" aria-labelledby="onbT">
+  <div class="sheet">
+    <div class="sheet-h"><h2 id="onbT" data-i18n="onbT">أهلًا بك في مِزْوَلة</h2>
+      <button class="x" type="button" data-close="ovOnb" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b">
+      <div id="onbFig"></div>
+      <p data-i18n="onb1">اسحب مؤشّر الوقت لتشاهد ظرف الشمس يكتسح الوجه، واضبط خط العرض لتبني زاوية المِزْوَلة وخطوط الساعات بحساب فلكي حقيقي.</p>
+      <p data-i18n="onb2">حين ترضى عن التصميم صدّره قالبًا للطباعة أو صورة PNG وابنِ مِزْوَلتك غدًا على الشرفة.</p>
+      <div class="onb-actions"><button class="btn primary" id="onbGo" type="button" data-i18n="onbGot">فهمت، لنبدأ</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= ABOUT ======= -->
+<div class="overlay" id="ovAbout" role="dialog" aria-modal="true" aria-labelledby="abT">
+  <div class="sheet">
+    <div class="sheet-h"><h2 id="abT" data-i18n="aboutT">حول مِزْوَلة</h2>
+      <button class="x" type="button" data-close="ovAbout" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b">
+      <p data-i18n="pitch">صمّم مِزْوَلة صالحة للعمل في أي مكان على الأرض: شاهد الشمس الحقيقية تكتسح وجهًا حيًّا، ثم اطبع قالبًا بالمقاس تبنيه غدًا. زاوية المِزْوَلة تساوي خط عرضك، وخطوط الساعات محسوبة من مثلثات كروية حقيقية.</p>
+      <h3 data-i18n="ctlTitle" style="font-size:.9rem;color:var(--muted)">التحكم</h3>
+      <div class="kbdlist">
+        <div><kbd>⇔</kbd><span data-i18n="ctlDrag">اسحب على الوجه مباشرة: أفقيًا للوقت، رأسيًا لليوم</span></div>
+        <div><kbd>←→</kbd><span data-i18n="ctlArrows">الأسهم تحرّك المؤشرات المحدَّدة (الوقت، اليوم، العرض)</span></div>
+        <div><kbd>E</kbd><span data-i18n="ctlE">تصدير قالب PNG</span></div>
+        <div><kbd>P</kbd><span data-i18n="ctlP">طباعة القالب الكامل</span></div>
+        <div><kbd>Esc</kbd><span data-i18n="ctlEsc">إغلاق أي نافذة</span></div>
+        <div><kbd>1·2·3</kbd><span data-i18n="ctl123">أنواع المِزْوَلة: ١ أفقية · ٢ استوائية · ٣ جدارية</span></div>
+        <div><kbd>A·M</kbd><span data-i18n="ctlAM">تبديل الأنالَما (A) أو زخرفة القمر (M)</span></div>
+      </div>
+      <div class="about-acts">
+        <button class="btn" id="abLesson" type="button">☀ <span data-i18n="lessonBtn">كيف تعمل المِزْوَلة؟</span></button>
+        <button class="btn" id="abGuide" type="button">📐 <span data-i18n="guideBtn">دليل البناء خطوة بخطوة</span></button>
+        <button class="btn" id="abOnb" type="button">💡 <span data-i18n="onbAgain">أعد عرض الترحيب</span></button>
+      </div>
+      <div class="creditline"><span data-i18n="credit">جزء من مجموعة «الأصيلة العشرة» — تعمل دون اتصال بالكامل</span> · <span data-i18n="verLine">مفهوم أصلي · بلا خوادم ولا شبكة</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= SETTINGS ======= -->
+<div class="overlay" id="ovSet" role="dialog" aria-modal="true" aria-labelledby="stT">
+  <div class="sheet">
+    <div class="sheet-h"><h2 id="stT" data-i18n="setT">الإعدادات</h2>
+      <button class="x" type="button" data-close="ovSet" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b">
+      <div class="setrow"><span data-i18n="sound">صوت النقرات ودقات الساعة</span>
+        <label class="switch"><input type="checkbox" id="stSound" checked data-i18n-aria="sound" aria-label="الصوت"><i></i></label></div>
+      <div class="setrow"><span data-i18n="motion">الحركة والتوهج التفاعلي</span>
+        <label class="switch"><input type="checkbox" id="stMotion" checked data-i18n-aria="motion" aria-label="الحركة"><i></i></label></div>
+      <div class="setrow"><span data-i18n="units">وحدات القياس</span>
+        <div class="ctl seg c2" id="stUnits" role="radiogroup" data-i18n-aria="units" aria-label="الوحدات" style="width:170px">
+          <button class="segbtn on" type="button" data-unit="cm" role="radio" aria-checked="true"><b data-i18n="uCm">سنتيمتر</b></button>
+          <button class="segbtn" type="button" data-unit="in" role="radio" aria-checked="false"><b data-i18n="uIn">بوصة</b></button>
+        </div></div>
+      <div class="setrow"><span data-i18n="lw">ثقل الخطوط</span>
+        <div class="ctl seg c3" id="stLw" role="radiogroup" data-i18n-aria="lw" aria-label="ثقل الخطوط" style="width:210px">
+          <button class="segbtn" type="button" data-lw="thin" role="radio" aria-checked="false"><b data-i18n="lwThin">رفيع</b></button>
+          <button class="segbtn on" type="button" data-lw="normal" role="radio" aria-checked="true"><b data-i18n="lwMid">متوسط</b></button>
+          <button class="segbtn" type="button" data-lw="bold" role="radio" aria-checked="false"><b data-i18n="lwBold">عريض</b></button>
+        </div></div>
+      <div class="setrow"><span data-i18n="theme">ثيم الواجهة</span>
+        <div class="ctl swatches" id="stTheme" role="radiogroup" data-i18n-aria="theme" aria-label="الثيم" style="grid-template-columns:repeat(4,1fr); width:250px">
+          <button class="swbtn on" type="button" data-theme="brass" role="radio" aria-checked="true"><span class="sw brass"></span><span data-i18n="stBrass">نحاس</span></button>
+          <button class="swbtn" type="button" data-theme="stone" role="radio" aria-checked="false"><span class="sw stone"></span><span data-i18n="stStone">حجر</span></button>
+          <button class="swbtn" type="button" data-theme="slate" role="radio" aria-checked="false"><span class="sw slate"></span><span data-i18n="stSlate">سواند</span></button>
+          <button class="swbtn" type="button" data-theme="paper" role="radio" aria-checked="false"><span class="sw paper"></span><span data-i18n="stPaper">ورق</span></button>
+        </div></div>
+      <div class="setrow"><span data-i18n="reset">مسح كل البيانات المحلية</span>
+        <button class="btn danger" id="stReset" type="button" data-i18n="resetBtn">مسح…</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= LESSON ======= -->
+<div class="overlay" id="ovLesson" role="dialog" aria-modal="true" aria-labelledby="lsT">
+  <div class="sheet">
+    <div class="sheet-h"><h2 id="lsT" data-i18n="lesT">كيف تعمل المِزْوَلة؟</h2>
+      <button class="x" type="button" data-close="ovLesson" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b" id="lessonBody"></div>
+  </div>
+</div>
+
+<!-- ======= BUILD GUIDE ======= -->
+<div class="overlay" id="ovGuide" role="dialog" aria-modal="true" aria-labelledby="gdT">
+  <div class="sheet">
+    <div class="sheet-h"><h2 id="gdT" data-i18n="guiT">دليل البناء خطوة بخطوة</h2>
+      <button class="x" type="button" data-close="ovGuide" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b" id="guideBody"></div>
+  </div>
+</div>
+
+<!-- ======= LIBRARY ======= -->
+<div class="overlay" id="ovLib" role="dialog" aria-modal="true" aria-labelledby="lbT">
+  <div class="sheet">
+    <div class="sheet-h"><h2 id="lbT" data-i18n="libT">مكتبة التصاميم</h2>
+      <button class="x" type="button" data-close="ovLib" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b">
+      <p class="lead" data-i18n="libHint">تصاميمك المحفوظة تبقى على هذا الجهاز. حمّل تصميمًا، أو قارنه بوجهك الحالي بخطوط شبحية.</p>
+      <div class="liblist" id="libList"></div>
+      <p class="ctext" id="libStats" style="font-size:.8rem">—</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======= NAME MODAL ======= -->
+<div class="overlay" id="ovName" role="dialog" aria-modal="true" aria-labelledby="nmT">
+  <div class="sheet" style="width:min(420px,94vw)">
+    <div class="sheet-h"><h2 id="nmT" data-i18n="libName">اسم التصميم</h2>
+      <button class="x" type="button" data-close="ovName" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b">
+      <div class="mini-form">
+        <input class="tinput" id="nameInput" type="text" maxlength="40" data-i18n-ph="libNamePh" placeholder="مثال: ميزولة الشرفة">
+        <div style="display:flex; gap:8px; justify-content:flex-end">
+          <button class="btn" type="button" data-close="ovName" data-i18n="cancel">إلغاء</button>
+          <button class="btn primary" id="nameOk" type="button" data-i18n="save">احفظ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= CONFIRM MODAL ======= -->
+<div class="overlay" id="ovConfirm" role="dialog" aria-modal="true" aria-labelledby="cmT">
+  <div class="sheet" style="width:min(430px,94vw)">
+    <div class="sheet-h"><h2 id="cmT">—</h2>
+      <button class="x" type="button" data-close="ovConfirm" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b">
+      <p class="ctext" id="cmBody">—</p>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
+        <button class="btn" id="cmNo" type="button" data-close="ovConfirm" data-i18n="keep">تراجع</button>
+        <button class="btn danger" id="cmYes" type="button" data-i18n="doReset">تأكيد</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= COPY FALLBACK MODAL ======= -->
+<div class="overlay" id="ovCopy" role="dialog" aria-modal="true" aria-labelledby="cpT">
+  <div class="sheet" style="width:min(560px,94vw)">
+    <div class="sheet-h"><h2 id="cpT" data-i18n="cpT">انسخ يدويًا</h2>
+      <button class="x" type="button" data-close="ovCopy" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b">
+      <p class="ctext" data-i18n="cpHint">تعذّر النسخ التلقائي — النص محدد أدناه، اضغط Ctrl+C (أو ⌘C) لنسخه.</p>
+      <textarea class="copyta" id="copyTa" readonly aria-label="نص للنسخ"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ======= ANALEMMA MINI-CARD (figure-8 explainer) ======= -->
+<div class="overlay" id="ovAnl" role="dialog" aria-modal="true" aria-labelledby="anlH">
+  <div class="sheet" style="width:min(520px,94vw)">
+    <div class="sheet-h"><h2 id="anlH" data-i18n="anlT">الأنالَما: بصمة ميل الأرض</h2>
+      <button class="x" type="button" data-close="ovAnl" data-i18n-aria="aClose" aria-label="إغلاق">✕</button></div>
+    <div class="sheet-b">
+      <svg class="anlsvg" width="150" height="150" viewBox="0 0 100 100" role="img"
+           aria-label="منحنى الشكل الثماني للأنالَما على وجه الميزولة">
+        <line x1="50" y1="4" x2="50" y2="96" stroke="#8f8a7a" stroke-width="1" stroke-dasharray="3 3"/>
+        <path d="M50 8 C 76 8 76 40 50 50 C 24 60 24 92 50 92 C 76 92 76 60 50 50 C 24 40 24 8 50 8 Z"
+              fill="none" stroke="#e0a83c" stroke-width="2.4" stroke-linejoin="round"/>
+        <circle cx="50" cy="50" r="2.2" fill="#8f8a7a"/>
+        <circle cx="50" cy="8"  r="3"   fill="#e6b84c"/>
+        <circle cx="50" cy="92" r="3"   fill="#e6b84c"/>
+        <text x="57" y="12" font-size="7" fill="#8f8a7a">6 · يونيو</text>
+        <text x="57" y="90" font-size="7" fill="#8f8a7a">12 · ديسمبر</text>
+      </svg>
+      <svg class="anlsvg" width="190" height="84" viewBox="0 0 190 84" role="img"
+           aria-label="محور الأرض المائل بين مداري السرطان والجدي">
+        <line x1="10" y1="42" x2="180" y2="42" stroke="#8f8a7a" stroke-width="1" stroke-dasharray="3 3"/>
+        <circle cx="95" cy="42" r="20" fill="none" stroke="#6f8fae" stroke-width="2"/>
+        <line x1="95" y1="14" x2="84" y2="70" stroke="#6f8fae" stroke-width="2"/>
+        <circle cx="95" cy="24" r="2.4" fill="#e0a83c"/>
+        <circle cx="95" cy="60" r="2.4" fill="#e0a83c"/>
+        <text x="103" y="27" font-size="8" fill="#8f8a7a">23.4°N</text>
+        <text x="103" y="63" font-size="8" fill="#8f8a7a">23.4°S</text>
+      </svg>
+      <p class="ctext" data-i18n="anlP1">…</p>
+      <p class="ctext" data-i18n="anlP2">…</p>
+      <p class="ctext" data-i18n="anlP3">…</p>
+      <p class="ctext" data-i18n="anlP4">…</p>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+
+<!-- ======= PRINT SHEET (print-only) ======= -->
+<div id="printSheet">
+  <h2 id="prTitle">—</h2>
+  <p class="prsub" id="prSub">—</p>
+  <canvas id="printCanvas" width="1180" height="1180"></canvas>
+  <div class="prcols">
+    <div>
+      <h3 id="prTableT">—</h3>
+      <table id="prTable"></table>
+    </div>
+    <div>
+      <h3 id="prEotT">—</h3>
+      <table class="eot-tbl" id="prEot"></table>
+      <h3 id="prStepsT">—</h3>
+      <ol id="prSteps"></ol>
+    </div>
+  </div>
+  <p class="prfoot" id="prFoot">—</p>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   00 · UTILITIES
+   ============================================================ */
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2, RAD=Math.PI/180;
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+const lerp=(a,b,k)=>a+(b-a)*k;
+const pad2=n=>(n<10?"0":"")+n;
+const f1=v=>(Math.round(v*10)/10).toFixed(1);
+const f2=v=>(Math.round(v*100)/100).toFixed(2);
+function mulberry(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function roman(n){const T=[[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]];let s="";for(const[v,c]of T){while(n>=v){s+=c;n-=v;}}return s||"0";}
+const ADIG="٠١٢٣٤٥٦٧٨٩";
+const arNum=v=>String(v).replace(/[0-9]/g,d=>ADIG[+d]);
+function numFor(style,n){
+  if(style==="roman")return roman(n);
+  if(style==="arabic")return arNum(n);
+  return String(n);
+}
+function fmtTime(min){const h=Math.floor(min/60),m=Math.round(min%60);return pad2(h)+":"+pad2(m);}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+/* ============================================================
+   01 · I18N — every user-visible string, AR (default) + EN
+   ============================================================ */
+const I18N={
+ar:{
+  skip:"تخطَّ إلى أدوات التحكم", title:"مِزْوَلة", tagline:"صمّم مِزْوَلة تعمل لأي مكان على الأرض — ثم اطبعها وابنِها",
+  back:"عودة إلى مجموعة «الأصيلة العشرة»", about:"حول", settings:"الإعدادات", controlsAria:"أدوات التصميم",
+  docTitle:"مِزْوَلة — استوديو المزاول · يعمل دون اتصال",
+  gType:"نوع المِزْوَلة", tyHor:"أفقية", tyHorD:"الأصل الكلاسيكي", tyEq:"استوائية", tyEqD:"٢٤ شعاعًا وقضيب", tyVer:"جدارية", tyVerD:"جدار يواجه الجنوب",
+  gLat:"خط العرض", gStyle:"الخامة", gNum:"أرقام الساعات",
+  stBrass:"نحاس", stStone:"حجر", stSlate:"سواند", stPaper:"ورق",
+  nmRoman:"رومانية", nmArabic:"هندية", nmWest:"غربية",
+  tgAnl:"منحنى التمايل (أنالَما)", tgRose:"وردة البوصلة", tgMoon:"زخرفة أطوار القمر",
+  gTime:"وقت اليوم", gDate:"اليوم من السنة", gEot:"معادلة الزمن", gOut:"المخرجات", gCmp:"مقارنة تصميمين",
+  sweepBtn:"تشغيل اليوم", sweepAria:"تشغيل حركة الشمس عبر النهار", sweepOn:"انطلقت الشمس — تتبّع الظل", sweepOff:"أوقفت مسار اليوم",
+  expPng:"قالب PNG", doPrint:"طباعة", copyJson:"انسخ المواصفات", copySteps:"انسخ خطوات البناء",
+  tipPrev:"الحيلة السابقة", tipNext:"الحيلة التالية", anlBtn:"ما الأنالَما؟",
+  anlT:"الأنالَما: بصمة ميل الأرض",
+  anlP1:"علّم طرف ظل الظهيرة على الوجه يومًا بعد يوم، وسترى الرقم 8 يرسم نفسه ببطء عبر السنة.",
+  anlP2:"ميل محور الأرض يرفع الشمس ويخفضها بين الصيف والشتاء، وبيضاوية المدار تُسرّعها وتُبطئها — وهو ما يسمّيه الفلكيون معادلة الزمن.",
+  anlP3:"لذلك يُرسم الأنالَما على الميزولات الأفقية والجدارية فقط، وهو أجمل ما يسجّله لوح صبور.",
+  anlP4:"العقدتان تكبران كلما ابتعدت عن خط الاستواء — وعند الخطوط العليا يطول المنحنى حتى يمتد على الوجه كله.",
+  grpTips:"حِيَل سريعة",
+  tplT:"قالب بناء مِزْوَلة", tplSub:"خط العرض {lat}°", tplDim:"زوايا خطوط الساعات", tplGno:"مثلث المؤشّر — اقطعه بدقة 100%",
+  prColH:"الساعة", prColSide:"الجهة", prColA:"الزاوية", prEotH:"معادلة الزمن شهريًا (دقائق)", prStepsH:"خطوات البناء",
+  prTip:"اطبع بمقياس 100% (بلا تحجيم أو ملاءمة للصفحة) حتى تنطبق المقاسات.",
+  cpOk:"نُسخ إلى الحافظة", expOk:"صُدّر قالب PNG",
+  prSteps:["اطبع القالب بمقياس 100% على ورق سميك، أو الصقّه على اللوح مباشرة.","انقل دائرة الوجه وخطوط الساعات إلى الخامة بالدبوس والمسطرة.","انقل مثلث المؤشّر ثم اقطعه، واجعل زاوية الحافة {lat}° تمامًا.","ثبّت المؤشّر على خط الظهيرة بحيث تشير حافته إلى القطب السماوي.","صدّد اللوح بمستوى روحي، ثم وجّه خط الظهيرة نحو الشمال الحقيقي.","تحقّق من القراءة ظهرًا، وصحّح الفارق بمعادلة الزمن."],
+  saveDesign:"احفظ التصميم", openLib:"المكتبة",
+  credit:"جزء من مجموعة «الأصيلة العشرة» — تعمل دون اتصال بالكامل", verLine:"مفهوم أصلي · بلا خوادم ولا شبكة",
+  onbT:"أهلًا بك في مِزْوَلة",
+  onb1:"اسحب مؤشّر الوقت لتشاهد ظرف الشمس يكتسح الوجه، واضبط خط العرض لتبني زاوية المِزْوَلة وخطوط الساعات بحساب فلكي حقيقي.",
+  onb2:"حين ترضى عن التصميم صدّره قالبًا للطباعة أو صورة PNG وابنِ مِزْوَلتك غدًا على الشرفة.",
+  onbGot:"فهمت، لنبدأ",
+  aboutT:"حول مِزْوَلة",
+  pitch:"صمّم مِزْوَلة صالحة للعمل في أي مكان على الأرض: شاهد الشمس الحقيقية تكتسح وجهًا حيًّا، ثم اطبع قالبًا بالمقاس تبنيه غدًا. زاوية المِزْوَلة تساوي خط عرضك، وخطوط الساعات محسوبة من مثلثات كروية حقيقية.",
+  ctlTitle:"التحكم", ctlDrag:"اسحب على الوجه مباشرة: أفقيًا للوقت، رأسيًا لليوم",
+  ctlArrows:"الأسهم تحرّك المؤشرات المحدَّدة (الوقت، اليوم، العرض)",
+  ctlE:"تصدير قالب PNG", ctlP:"طباعة القالب الكامل", ctlEsc:"إغلاق أي نافذة",
+  lessonBtn:"كيف تعمل المِزْوَلة؟", guideBtn:"دليل البناء خطوة بخطوة", onbAgain:"أعد عرض الترحيب",
+  setT:"الإعدادات", sound:"صوت النقرات ودقات الساعة", motion:"الحركة والتوهج التفاعلي",
+  units:"وحدات القياس", uCm:"سنتيمتر", uIn:"بوصة", lw:"ثقل الخطوط",
+  lwThin:"رفيع", lwMid:"متوسط", lwBold:"عريض", theme:"ثيم الواجهة",
+  reset:"مسح كل البيانات المحلية", resetBtn:"مسح…",
+  lesT:"كيف تعمل المِزْوَلة؟", guiT:"دليل البناء خطوة بخطوة",
+  libT:"مكتبة التصاميم", libHint:"تصاميمك المحفوظة تبقى على هذا الجهاز. حمّل تصميمًا، أو قارنه بوجهك الحالي بخطوط شبحية.",
+  libName:"اسم التصميم", libNamePh:"مثال: ميزولة الشرفة", save:"احفظ", cancel:"إلغاء",
+  doReset:"تأكيد", keep:"تراجع",
+  cpT:"انسخ يدويًا", cpHint:"تعذّر النسخ التلقائي — النص محدد أدناه، اضغط Ctrl+C (أو ⌘C) لنسخه.",
+  aClose:"إغلاق", aDial:"وجه الميزولة الحي", aLat:"خط العرض", aTime:"وقت اليوم", aDate:"اليوم من السنة",
+  cities:["دمشق","القاهرة","لندن","نيويورك","مكة","الرياض","طوكيو","إستنبول","الرباط","جاكرتا","كيب تاون"],
+  months:["ينا","فبر","مار","أبر","ماي","يون","يول","أغس","سبت","أكت","نوف","ديس"],
+  winds:["شمال","شمال شرق","شرق","جنوب شرق","جنوب","جنوب غرب","غرب","شمال غرب"],
+  am:"ص", pm:"م", north:"شمال", south:"جنوب",
+  sunUp:"الشمس {a}° فوق الأفق · اتجاه {w}", sunBelow:"الشمس تحت الأفق — لا ظل الآن",
+  eotFast:"المِزْوَلة تسبق الساعة بـ {m} دقيقة", eotSlow:"المِزْوَلة تتأخر عن الساعة بـ {m} دقيقة", eotEq:"المِزْوَلة مطابقة للساعة تقريبًا اليوم",
+  eotSundial:"وقت المِزْوَلة الآن ≈ {s} (ساعتك {c})", eotNote:"القيم بأحداب معدّلة شهريًا واستيفاء خطّي",
+  dayOf:"اليوم {d} من السنة · {mon} {dm} · ميل الشمس δ = {dec}°",
+  fastS:"سابقة", slowS:"متأخرة",
+  gnomonCut:"مثلث المِزْوَلة (قصّة)", dialR:"نصف قطر الوجه", gBase:"القاعدة", gHeight:"الارتفاع", gAngle:"الزاوية",
+  sideView:"منظر جانبي", noonLine:"خط الظهر", northArrow:"شمال", foldTab:"لسان طيّ",
+  exportTitle:"قالب مِزْوَلة {type} — خط عرض {lat}°", printScale:"اطبع بمقياس 100% (بلا «ملاءمة الصفحة») — الوجه بنصف قطر {r}",
+  design:"تصميم", cmpNone:"بلا مقارنة", cmpGhost:"شبح: {name}",
+  tsSaved:"حُفظ «{n}» في المكتبة", tsLoaded:"حُمِّل «{n}»", tsDeleted:"حُذف التصميم",
+  tsPng:"صُدِّر قالب PNG — «{n}»", tsJson:"نُسخت مواصفات JSON", tsSteps:"نُسخت خطوات البناء",
+  tsPrinted:"جهّزنا ورقة الطباعة — اختر الطابعة", tsReset:"مُسحت كل البيانات المحلية",
+  tsCopyFail:"النسخ التلقائي غير متاح — انسخ يدويًا", tsCmpDiff:"أنواع مختلفة — تُرسم خطوط الشبح فوق الوجه الحالي",
+  tsCmpOn:"تُقارن الآن مع «{n}»", tsAnlEq:"الأنالَما تُرسم للميزولة الأفقية أو الجدارية",
+  tsNight:"الوقت الحالي: الشمس خلف الأفق — جرّب وقت الظهر",
+  resetT:"مسح كل البيانات؟", resetB:"سيُمسح كل شيء: التصاميم المحفوظة، الإعدادات، وعدّاد الإنشاء. لا يمكن التراجع.",
+  delT:"حذف التصميم؟", delB:"سيُحذف «{n}» نهائيًا من المكتبة.",
+  libEmpty:"لا تصاميم محفوظة بعد — احفظ تصميمك الأول.", libStats:"أُنشئت {n} تصميم على هذا الجهاز",
+  prT:"قالب مِزْوَلة {type} — خط عرض {lat}°", prSub:"مِزْوَلة · مجموعة الأصيلة العشرة · اطبع بمقياس 100% · الوجه بنصف قطر {r}",
+  prTableT:"جدول خطوط الساعات", prEotT:"معادلة الزمن (دقائق)", prStepsT:"خطوات البناء",
+  prFoot:"زاوية المِزْوَلة = خط العرض φ. القيم محسوبة من θ = atan(sin φ · tan H) للأفقية و θ = atan(cos φ · tan H) للجدارية.",
+  th1:"الساعة", th2:"H°", th3:"θ°", th4:"الجهة",
+  stp1:"اطبع هذا القالب بمقياس 100% (عطّل «ملاءمة الصفحة») والصقه على كرتون سميك.",
+  stp2:"قصّ دائرة الوجه بنصف قطر {r} بدقة، وثقّب نقطة الأصل حيث تتقاطع الخطوط.",
+  stp3:"قصّ مثلث المِزْوَلة: قاعدة {b} × ارتفاع {h} — زاوية القائمة = {g}° (خط عرضك).",
+  stp4:"ألصق المثلث واقفًا على خط الظهر بحيث تنظر حافّته نحو النجم القطبي (اتجاه {pole}).",
+  stp5:"اضبط الاتجاه: في ظهيرة يوم صافٍ أدر الوجه حتى يستقيم ظل الظهر على خط الظهر تمامًا.",
+  stp6:"اقرأ الظل على أقرب خط ساعة، ثم صحّح بمعادلة الزمن (الجدول أعلاه) لتحصل على توقيت الساعة.",
+  stp7:"في فصل الصيف قد يتجاوز الظل الوجه — انثر خطوطًا إضافية على قاعدة أو أرضية خارجية إن شئت.",
+  g1:"اطبع القالب 100% والصقه على كرتون 2 مم بلا فقاعات.",
+  g2:"قصّ الدائرة بمقص أو مقص دائري، ثم ارسن مركزها بدبوس.",
+  g3:"قصّ مثلث المِزْوَلة من كرتون أصلب؛ الحافة العلوية هي «الحافة المالِئة» — لا تشوّهها.",
+  g4:"ارسم خط الظهر بعمق (قلم رصاص) قبل اللصق ليظل مرشدًا.",
+  g5:"أفقية: ألصق المثلث واقفًا على خط الظهر. جدارية: ثبّت الزعنفة نازلةً من نقطة الأصل نحو الخارج والأسفل.",
+  g6:"استوائية: اثنِ ألسنة الطيّ للخلف، ومرّر القضيب عبر المركز عموديًا على الوجه.",
+  g7:"الميل: مدد القضيب نحو النجم القطبي بارتفاع {g}°، أو ميّل الوجه كله بزاوية {c}° من الأرض.",
+  g8:"ثبّت كل شيء على قاعدة، اضبط الشمال الحقيقي بالخطوة 5 من الملخص، وجاهز للقراءة.",
+  l1T:"المِزْوَلة = خط العرض", l1B:"الحافة المالئة للمثلث توازي محور دوران الأرض؛ لذا زاويتها عن الأفق تساوي خط عرضك φ تمامًا — لهذا تعمل مِزْوَلة دمشق في دمشق فقط.",
+  l2T:"خطوط الساعات من مثلثات كروية", l2B:"كل ساعة لها زاوية ساعية H = 15° × (الساعة − 12). الأفقية: θ = atan(sin φ · tan H)؛ الجدارية: θ = atan(cos φ · tan H)؛ والاستوائية منتظمة 15°.",
+  l3T:"معادلة الزمن", l3B:"الشمس الحقيقية تسبق الساعة المتوسطة وتتأخر عنها خلال السنة (−14 إلى +16 دقيقة). الجدول يصحّح قراءتك شهرًا بشهر.",
+  gfig1:"ص/م", specNote:"ملاحظة: خطوط الساعات بتوقيت شمسٍ متوسطة محلي؛ صحّح بمعادلة الزمن.",
+  specSouth:"خط العرض جنوبي: القالب معكوس تلقائيًا؛ للميزولة الجدارية اركبه على جدار يواجه الشمال.",
+  canvasAria:"مِزْوَلة {type} على خط عرض {lat}°، الوقت {tm}، اليوم {dy} من السنة",
+  east:"شرق", west:"غرب",
+  l4T:"الأنالَما: توقيع الأرض المائل",
+  l4B:"لو علّمت موضع ظل الظهر كل يوم لرسمتَ شكل الثمانية: الميل المحوري يرفع الشمس ويخفضها، والمدار الإهليلجي للأرض يولّد معادلة الزمن فيزيح الظل جانبيًا. الوجه يسجّل الحركتين معًا.",
+  tips:["اسحب على الوجه أفقيًا لتغيير الوقت، ورأسيًا لتغيير اليوم من السنة.","زاوية المِزْوَلة تساوي خط العرض تمامًا — حرّكه وشاهد المثلث يتغيّر.","عند خط العرض 0 تصبح الاستوائية مستوية تمامًا (ميل 90°).","الأنالَما تُرسم في الميزولات الأفقية والجدارية فقط.","اطبع دائمًا بمقياس 100% وإلا لن تنطبق المقاسات.","احفظ تصميمين ثم قارنهما بخطوط شبحية من المكتبة.","صحّح قراءتك بمعادلة الزمن — فبراير أصعب شهر (−14 دقيقة)."],
+  tipsK:"حيلة", stExports:"{n} عملية تصدير على هذا الجهاز", tsCmpOff:"أُوقفت المقارنة",
+  load:"حمّل", del:"احذف", glueHere:"ألصق هنا",
+  triScale:"مقياس المثلث {p}% — اطبع الصفحة كاملةً للحجم الحقيقي",
+  ctl123:"أنواع المِزْوَلة: ١ أفقية · ٢ استوائية · ٣ جدارية",
+  ctlAM:"تبديل الأنالَما (A) أو زخرفة القمر (M)",
+  week:"م", hUnit:"سم", inUnit:"بوصة"
+},
+en:{
+  skip:"Skip to controls", title:"Mizwala", tagline:"Design a working sundial for any place on Earth — then print and build it",
+  back:"Back to the 10 Originals collection", about:"About", settings:"Settings", controlsAria:"Design controls",
+  docTitle:"Mizwala — Sundial Studio · works offline",
+  gType:"Dial type", tyHor:"Horizontal", tyHorD:"the classic form", tyEq:"Equatorial", tyEqD:"24 spokes + bar", tyVer:"Vertical", tyVerD:"south-facing wall",
+  gLat:"Latitude", gStyle:"Material", gNum:"Hour numerals",
+  stBrass:"Brass", stStone:"Stone", stSlate:"Slate", stPaper:"Paper",
+  nmRoman:"Roman", nmArabic:"Arabic-Indic", nmWest:"Western",
+  tgAnl:"Analemma curve", tgRose:"Compass rose", tgMoon:"Moon-phase border",
+  gTime:"Time of day", gDate:"Day of year", gEot:"Equation of time", gOut:"Outputs", gCmp:"Compare designs",
+  sweepBtn:"Play the day", sweepAria:"Play the sun across the day", sweepOn:"The sun is up — follow the shadow", sweepOff:"Day sweep stopped",
+  expPng:"PNG template", doPrint:"Print", copyJson:"Copy JSON spec", copySteps:"Copy build steps",
+  tipPrev:"Previous tip", tipNext:"Next tip", anlBtn:"What is the analemma?",
+  anlT:"The analemma: Earth’s tilted signature",
+  anlP1:"Mark the noon shadow tip day after day and a figure eight slowly draws itself across the year.",
+  anlP2:"Earth’s axial tilt lifts and lowers the sun between summer and winter, while the elliptical orbit speeds it up and slows it down — astronomers call this the equation of time.",
+  anlP3:"That is why the analemma draws on horizontal and vertical dials only — and it is the loveliest thing a patient plate can record.",
+  anlP4:"The two loops grow as you move away from the equator — at high latitudes the curve stretches until it spans the whole face.",
+  grpTips:"Quick tips",
+  tplT:"Sundial build template", tplSub:"Latitude {lat}°", tplDim:"Hour-line angles", tplGno:"Gnomon cut-out — cut at 100% scale",
+  prColH:"Hour", prColSide:"Side", prColA:"Angle", prEotH:"Monthly equation of time (minutes)", prStepsH:"Build steps",
+  prTip:"Print at 100% scale (no fitting or shrinking) so the dimensions hold true.",
+  cpOk:"Copied to clipboard", expOk:"PNG template exported",
+  prSteps:["Print the template at 100% scale on stiff paper, or glue it straight onto the board.","Transfer the face circle and the hour lines onto the material with a pin and a ruler.","Transfer the gnomon triangle and cut it out, keeping the edge angle at exactly {lat}°.","Fix the gnomon on the noon line so its edge points to the celestial pole.","Level the plate with a spirit level, then turn the noon line to true north.","Check the reading at noon and correct the difference with the equation of time."],
+  saveDesign:"Save design", openLib:"Library",
+  credit:"Part of ’10 Originals’ — fully offline", verLine:"original concept · no servers, no network",
+  onbT:"Welcome to Mizwala",
+  onb1:"Drag the time scrubber to watch the gnomon shadow sweep the dial, and set your latitude to build the gnomon angle and hour lines from real spherical trigonometry.",
+  onb2:"When you are happy with the design, export it as a print template or PNG and build your sundial tomorrow on the balcony.",
+  onbGot:"Got it, start",
+  aboutT:"About Mizwala",
+  pitch:"Design a working sundial for any place on Earth: watch the real sun sweep a live dial, then print a full-size template you can build tomorrow. The gnomon angle equals your latitude, and the hour lines come from real spherical trigonometry.",
+  ctlTitle:"Controls", ctlDrag:"Drag on the dial face directly: horizontal for time, vertical for date",
+  ctlArrows:"Arrow keys move the focused scrubber (time, date, latitude)",
+  ctlE:"Export PNG template", ctlP:"Print the full template", ctlEsc:"Close any panel",
+  lessonBtn:"How does a sundial work?", guideBtn:"Step-by-step build guide", onbAgain:"Replay the welcome",
+  setT:"Settings", sound:"Click & hour-tick sounds", motion:"Motion & reactive glow",
+  units:"Measurement units", uCm:"Centimeter", uIn:"Inch", lw:"Line weight",
+  lwThin:"Thin", lwMid:"Normal", lwBold:"Bold", theme:"Interface theme",
+  reset:"Reset all local data", resetBtn:"Reset…",
+  lesT:"How does a sundial work?", guiT:"Step-by-step build guide",
+  libT:"Design library", libHint:"Saved designs stay on this device. Load one, or ghost-compare it against your current face.",
+  libName:"Design name", libNamePh:"e.g. Balcony dial", save:"Save", cancel:"Cancel",
+  doReset:"Confirm", keep:"Keep",
+  cpT:"Manual copy", cpHint:"Automatic copy failed — the text below is selected; press Ctrl+C (or ⌘C) to copy it.",
+  aClose:"Close", aDial:"Live sundial face", aLat:"Latitude", aTime:"Time of day", aDate:"Day of year",
+  cities:["Damascus","Cairo","London","New York","Mecca","Riyadh","Tokyo","Istanbul","Rabat","Jakarta","Cape Town"],
+  months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+  winds:["north","north-east","east","south-east","south","south-west","west","north-west"],
+  am:"AM", pm:"PM", north:"north", south:"south",
+  sunUp:"Sun {a}° above horizon · toward {w}", sunBelow:"Sun below horizon — no shadow right now",
+  eotFast:"The dial runs {m} min fast of the clock", eotSlow:"The dial runs {m} min slow of the clock", eotEq:"Dial and clock nearly agree today",
+  eotSundial:"Sundial time now ≈ {s} (your clock {c})", eotNote:"12 monthly values, linearly interpolated",
+  dayOf:"Day {d} of year · {mon} {dm} · sun declination δ = {dec}°",
+  fastS:"fast", slowS:"slow",
+  gnomonCut:"Gnomon cut-out", dialR:"Face radius", gBase:"Base", gHeight:"Height", gAngle:"Angle",
+  sideView:"Side view", noonLine:"Noon line", northArrow:"north", foldTab:"Fold tab",
+  exportTitle:"{type} sundial template — latitude {lat}°", printScale:"Print at 100% scale (no fit-to-page) — face radius {r}",
+  design:"Design", cmpNone:"No comparison", cmpGhost:"ghost: {name}",
+  tsSaved:"Saved “{n}” to the library", tsLoaded:"Loaded “{n}”", tsDeleted:"Design deleted",
+  tsPng:"PNG template exported — “{n}”", tsJson:"JSON spec copied", tsSteps:"Build steps copied",
+  tsPrinted:"Print sheet prepared — choose your printer", tsReset:"All local data wiped",
+  tsCopyFail:"Automatic copy unavailable — copy manually", tsCmpDiff:"Different types — ghost lines drawn over the current face",
+  tsCmpOn:"Now comparing with “{n}”", tsAnlEq:"The analemma draws on horizontal or vertical dials",
+  tsNight:"Right now the sun is behind the horizon — try noon",
+  resetT:"Wipe all data?", resetB:"Everything goes: saved designs, settings and the creation counter. This cannot be undone.",
+  delT:"Delete design?", delB:"“{n}” will be removed from the library permanently.",
+  libEmpty:"No saved designs yet — save your first one.", libStats:"{n} designs created on this device",
+  prT:"{type} sundial template — latitude {lat}°", prSub:"Mizwala · 10 Originals collection · print at 100% · face radius {r}",
+  prTableT:"Hour-line table", prEotT:"Equation of time (minutes)", prStepsT:"Build steps",
+  prFoot:"Gnomon angle = latitude φ. Values from θ = atan(sin φ · tan H) for horizontal and θ = atan(cos φ · tan H) for vertical dials.",
+  th1:"Hour", th2:"H°", th3:"θ°", th4:"Side",
+  stp1:"Print this template at 100% scale (disable fit-to-page) and glue it onto stiff cardboard.",
+  stp2:"Cut the face circle to radius {r} precisely; pierce the origin where the lines cross.",
+  stp3:"Cut the gnomon triangle: base {b} × height {h} — the right angle is {g}° (your latitude).",
+  stp4:"Stand the triangle on the noon line so its sloped edge points to the pole star (toward {pole}).",
+  stp5:"Align: on a clear midday, rotate the dial until the noon shadow lies exactly on the noon line.",
+  stp6:"Read the shadow on the nearest hour line, then correct with the equation of time (table above).",
+  stp7:"In summer the shadow may overrun the face — extend extra lines onto a base board if you like.",
+  g1:"Print the template at 100% and glue it onto 2 mm cardboard without bubbles.",
+  g2:"Cut the circle with scissors or a circle cutter, then pin the exact center.",
+  g3:"Cut the gnomon triangle from stiffer card; the top edge is the style — keep it perfectly straight.",
+  g4:"Score the noon line deep with a pencil before gluing so it stays your guide.",
+  g5:"Horizontal: stand the triangle on the noon line. Vertical: fix the fin dropping from the origin, outward and down.",
+  g6:"Equatorial: fold the tabs backward and slide the bar through the center, perpendicular to the face.",
+  g7:"Tilt: point the bar at the pole star at {g}° elevation, or tilt the whole face {c}° off the ground.",
+  g8:"Mount everything on a base, set true north with summary step 5, and start reading.",
+  l1T:"The gnomon is your latitude", l1B:"The triangle’s sloped edge stays parallel to Earth’s rotation axis, so its elevation equals your latitude φ exactly — which is why a Damascus dial only works in Damascus.",
+  l2T:"Hour lines from spherical trig", l2B:"Each hour has an hour angle H = 15° × (hour − 12). Horizontal: θ = atan(sin φ · tan H); vertical: θ = atan(cos φ · tan H); equatorial is a uniform 15°.",
+  l3T:"The equation of time", l3B:"The real sun runs ahead of, then behind, the mean clock through the year (−14 to +16 minutes). The table corrects your reading month by month.",
+  gfig1:"AM/PM", specNote:"Note: hour lines give local mean-solar time; correct with the equation of time.",
+  specSouth:"Southern latitude: the template is auto-mirrored; for the vertical dial mount it on a north-facing wall.",
+  canvasAria:"{type} sundial at latitude {lat}°, time {tm}, day {dy} of year",
+  east:"east", west:"west",
+  l4T:"The analemma: Earth’s tilted signature",
+  l4B:"Mark the noon shadow tip every day and a figure-eight appears: axial tilt raises and lowers the sun, while Earth’s elliptical orbit produces the equation of time that nudges the shadow sideways. The dial records both motions at once.",
+  tips:["Drag horizontally on the face to change the time, vertically to change the day of year.","The gnomon angle equals your latitude exactly — move it and watch the triangle change.","At latitude 0 the equatorial dial lies perfectly flat (90° tilt).","The analemma draws on horizontal and vertical dials only.","Always print at 100% scale, or the dimensions will not match.","Save two designs and ghost-compare them from the library.","Correct your reading with the equation of time — February is the hardest month (−14 min)."],
+  tipsK:"Tip", stExports:"{n} exports on this device", tsCmpOff:"Comparison off",
+  load:"Load", del:"Delete", glueHere:"glue here",
+  triScale:"Triangle at {p}% scale — print the full page for true size",
+  ctl123:"Dial types: 1 horizontal · 2 equatorial · 3 vertical",
+  ctlAM:"Toggle the analemma (A) or moon border (M)",
+  week:"w", hUnit:"cm", inUnit:"in"
+}};
+
+/* ============================================================
+   02 · SAFE STORAGE & PERSISTENT STATE
+   ============================================================ */
+const store={mem:{},ok:false,init(){try{localStorage.setItem("_t1","1");localStorage.removeItem("_t1");this.ok=true}catch(e){this.ok=false}},get(k,d){try{if(this.ok){const v=localStorage.getItem(k);if(v!=null)return JSON.parse(v)}}catch(e){}return k in this.mem?this.mem[k]:d},set(k,v){try{if(this.ok){localStorage.setItem(k,JSON.stringify(v));return}}catch(e){}this.mem[k]=v}};store.init();
+
+const LS={lang:"mizwala_lang",seen:"mizwala_seen",set:"mizwala_settings",cur:"mizwala_current",lib:"mizwala_library",stats:"mizwala_stats"};
+
+let LANG = store.get(LS.lang,"ar")==="en" ? "en" : "ar";
+function t(k,vars){
+  let s;
+  const L=I18N[LANG];
+  s=(L&&Object.prototype.hasOwnProperty.call(L,k))?L[k]:(Object.prototype.hasOwnProperty.call(I18N.en,k)?I18N.en[k]:k);
+  if(vars){for(const v in vars){s=s.split("{"+v+"}").join(String(vars[v]));}}
+  return s;
+}
+
+const CFG=Object.assign({sound:true,motion:true,units:"cm",lw:"normal",theme:"brass"},store.get(LS.set,{}));
+const S=Object.assign({
+  lat:33.5, type:"horizontal", style:"brass", numerals:"roman",
+  rose:true, moon:false, analemma:false,
+  timeMin:12*60, date:172, compare:null
+}, store.get(LS.cur,{}));
+S.lat=clamp(+S.lat||33.5,-66,66);
+S.timeMin=clamp(Math.round((+S.timeMin||720)/5)*5,240,1200);
+S.date=clamp(Math.round(+S.date||172),1,365);
+
+const PRESETS=[[33.51,0],[30.04,1],[51.51,2],[40.71,3],[21.39,4],[24.71,5],[35.68,6],[41.01,7],[34.02,8],[-6.21,9],[-33.92,10]];
+
+let saveTimer=null;
+function persistCurrent(){
+  if(saveTimer)clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{store.set(LS.cur,{lat:S.lat,type:S.type,style:S.style,numerals:S.numerals,
+    rose:S.rose,moon:S.moon,analemma:S.analemma,timeMin:S.timeMin,date:S.date,compare:S.compare});},250);
+}
+function persistCfg(){store.set(LS.set,CFG);}
+
+/* ============================================================
+   03 · AUDIO — lazy WebAudio, synthesized cues only
+   ============================================================ */
+const SND={
+  ctx:null,g:null,
+  ensure(){
+    if(this.ctx){ if(this.ctx.state==="suspended")this.ctx.resume().catch(()=>{}); return true; }
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return false;
+    try{
+      this.ctx=new AC();
+      this.g=this.ctx.createGain();
+      this.g.connect(this.ctx.destination);
+      this.vol();
+    }catch(e){return false;}
+    return true;
+  },
+  vol(){ if(this.g)this.g.gain.value=CFG.sound?0.5:0; },
+  tone(f0,f1,dur,type,vol,at){
+    if(!this.ctx||!CFG.sound)return;
+    const t0=this.ctx.currentTime+(at||0);
+    const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+    o.type=type; o.frequency.setValueAtTime(f0,t0);
+    if(f1&&f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t0+dur);
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(vol,t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g); g.connect(this.g);
+    o.start(t0); o.stop(t0+dur+0.05);
+  },
+  tick(){ this.tone(1180,880,0.10,"sine",0.16,0); },                       /* soft hour tick */
+  click(){ this.tone(640,640,0.045,"square",0.07,0); },                    /* toggle click   */
+  ok(){ this.tone(784,784,0.16,"sine",0.14,0); this.tone(1046,1046,0.28,"sine",0.13,0.11); }, /* export success */
+  warn(){ this.tone(210,170,0.20,"sine",0.12,0); }
+};
+window.addEventListener("pointerdown",()=>SND.ensure(),{capture:true,passive:true});
+window.addEventListener("keydown",()=>SND.ensure(),{capture:true,passive:true});
+
+/* ============================================================
+   04 · MATH / ASTRONOMY — real spherical trigonometry
+   ============================================================ */
+const MONTH_LEN=[31,28,31,30,31,30,31,31,30,31,30,31];
+const MONTH_CUM=[0,31,59,90,120,151,181,212,243,273,304,334];
+const EOT_M=[-10.5,-14.0,-9.0,-2.2,3.5,8.5,9.5,6.0,0.0,10.0,16.0,9.0];   /* monthly minutes, given */
+const EOT_MID=[15,46,74,105,135,166,196,227,258,288,319,349];            /* anchor: 15th of month  */
+
+/* solar declination δ = 23.44·sin(360/365·(N+284))° */
+function decl(d){ return 23.44*Math.sin((360/365)*(d+284)*RAD); }
+
+/* equation of time, minutes (positive ⇒ sundial ahead of clock) */
+function eot(d){
+  const M=EOT_M, mid=EOT_MID;
+  if(d<=mid[0]){ const k=(d+16)/(mid[0]+16); return M[11]+(M[0]-M[11])*k; }
+  for(let i=0;i<11;i++){
+    if(d<=mid[i+1]) return M[i]+(M[i+1]-M[i])*((d-mid[i])/(mid[i+1]-mid[i]));
+  }
+  const k=(d-mid[11])/(365+15-mid[11]); return M[11]+(M[0]-M[11])*k;
+}
+
+function dateFromDay(d){
+  let m=11; for(let i=0;i<12;i++){ if(d<=MONTH_CUM[i]+MONTH_LEN[i]){m=i;break;} }
+  return {m, dm:d-MONTH_CUM[m]};
+}
+
+/* hour angle H = 15°·(t−12h), t in hours */
+const hourAngle=h=>15*(h-12);
+
+/* sun direction in local ENU (east, north, up), unit length */
+function sunVec(phiDeg,decDeg,Hdeg){
+  const p=phiDeg*RAD, d=decDeg*RAD, H=Hdeg*RAD;
+  return {
+    E:-Math.cos(d)*Math.sin(H),
+    N: Math.cos(p)*Math.sin(d)-Math.sin(p)*Math.cos(d)*Math.cos(H),
+    U: Math.sin(p)*Math.sin(d)+Math.cos(p)*Math.cos(d)*Math.cos(H)
+  };
+}
+function altAz(phiDeg,decDeg,Hdeg){
+  const v=sunVec(phiDeg,decDeg,Hdeg);
+  const alt=Math.asin(clamp(v.U,-1,1))/RAD;
+  let az=Math.atan2(v.E,v.N)/RAD; if(az<0)az+=360;
+  return {alt,az,E:v.E,N:v.N,U:v.U};
+}
+const windName=az=>t("winds")[Math.round(((az%360)+360)%360/45)%8];
+
+/* hour-line geometry — the briefed formulas, implemented exactly:
+   horizontal: θ = atan( sin φ · tan H )   (mirrored per side by the sign of θ)
+   vertical:   θ = atan( cos φ · tan H )
+   equatorial: uniform 15° spokes */
+const GEO=new Map();
+function hourLines(type,lat){
+  const key=type+"|"+lat.toFixed(1);
+  if(GEO.has(key))return GEO.get(key);
+  const out=[];
+  if(type==="equatorial"){
+    for(let h=0;h<24;h++){ const H=hourAngle(h); out.push({h,H,th:H}); }
+  }else{
+    /* unwrap the tan(±90°) discontinuity so evening/early-morning lines
+       keep rotating past the horizontal instead of flipping sides */
+    const raw=h=>Math.atan(Math.tan(hourAngle(h)*RAD) * (type==="horizontal"?Math.sin(lat*RAD):Math.cos(lat*RAD)))/RAD;
+    out.push({h:12,H:0,th:0});
+    let prev=0;
+    for(let h=13;h<=20;h++){ let th=raw(h); while(th-prev>90)th-=180; while(prev-th>90)th+=180; prev=th; out.push({h,H:hourAngle(h),th}); }
+    prev=0;
+    for(let h=11;h>=4;h--){ let th=raw(h); while(th-prev>90)th-=180; while(prev-th>90)th+=180; prev=th; out.push({h,H:hourAngle(h),th}); }
+  }
+  GEO.set(key,out);
+  return out;
+}
+
+/* live shadow direction on the dial plane, canvas coords (x right, y down).
+   Canvas convention: the nearest celestial pole is drawn up-screen.
+   horizontal dial — shadow of the polar style on the ground plane:
+     dir ∝ ( −sinφ·E , cosφ·U − sinφ·N )
+   vertical dial — shadow of the descending polar fin on a south wall:
+     dir ∝ ( cosφ·E , sinφ·N − cosφ·U ), mirrored for southern latitudes. */
+function shadowDir(type,phiDeg,decDeg,Hdeg){
+  const s=phiDeg>=0?1:-1;
+  const p=phiDeg*RAD, d=decDeg*RAD, H=Hdeg*RAD;
+  const E=-Math.cos(d)*Math.sin(H);
+  const N= Math.cos(p)*Math.sin(d)-Math.sin(p)*Math.cos(d)*Math.cos(H);
+  const U= Math.sin(p)*Math.sin(d)+Math.cos(p)*Math.cos(d)*Math.cos(H);
+  if(type==="vertical"){
+    if(Math.abs(N)<1e-4)return null;
+    const t_=(-s*Math.cos(p))/N;             /* ray parameter for fin tip (unit length) */
+    const x=t_*(-E);
+    const z=(-s*Math.sin(p))+t_*(-U);
+    return {x:s*x, y:-z};
+  }
+  const x=-Math.sin(p)*E, y=Math.cos(p)*U-Math.sin(p)*N;
+  const len=Math.hypot(x,y);
+  if(len<1e-4)return null;
+  /* screen mapping (x2d, −y2d) is hemisphere-independent: for southern
+     latitudes sinφ already mirrors the hour lines and the nearest-pole-up
+     view convention mirrors the scene, so no extra flip here */
+  return {x:x/len, y:-y/len};
+}
+
+/* noon-shadow tip (analemma) on the dial plane, unit dial radius.
+   horizontal: distance from origin ∝ (φ−δ), toward the pole.
+   vertical:   wall drop = cosδ / sin(φ−δ) below the origin. */
+function noonTip(type,phiDeg,dec){
+  const s=phiDeg>=0?1:-1;
+  const dd=dec*RAD;
+  if(type==="horizontal"){
+    const L=clamp((phiDeg-dec)/80,-1.12,1.12);
+    return {x:0, y:-s*L};
+  }
+  if(type==="vertical"){
+    const gap=phiDeg-dec;
+    if(gap<=0.5)return null;                 /* sun behind the wall half of the year */
+    return {x:0, y:clamp(Math.cos(dd)/Math.sin(gap*RAD),0,2.2)};
+  }
+  return null;
+}
+
+/* gnomon dimensions in the active unit */
+function gnomonDims(){
+  const Rcm=12, k=CFG.units==="in"?1/2.54:1, u=CFG.units==="in"?t("inUnit"):t("hUnit");
+  const phi=Math.abs(S.lat);
+  return {
+    r:Rcm*k, u,
+    base:9*k,
+    height:9*k*Math.tan(phi*RAD),
+    edge:9*k/Math.max(0.2,Math.cos(phi*RAD)),
+    phi,
+    tilt:90-phi                                   /* equatorial face tilt off the ground */
+  };
+}
+
+/* hourly table rows for spec / print */
+function tableRows(){
+  const lines=hourLines(S.type,S.lat);
+  return lines.map(o=>({
+    h:o.h, H:o.H, th:Math.abs(o.th),
+    side:o.h===12?"—":(o.h<12?t("am"):t("pm"))
+  }));
+}
+/* ============================================================
+   07 · EXPORT — shared dial painter (template PNG + print sheet)
+   ($ helper from section 00 is reused here)
+   ============================================================ */
+const NM_KEY={roman:"nmRoman",arabic:"nmArabic",western:"nmWest"};
+const TYPE_KEY={horizontal:"tyHor",equatorial:"tyEq",vertical:"tyVer"};
+const stKey=(s)=>"st"+(s?s.charAt(0).toUpperCase()+s.slice(1):s);
+
+const STYLE_COL={
+  brass:{plate:"#c89a4b",rim:"#8a6420",line:"#3c2f14",txt:"#2c220c",sub:"#6b5626"},
+  stone:{plate:"#a89f8d",rim:"#6f6754",line:"#2e2a20",txt:"#241f16",sub:"#5a5343"},
+  slate:{plate:"#454b54",rim:"#23272d",line:"#dfe4ea",txt:"#eef1f5",sub:"#aab2bc"},
+  paper:{plate:"#f2e7cf",rim:"#b09a6a",line:"#40331c",txt:"#33291a",sub:"#7d6c4c"}
+};
+
+function faceFont(px,bold){
+  return (bold?"600 ":"")+px+"px "+(LANG==="ar"
+    ? "Tahoma,'Noto Kufi Arabic',sans-serif"
+    : "Georgia,'Times New Roman',serif");
+}
+
+/* hour-line direction on canvas (x right, y down); th in degrees.
+   horizontal/equatorial: noon ray points up-screen (nearest pole up).
+   vertical (south wall): the noon shadow falls straight down the wall. */
+function lineXY(type,thDeg,R){
+  const a=thDeg*RAD;
+  if(type==="vertical")return {x:Math.sin(a)*R, y:Math.cos(a)*R};
+  return {x:Math.sin(a)*R, y:-Math.cos(a)*R};
+}
+
+/* paint the current dial design into any 2d context.
+   opts.dims   — rim labels with the hour-line angles (tableRows data)
+   opts.gnomon — draw the polar style fin rising from the center   */
+function paintDial(ctx,cx,cy,R,rows,opts){
+  const o=opts||{};
+  const C=STYLE_COL[S.style]||STYLE_COL.brass;
+  const lwMul=CFG.lw==="thin"?0.7:(CFG.lw==="bold"?1.7:1);
+  ctx.save();
+  /* plate + rim */
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.fillStyle=C.plate;ctx.fill();
+  ctx.lineWidth=Math.max(2,R*0.02)*lwMul;ctx.strokeStyle=C.rim;ctx.stroke();
+  /* faint guide rings — help transfer the template by compass points */
+  if(o.dims){
+    ctx.save();
+    ctx.strokeStyle=C.sub;ctx.globalAlpha=0.25;ctx.lineWidth=1;
+    for(const rr of [0.5,0.65,0.85]){
+      ctx.beginPath();ctx.arc(cx,cy,R*rr,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.restore();
+  }
+  /* quarter-hour rim ticks (horizontal/vertical faces only) */
+  if(S.type!=="equatorial"){
+    ctx.save();ctx.strokeStyle=C.line;ctx.globalAlpha=0.5;
+    ctx.lineWidth=Math.max(1,R*0.006);
+    for(let i=0;i<48;i++){
+      const a=(i/48)*Math.PI*2;
+      const r1=R*0.965, r2=R*(i%4===0?0.92:0.945);
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.sin(a)*r1,cy-Math.cos(a)*r1);
+      ctx.lineTo(cx+Math.sin(a)*r2,cy-Math.cos(a)*r2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  /* hour lines from the real geometry */
+  const lines=hourLines(S.type,S.lat);
+  ctx.strokeStyle=C.line;
+  ctx.lineWidth=Math.max(1,R*0.012)*lwMul;
+  ctx.lineCap="round";
+  let lastA=-999;
+  for(const L of lines){
+    const p=lineXY(S.type,L.th,R);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+p.x,cy+p.y);ctx.stroke();
+    /* inner hour numerals (every 3rd hour keeps the face readable) */
+    if(L.h%3===0){
+      const q=lineXY(S.type,L.th,R*0.8);
+      ctx.fillStyle=C.txt;
+      ctx.font=faceFont(Math.max(10,R*0.085),true);
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillText(numFor(S.numerals,L.h),cx+q.x,cy+q.y);
+    }
+    if(o.dims&&rows){
+      /* dimension label: angle of this hour line, tableRows-sourced */
+      if(Math.abs(L.th-lastA)>=14){
+        lastA=L.th;
+        const q2=lineXY(S.type,L.th,R*1.16);
+        ctx.fillStyle=C.sub;
+        ctx.font=faceFont(Math.max(9,R*0.062),false);
+        ctx.textAlign="center";ctx.textBaseline="middle";
+        ctx.fillText((L.h===12?"0":Math.abs(L.th).toFixed(1))+"°",cx+q2.x,cy+q2.y);
+      }
+    }
+  }
+  /* center hub + decorations from the current design toggles */
+  if(S.rose){
+    /* compass rose — 8-point star; the cardinal points are longer */
+    ctx.save();
+    for(const d of [0,45,90,135,180,225,270,315]){
+      const a=d*RAD, main=d%90===0;
+      const r1=R*(main?0.30:0.18), r2=R*0.055;
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.sin(a)*r1,cy-Math.cos(a)*r1);
+      ctx.lineTo(cx+Math.sin(a+2.22)*r2,cy-Math.cos(a+2.22)*r2);
+      ctx.lineTo(cx+Math.sin(a-2.22)*r2,cy-Math.cos(a-2.22)*r2);
+      ctx.closePath();
+      ctx.fillStyle=main?C.rim:C.sub;
+      ctx.fill();
+    }
+    if(S.type==="horizontal"){        /* pole direction label */
+      const n0=lineXY(S.type,0,R*0.42);
+      ctx.fillStyle=C.txt;
+      ctx.font=faceFont(Math.max(9,R*0.07),true);
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillText(t("north").charAt(0),cx+n0.x,cy+n0.y);
+    }
+    ctx.restore();
+  }
+  if(S.moon){
+    /* moon-phase border — eight glyphs riding just outside the rim */
+    ctx.save();
+    ctx.fillStyle=C.txt;
+    ctx.font=faceFont(Math.max(10,R*0.08),false);
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    const ph=["●","◐","○","◑","●","◐","○","◑"];
+    for(let i=0;i<8;i++){
+      const a=(i/8)*Math.PI*2;
+      ctx.fillText(ph[i],cx+Math.sin(a)*R*1.08,cy-Math.cos(a)*R*1.08);
+    }
+    ctx.restore();
+  }
+  if(S.analemma){
+    /* figure-8 traced by the noon shadow tip across the whole year */
+    ctx.save();
+    ctx.strokeStyle=C.txt;ctx.globalAlpha=0.85;
+    ctx.lineWidth=Math.max(1.2,R*0.009);
+    ctx.beginPath();
+    let pen=false;
+    for(let d=1;d<=365;d++){
+      const tip=noonTip(S.type,S.lat,decl(d));
+      if(!tip){pen=false;continue;}
+      const px2=cx+tip.x*R, py2=cy+tip.y*R;
+      if(pen)ctx.lineTo(px2,py2);else{ctx.moveTo(px2,py2);pen=true;}
+    }
+    ctx.stroke();ctx.restore();
+  }
+  if(o.dayArc){
+    /* today's shadow-tip sweep — uses the live sun geometry */
+    ctx.save();
+    ctx.strokeStyle=C.txt;ctx.globalAlpha=0.6;
+    ctx.lineWidth=Math.max(1,R*0.008);
+    ctx.setLineDash([6,5]);
+    ctx.beginPath();
+    let pen2=false;
+    for(let H=-180;H<=180;H+=2){
+      const sh=shadowDir(S.type,S.lat,decl(S.date),H);
+      if(!sh){pen2=false;continue;}
+      const px2=cx+sh.x*R*0.94, py2=cy+sh.y*R*0.94;
+      if(pen2)ctx.lineTo(px2,py2);else{ctx.moveTo(px2,py2);pen2=true;}
+    }
+    ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(cx,cy,Math.max(2.5,R*0.02),0,Math.PI*2);
+  ctx.fillStyle=C.rim;ctx.fill();
+  if(o.gnomon){
+    const rise=Math.max(6,R*0.16);
+    const drop=R*0.36*Math.tan(Math.abs(S.lat)*RAD);
+    ctx.strokeStyle=C.txt;ctx.lineWidth=Math.max(2,R*0.02);
+    ctx.beginPath();ctx.moveTo(cx,cy+drop);ctx.lineTo(cx,cy-rise);ctx.stroke();
+  }
+  ctx.restore();
+  return lines;
+}
+
+/* keep the live #dial canvas showing the current design */
+function renderLive(){
+  const cv=$("dial"); if(!cv)return;
+  const w=cv.clientWidth||640, h=cv.clientHeight||640;
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext("2d"); if(!ctx)return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  paintDial(ctx,w/2,h/2,Math.min(w,h)/2-30,null,{gnomon:true});
+}
+
+/* toasts (no alert/confirm/prompt anywhere in this app) */
+function toast(msg,kind){
+  const box=$("toasts"); if(!box)return;
+  const el=document.createElement("div");
+  el.className="toast"+(kind?" "+kind:"");
+  el.setAttribute("role","status");
+  el.textContent=msg;
+  box.appendChild(el);
+  while(box.children.length>3)box.removeChild(box.firstChild);
+  setTimeout(()=>{el.classList.add("out");setTimeout(()=>el.remove(),340);},2600);
+}
+
+/* overlay helpers — also serve every existing data-close button */
+function openOv(id){const o=$(id); if(o){o.style.display="grid";const f=o.querySelector(".x");if(f)f.focus();}}
+function closeOv(id){const o=$(id); if(o)o.style.display="";}
+
+/* ============================================================
+   08 · EXPORT — PNG template (portrait 1200×1600)
+   ============================================================ */
+function drawGnomonCut(ctx,x,y,labelFont){
+  const g=gnomonDims();
+  const k=340/Math.max(0.5,g.base);          /* base always 340px wide  */
+  const W=g.base*k, H=g.height*k;
+  ctx.save();
+  ctx.strokeStyle="#5a4632";ctx.lineWidth=2;
+  ctx.fillStyle="rgba(224,168,60,.18)";
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+W,y);ctx.lineTo(x,y-H);ctx.closePath();
+  ctx.fill();ctx.stroke();
+  /* dashed glue tab behind the base — papercraft fold-and-paste strip */
+  ctx.setLineDash([5,4]);
+  ctx.strokeRect(x+8,y+3,W-16,16);
+  ctx.setLineDash([]);
+  /* drafting arc marking φ at the right-angle vertex */
+  ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(x,y,Math.min(34,H*0.5),-g.phi*RAD,0);ctx.stroke();
+  ctx.fillStyle="#33291a";ctx.font=labelFont;
+  ctx.textAlign="right";ctx.textBaseline="middle";
+  ctx.fillText(g.height.toFixed(1)+" "+g.u,x-10,y-H/2);
+  ctx.textAlign="center";ctx.textBaseline="top";
+  ctx.fillText(g.base.toFixed(1)+" "+g.u,x+W/2,y+8);
+  ctx.textAlign="left";ctx.textBaseline="middle";
+  ctx.fillText(g.edge.toFixed(1)+" "+g.u,x+W*0.66,y-H*0.68);
+  ctx.fillText("φ = "+g.phi.toFixed(1)+"°",x+W*0.3,y-H*0.16);
+  if(S.type==="equatorial"){                 /* face tilt note */
+    ctx.textBaseline="top";
+    ctx.fillText(g.tilt.toFixed(1)+"°",x+W*0.3,y+8);
+  }
+  ctx.restore();
+}
+
+function exportTemplatePNG(){
+  const cv=document.createElement("canvas");
+  cv.width=1200; cv.height=1600;
+  const ctx=cv.getContext("2d"); if(!ctx)return;
+  /* paper background + title block */
+  ctx.fillStyle="#fdfaf2";ctx.fillRect(0,0,1200,1600);
+  ctx.fillStyle="#2c2416";ctx.textAlign="center";ctx.textBaseline="alphabetic";
+  ctx.font=faceFont(46,true);
+  ctx.fillText(t("tplT"),600,90);
+  ctx.fillStyle="#6b5c40";ctx.font=faceFont(26,false);
+  ctx.fillText(t("tplSub",{lat:S.lat.toFixed(2)})
+    +" · "+t("gType")+" "+t(TYPE_KEY[S.type]||S.type)
+    +" · "+t("gStyle")+" "+t(stKey(S.style)),600,138);
+  /* build-day astronomy line — declination + equation of time */
+  ctx.fillStyle="#8a7a58";ctx.font=faceFont(20,false);
+  ctx.fillText(t("gDate")+" "+S.date+" · δ "+decl(S.date).toFixed(1)
+    +"° · "+t("gEot")+" "+eot(S.date).toFixed(1)+"′",600,172);
+  /* the dial, with hour-line dimension labels from tableRows */
+  paintDial(ctx,600,560,400,tableRows(),{dims:true,dayArc:true});
+  /* gnomon cut-out panel */
+  ctx.fillStyle="#2c2416";ctx.font=faceFont(30,true);
+  ctx.fillText(t("tplDim"),600,1082);
+  ctx.font=faceFont(26,true);
+  ctx.fillText(t("tplGno"),600,1146);
+  drawGnomonCut(ctx,430,1466,faceFont(20,false));
+  ctx.fillStyle="#7d6c4c";ctx.font=faceFont(20,false);ctx.textAlign="center";
+  ctx.fillText(t("prTip"),600,1534);
+  ctx.fillStyle="#9a8a6a";ctx.font=faceFont(17,false);
+  ctx.fillText(t("credit")+" · "+t("verLine"),600,1572);
+  /* download + toast + running export counter (uses existing LS.stats) */
+  const url=cv.toDataURL("image/png");
+  const a=document.createElement("a");
+  a.href=url; a.download="mizwala-template.png";
+  document.body.appendChild(a); a.click(); a.remove();
+  const n=((store.get(LS.stats,0)|0)+1);
+  store.set(LS.stats,n);
+  SND.ok();
+  toast(t("expOk")+" · "+t("stExports",{n}));
+}
+
+/* ============================================================
+   09 · EXPORT — print sheet + clipboard specs
+   ============================================================ */
+function buildStepsText(){
+  const g=gnomonDims();
+  const head=t("tplT")+" — "+t("tplSub",{lat:S.lat.toFixed(2)});
+  const body=t("prSteps").map((s,i)=>(i+1)+". "+s.split("{lat}").join(g.phi.toFixed(1)));
+  return head+"\n\n"+body.join("\n")+"\n\n"+t("prTip");
+}
+
+function copyText(txt,okMsg){
+  const done=()=>{SND.ok();toast(okMsg);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(()=>copyFallback(txt));
+  }else{
+    copyFallback(txt);
+  }
+}
+
+/* fallback: readonly auto-selected textarea inside the existing modal */
+function copyFallback(txt){
+  const ta=$("copyTa"); if(!ta)return;
+  ta.value=txt;
+  openOv("ovCopy");
+  ta.focus();
+  ta.select();
+  try{ta.setSelectionRange(0,txt.length);}catch(e){}
+}
+
+function copyJSON(){
+  const g=gnomonDims();
+  const spec={
+    app:"mizwala", spec:1,
+    latitude:+S.lat.toFixed(2),
+    type:S.type, style:S.style, numerals:S.numerals, units:CFG.units,
+    gnomon:{phiDeg:+g.phi.toFixed(1), tiltDeg:+g.tilt.toFixed(1),
+            base:+g.base.toFixed(2), height:+g.height.toFixed(2),
+            edge:+g.edge.toFixed(2), unit:g.u},
+    hourLines:hourLines(S.type,S.lat).map(o=>({h:o.h, hourAngle:+o.H.toFixed(2), dialAngle:+o.th.toFixed(2)})),
+    equationOfTimeMinutes:EOT_M.slice()
+  };
+  copyText(JSON.stringify(spec,null,2),t("cpOk"));
+}
+
+function copySteps(){
+  copyText(buildStepsText(),t("cpOk"));
+}
+
+function fillPrintSheet(){
+  const g0=gnomonDims();
+  $("prTitle").textContent=t("tplT");
+  $("prSub").textContent=t("tplSub",{lat:S.lat.toFixed(2)})
+    +" · "+t("gType")+" "+t(TYPE_KEY[S.type]||S.type)
+    +" · "+t("gStyle")+" "+t(stKey(S.style))
+    +" · "+t("gNum")+" "+t(NM_KEY[S.numerals]||S.numerals)
+    +" · φ "+g0.phi.toFixed(1)+"° · "+t("gEot")+" "+eot(S.date).toFixed(1)+"′";
+  /* 1:1-ish dial + dimension labels */
+  const pc=$("printCanvas");
+  const pctx=pc&&pc.getContext("2d");
+  if(pctx){
+    pctx.clearRect(0,0,pc.width,pc.height);
+    paintDial(pctx,pc.width/2,pc.height/2,pc.width/2-70,tableRows(),{dims:true});
+  }
+  /* hour-line table */
+  const tb=$("prTable");
+  if(tb){
+    let html="<tr><th>"+t("prColH")+"</th><th>"+t("prColSide")+"</th><th>"+t("prColA")+"</th></tr>";
+    for(const r of tableRows()){
+      html+="<tr><td>"+numFor(S.numerals,r.h)+"</td><td>"+esc(r.side)+"</td><td>"+r.th.toFixed(1)+"°</td></tr>";
+    }
+    tb.innerHTML=html;
+  }
+  /* monthly equation-of-time strip (fast/slow at a glance) */
+  $("prEotT").textContent=t("prEotH");
+  const et=$("prEot");
+  if(et){
+    const mon=t("months");
+    let html="<tr>";
+    for(let i=0;i<12;i++)html+="<th>"+esc(mon[i])+"</th>";
+    html+="</tr><tr>";
+    for(let i=0;i<12;i++){
+      html+="<td><b class=\""+(EOT_M[i]>=0?"fast":"slow")+"\">"
+          +(EOT_M[i]>0?"+":"")+EOT_M[i]+"</b></td>";
+    }
+    et.innerHTML=html+"</tr>";
+  }
+  /* six numbered build steps */
+  $("prStepsT").textContent=t("prStepsH");
+  const ol=$("prSteps");
+  if(ol){
+    const g=gnomonDims();
+    ol.innerHTML=t("prSteps")
+      .map(s=>"<li>"+esc(s.split("{lat}").join(g.phi.toFixed(1)))+"</li>").join("");
+  }
+  $("prFoot").textContent=t("credit")+" · "+t("prTip");
+}
+
+function printSheet(){
+  fillPrintSheet();
+  setTimeout(()=>window.print(),60);   /* let the DOM settle first */
+}
+
+/* ============================================================
+   10 · TIPS ROTATOR — cycles real sundial facts over the stage
+   ============================================================ */
+let tipIdx=0, tipTimer=null;
+const TIP_MS=9000;
+function showTip(i){
+  const tips=t("tips");
+  if(!tips||!tips.length)return;
+  tipIdx=((i%tips.length)+tips.length)%tips.length;
+  const el=$("tipTxt"), k=$("tipK");
+  if(el){el.textContent=tips[tipIdx];el.classList.remove("in");void el.offsetWidth;el.classList.add("in");}
+  if(k)k.textContent=t("tipsK")+" "+(tipIdx+1)+"/"+tips.length;
+  buildDots();
+}
+/* one dot per fact — click to jump straight to it */
+function buildDots(){
+  const tips=t("tips"), box=$("tipDots");
+  if(!box||!tips||!tips.length)return;
+  if(box.children.length!==tips.length){
+    box.innerHTML="";
+    tips.forEach((_,i)=>{
+      const b=document.createElement("button");
+      b.type="button"; b.className="tipdot";
+      b.setAttribute("aria-label",""+(i+1)+" / "+tips.length);
+      b.addEventListener("click",()=>{showTip(i);restartTips();});
+      box.appendChild(b);
+    });
+  }
+  const kids=box.children;
+  for(let i=0;i<kids.length;i++)kids[i].classList.toggle("on",i===tipIdx);
+}
+function tipStep(d){showTip(tipIdx+d);restartTips();}
+function restartTips(){
+  if(tipTimer)clearInterval(tipTimer);
+  if(CFG.motion)tipTimer=setInterval(()=>showTip(tipIdx+1),TIP_MS);
+}
+function initTips(){
+  showTip(Math.floor(Math.random()*97));
+  restartTips();
+  const strip=$("tipStrip");
+  if(strip){
+    /* pause while the reader holds the strip, resume on leave */
+    strip.addEventListener("pointerenter",()=>{if(tipTimer){clearInterval(tipTimer);tipTimer=null;}});
+    strip.addEventListener("pointerleave",restartTips);
+    /* RTL-aware arrow keys when the strip has focus */
+    strip.addEventListener("keydown",e=>{
+      const fwd=LANG==="ar"?-1:1;
+      if(e.key==="ArrowRight"){tipStep(-fwd);e.preventDefault();}
+      if(e.key==="ArrowLeft"){tipStep(fwd);e.preventDefault();}
+    });
+  }
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden){if(tipTimer){clearInterval(tipTimer);tipTimer=null;}}
+    else restartTips();
+  });
+  window.addEventListener("focus",restartTips);
+}
+
+/* ============================================================
+   11 · BOOT — wire exports, rotator, dialogs, first paint
+   ============================================================ */
+function initExports(){
+  const on=(id,fn)=>{const b=$(id); if(b)b.addEventListener("click",fn);};
+  on("btnPng",exportTemplatePNG);
+  on("btnPrint",printSheet);
+  on("btnJson",copyJSON);
+  on("btnSteps",copySteps);
+  on("tipPrev",()=>tipStep(-1));
+  on("tipNext",()=>tipStep(1));
+  on("anlBtn",()=>openOv("ovAnl"));
+  /* every [data-close] button (existing + new) closes its overlay */
+  document.addEventListener("click",e=>{
+    const c=e.target.closest("[data-close]");
+    if(c)closeOv(c.getAttribute("data-close"));
+  });
+  /* Escape closes the dialogs this module owns */
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){closeOv("ovAnl");closeOv("ovCopy");}
+  });
+}
+
+/* ===== day sweep: rAF playback of the sun across the day ===== */
+let sweepOn=false, sweepRaf=0, sweepLast=0, sweepHour=0;
+function toggleSweep(){
+  sweepOn=!sweepOn;
+  const b=$("playDay");
+  if(b && b.firstChild) b.firstChild.nodeValue = sweepOn ? "⏸ " : "▶ ";
+  if(sweepOn){
+    if(!CFG.motion){ sweepOn=false; if(b && b.firstChild) b.firstChild.nodeValue="▶ "; toast(t("sweepOff")); return; }
+    sweepLast=0; sweepHour=Math.floor(parseFloat($("timeR").value)/12);
+    sweepRaf=requestAnimationFrame(stepSweep);
+    toast(t("sweepOn"));
+  }else{
+    cancelAnimationFrame(sweepRaf);
+    toast(t("sweepOff"));
+  }
+}
+function stepSweep(ts){
+  if(!sweepOn) return;
+  if(!sweepLast) sweepLast=ts;
+  const dt=Math.min(50, ts-sweepLast); sweepLast=ts;
+  const r=$("timeR");
+  let v=parseFloat(r.value)+dt*0.014;   /* full daylight span ≈ 14 s */
+  if(v>192){ v=0; sweepHour=0; }
+  r.value=String(Math.round(v));
+  const h=Math.floor(v/12);
+  if(h!==sweepHour){ sweepHour=h; if(CFG.sound && SND.tick) SND.tick(); }
+  renderLive();
+  sweepRaf=requestAnimationFrame(stepSweep);
+}
+function initSweep(){
+  const pd=$("playDay");
+  if(pd) pd.addEventListener("click", toggleSweep);
+}
+
+function init(){
+  renderLive();          /* first paint of the live dial          */
+  initTips();            /* facts rotator over the stage          */
+  initExports();         /* PNG / print / copy buttons + dialogs  */
+  initSweep();           /* day-sweep playback button             */
+  window.addEventListener("resize",renderLive,{passive:true});
+}
+init();
+</script>
+
+</body>
+</html>
